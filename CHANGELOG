@@ -1,3 +1,7 @@
+2003-05-22  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fixed typo reported by David Wilson (DMI case 6).
+
 2003-03-08  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Decoded more fields according to the IPMI specification

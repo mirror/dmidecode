@@ -1228,7 +1228,7 @@ static void dmi_memory_module_types(u16 code, const char *sep)
 		"FPM",
 		"EDO",
 		"Parity",
-		"EDD",
+		"ECC",
 		"SIMM",
 		"DIMM",
 		"Burst EDO",
