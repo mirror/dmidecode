@@ -145,14 +145,6 @@
  *  - DMTF Master MIF version 020507
  *    "DMTF approved standard groups"
  *    http://www.dmtf.org/standards/standard_dmi.php
- *
- * Thanks to:
- *   Werner Heuser
- *   Alexandre Duret-Lutz
- *   Xavier Roche
- *   Pam Huntley
- *   Gael Stephan
- *   Sebastian Henschel
  */
 
 #include <sys/types.h>

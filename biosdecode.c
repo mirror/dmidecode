@@ -50,14 +50,6 @@
  *  - Microsoft "PCI IRQ Routing Table Specification"
  *    Version 1.0
  *    http://www.microsoft.com/hwdev/archive/BUSBIOS/pciirq.asp
- *
- * Thanks to:
- *   Werner Heuser
- *   Alexandre Duret-Lutz
- *   Xavier Roche
- *   Pam Huntley
- *   Gael Stephan
- *   Sebastian Henschel
  */
 
 #include <sys/types.h>
