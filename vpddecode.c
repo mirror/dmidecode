@@ -45,6 +45,8 @@
 static const char *product_name(const char *id)
 {
 	static const char *name[]={
+		"AP", "eServer xSeries 336", /* added 2005-02-01,
+		                                reported by David Rosala */
 		"GE", "eServer xSeries 345", /* added 2004-06-11,
 		                                reported by Doug Brenner */
 		"HR", "Thinkpad 650E",
@@ -86,6 +88,8 @@ static const char *product_name(const char *id)
 		"IZ", "Thinkpad X20 or X21", /* updated 2003-11-29 (IBM) */
 		"JP", "eServer xSeries 205", /* added 2004-04-30,
 		                                reported by Bernd Krumboeck */
+		"KP", "eServer xSeries 346", /* added 2005-02-01,
+		                                reported by David Rosala */
 		"KQ", "Thinkpad i1200 or i1300",
 		"KR", "Thinkpad i1400 or i1500",
 		"KS", "Thinkpad 240X",
@@ -113,6 +117,8 @@ static const char *product_name(const char *id)
 		                         reported by Ramiro Barreiro */
 		"RE", "eServer xSeries 445", /* added 2003-12-17,
 		                                reported by Josef Moellers */
+		"RD", "eServer xSeries 365", /* added 2005-02-01,
+		                                reported by David Rosala */
 		"T2", "eServer xSeries 335", /* added 2004-06-11,
 		                                reported by Doug Brenner */
 		"TT", "eServer xSeries 330", /* added 2003-12-03,
