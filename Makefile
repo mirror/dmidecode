@@ -49,19 +49,19 @@ vpddecode : vpddecode.o util.o
 # Objects
 #
 
-dmidecode.o : dmidecode.c version.h types.h util.h
+dmidecode.o : dmidecode.c version.h types.h util.h config.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-biosdecode.o : biosdecode.c version.h types.h util.h
+biosdecode.o : biosdecode.c version.h types.h util.h config.h 
 	$(CC) $(CFLAGS) -c $< -o $@
 
-ownership.o : ownership.c types.h util.h
+ownership.o : ownership.c types.h util.h config.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-vpddecode.o : vpddecode.c version.h types.h util.h
+vpddecode.o : vpddecode.c version.h types.h util.h config.h 
 	$(CC) $(CFLAGS) -c $< -o $@
 
-util.o : util.c types.h util.h
+util.o : util.c types.h util.h config.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 #
