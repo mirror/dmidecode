@@ -26,7 +26,7 @@
  *
  * Unless specified otherwise, all references are aimed at the "System
  * Management BIOS Reference Specification, Version 2.3.4" document,
- * available from http://www.dmtf.org/standards/bios.php.
+ * available from http://www.dmtf.org/standards/smbios.
  *
  * Note to contributors:
  * Please reference every value you add or modify, especially if the
@@ -38,7 +38,7 @@
  *    http://developer.intel.com/design/xeon/applnots/241618.htm
  *  - DMTF Master MIF version 030621
  *    "DMTF approved standard groups"
- *    http://www.dmtf.org/standards/standard_dmi.php
+ *    http://www.dmtf.org/standards/dmi
  *  - IPMI 1.5 revision 1.1
  *    "Intelligent Platform Management Interface Specification"
  *    http://developer.intel.com/design/servers/ipmi/spec.htm
@@ -957,7 +957,8 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 	|| (type>=0x18 && type<=0x1D) || type==0x1F /* AMD */
 	|| (type>=0xB0 && type<=0xB3) /* Intel */
 	|| (type>=0xB5 && type<=0xB7) /* Intel, AMD */
-	|| (type==0x84)) /* AMD Opteron */
+	|| (type==0xB9) /* Intel */
+	|| (type==0x83 || type==0x84)) /* AMD 64-bit */
 		cpuid=1;
 	else if(type==0x01)
 	{
