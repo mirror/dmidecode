@@ -1,3 +1,11 @@
+2004-11-22  Jean Delvare  <khali@linux-fr.org>
+
+	* biosdecode.c: Avoid size_t in printf. Should remove a warning on
+	  ia64. Thanks to Petter Reinholdtsen for reporting.
+	* util.c: Use sysconf(_SC_PAGESIZE) instead of getpagesize() where
+	  available. This may remove a warning on ia64 as a side effect.
+	  Thanks to Petter Reinholdtsen for reporting.
+
 2004-11-21  Jean Delvare  <khali@linux-fr.org>
 
 	* util.c, util.h: Function myread has no more user outside of util.c.
