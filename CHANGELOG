@@ -1,3 +1,12 @@
+2004-10-14  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Search for EFI systab at /sys/firmware/efi/systab.
+	  Original patch from Alex Williamson.
+	* dmidecode.c: Remove warning about legacy_decode not being used
+	  when USE_EFI is defined.
+	* dmidecode.c: Detect missing SMBIOS entry point in efi/systab.
+	* dmidecode.c: Fix fatal typo in USE_EFI-specific code.
+
 2004-10-01  Roberto Nibali  <ratz@tac.ch>
 
 	* Makefile: Be LDFLAGS aware.
