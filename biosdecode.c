@@ -27,7 +27,7 @@
  * References:
  *  - DMTF "System Management BIOS Reference Specification"
  *    Version 2.3.4
- *    http://www.dmtf.org/standards/bios.php.
+ *    http://www.dmtf.org/standards/smbios
  *	- Intel "Preboot Execution Environment (PXE) Specification"
  *    Version 2.1
  *    http://www.intel.com/labs/manage/wfm/wfmspecs.htm
@@ -47,7 +47,7 @@
  *    First Edition
  *    http://h18000.www1.hp.com/support/techpubs/technical_reference_guides/113a1097.html
  *  - IBM "Using the BIOS Build ID to identify IBM Thinkpad systems"
- *    Modified 2003-08-21
+ *    Revision "November 17, 2003"
  *    http://www.pc.ibm.com/qtechinfo/MIGR-45120.html
  */
 
