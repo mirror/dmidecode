@@ -28,6 +28,12 @@ mandir  = $(prefix)/share/man
 man8dir = $(mandir)/man8
 docdir  = $(prefix)/share/doc/dmidecode
 
+INSTALL         := install
+INSTALL_DATA    := $(INSTALL) -m 644
+INSTALL_DIR     := $(INSTALL) -m 755 -d
+INSTALL_PROGRAM := $(INSTALL) -m 755
+RM              := rm -f
+
 all : dmidecode biosdecode ownership vpddecode
 
 #
@@ -77,39 +83,39 @@ install : install-bin install-man install-doc
 uninstall : uninstall-bin uninstall-man uninstall-doc
 
 install-bin : all
-	install -d $(DESTDIR)$(sbindir)
-	install -m 755 dmidecode $(DESTDIR)$(sbindir)
-	install -m 755 biosdecode $(DESTDIR)$(sbindir)
-	install -m 755 ownership $(DESTDIR)$(sbindir)
-	install -m 755 vpddecode $(DESTDIR)$(sbindir)
+	$(INSTALL_DIR) $(DESTDIR)$(sbindir)
+	$(INSTALL_PROGRAM) dmidecode $(DESTDIR)$(sbindir)
+	$(INSTALL_PROGRAM) biosdecode $(DESTDIR)$(sbindir)
+	$(INSTALL_PROGRAM) ownership $(DESTDIR)$(sbindir)
+	$(INSTALL_PROGRAM) vpddecode $(DESTDIR)$(sbindir)
 
 uninstall-bin :
-	rm -f $(DESTDIR)$(sbindir)/dmidecode
-	rm -f $(DESTDIR)$(sbindir)/biosdecode
-	rm -f $(DESTDIR)$(sbindir)/ownership
-	rm -f $(DESTDIR)$(sbindir)/vpddecode
+	$(RM) $(DESTDIR)$(sbindir)/dmidecode
+	$(RM) $(DESTDIR)$(sbindir)/biosdecode
+	$(RM) $(DESTDIR)$(sbindir)/ownership
+	$(RM) $(DESTDIR)$(sbindir)/vpddecode
 
 install-man :
-	install -d $(DESTDIR)$(man8dir)
-	install -m 644 man/dmidecode.8 $(DESTDIR)$(man8dir)
-	install -m 644 man/biosdecode.8 $(DESTDIR)$(man8dir)
-	install -m 644 man/ownership.8 $(DESTDIR)$(man8dir)
-	install -m 644 man/vpddecode.8 $(DESTDIR)$(man8dir)
+	$(INSTALL_DIR) $(DESTDIR)$(man8dir)
+	$(INSTALL_DATA) man/dmidecode.8 $(DESTDIR)$(man8dir)
+	$(INSTALL_DATA) man/biosdecode.8 $(DESTDIR)$(man8dir)
+	$(INSTALL_DATA) man/ownership.8 $(DESTDIR)$(man8dir)
+	$(INSTALL_DATA) man/vpddecode.8 $(DESTDIR)$(man8dir)
 
 uninstall-man :
-	rm -f $(DESTDIR)$(man8dir)/dmidecode.8
-	rm -f $(DESTDIR)$(man8dir)/biosdecode.8
-	rm -f $(DESTDIR)$(man8dir)/ownership.8
-	rm -f $(DESTDIR)$(man8dir)/vpddecode.8
+	$(RM) $(DESTDIR)$(man8dir)/dmidecode.8
+	$(RM) $(DESTDIR)$(man8dir)/biosdecode.8
+	$(RM) $(DESTDIR)$(man8dir)/ownership.8
+	$(RM) $(DESTDIR)$(man8dir)/vpddecode.8
 
 install-doc :
-	install -d $(DESTDIR)$(docdir)
-	install -m 644 README $(DESTDIR)$(docdir)
-	install -m 644 CHANGELOG $(DESTDIR)$(docdir)
-	install -m 644 AUTHORS $(DESTDIR)$(docdir)
+	$(INSTALL_DIR) $(DESTDIR)$(docdir)
+	$(INSTALL_DATA) README $(DESTDIR)$(docdir)
+	$(INSTALL_DATA) CHANGELOG $(DESTDIR)$(docdir)
+	$(INSTALL_DATA) AUTHORS $(DESTDIR)$(docdir)
 
 uninstall-doc :
-	rm -rf $(DESTDIR)$(docdir)
+	$(RM) -r $(DESTDIR)$(docdir)
 
 clean :
-	rm -f *.o dmidecode biosdecode ownership vpddecode core
+	$(RM) *.o dmidecode biosdecode ownership vpddecode core
