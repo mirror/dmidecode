@@ -1,3 +1,13 @@
+2004-11-10  Jean Delvare  <khali@linux-fr.org>
+
+	* README: Update dmidecode presentation (copied from the web page).
+	  Move the list of supported systems from the documentation section
+	  to the installation section.
+
+2004-11-09  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Update product ID "1R". Reported by Marco Wertejuk.
+
 2004-10-24  Jean Delvare  <khali@linux-fr.org>
 
 	* util.c: Workaround missing MAP_FAILED definition, needed on
