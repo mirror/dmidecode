@@ -92,6 +92,9 @@ static const char *product_name(const char *id)
 		"KU", "Thinkpad A21e",
 		"KV", "Transnote",
 		"KW", "Thinkpad i1200 or i1300",
+		"KX", "Thinkpad A21m or A22m", /* added 2003-11-11,
+		                                  reported by Klaus Ade Johnstad,
+		                                  confirmed by Pamela Huntley */
 		"KY", "Thinkpad A21m or A22m",
 		"KZ", "Thinkpad A21p or A22p",
 		"10", "Thinkpad A21e or A22e",
