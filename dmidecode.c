@@ -3750,7 +3750,11 @@ static void dmi_decode(u8 *data, u16 ver)
 	}
 }
 		
+#ifdef USE_MMAP
+static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, __attribute__ ((unused)) const char *pname, __attribute__ ((unused)) const char *devmem)
+#else /* USE_MMAP */
 static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *pname, const char *devmem)
+#endif /* USE_MMAP */
 {
 	u8 *buf;
 	u8 *data;
@@ -3769,7 +3773,13 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 #ifdef USE_MMAP
 	psize=getpagesize();
 	mmbase=div(base, psize);
-	mmp=mmap(0, mmbase.rem+len, PROT_READ, MAP_PRIVATE, fd, mmbase.quot*psize);
+	/*
+	 * We need PROT_WRITE for ASCII filtering in dmi_string. Do NOT change MAP_PRIVATE
+	 * to MAP_SHARED unless you also remove PROT_WRITE and disable ASCII filtering, because
+	 * we DO NOT WANT to write to /dev/mem. Thanks a lot to Gabriel Forte for helping
+	 * me hunting down an annoying bug related to this.
+	 */
+	mmp=mmap(0, mmbase.rem+len, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, mmbase.quot*psize);
     if(mmp==MAP_FAILED)
     {
        perror("mmap");
@@ -3824,26 +3834,51 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 		printf("Wrong DMI structures count: %d announced, only %d decoded.\n",
 			num, i);
 	if(data-buf!=len)
-		printf("Wrong DMI structures length: %d bytes announced, strutures occupy %d bytes.\n",
-			len, data-buf);
+		printf("Wrong DMI structures length: %d bytes announced, structures occupy %d bytes.\n",
+			len, (unsigned int)(data-buf));
 	
 #ifdef USE_MMAP
-	munmap(mmp, mmbase.rem+len);
+	if(munmap(mmp, mmbase.rem+len)==-1)
+		perror("munmap");
 #else /* USE_MMAP */
 	free(buf);
 #endif /* USE_MMAP */
 }
 
 
+static int smbios_decode(u8 *buf, int fd, const char *pname, const char *devmem)
+{
+	if(checksum(buf, buf[0x05])
+	 && memcmp(buf+0x10, "_DMI_", 5)==0
+	 && checksum(buf+0x10, 0x0F))
+	{
+		printf("SMBIOS %u.%u present.\n",
+			buf[0x06], buf[0x07]);
+		dmi_table(fd, DWORD(buf+0x18), WORD(buf+0x16), WORD(buf+0x1C),
+			(buf[0x06]<<8)+buf[0x07], pname, devmem);
+		return 1;
+	}
+	
+	return 0;
+}
+
 int main(int argc, const char *argv[])
 {
-	u8 buf[0x20];
 	int fd;
 	off_t fp=0xF0000, fp_last=0xFFFF0;
 	const char *devmem="/dev/mem";
 #ifdef __IA64__
-	FILE* efi_systab;
+	FILE *efi_systab;
 	char linebuf[64];
+#ifdef USE_MMAP
+	div_t mmbase;
+	size_t psize;
+	void *mmp;
+#else /* USE_MMAP */
+	u8 buf[0x20];
+#endif /* USE_MMAP */
+#else /* __IA64__ */
+	u8 buf[0x20];
 #endif /* __IA64__ */
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4 || '\0'!=0)
@@ -3875,13 +3910,39 @@ int main(int argc, const char *argv[])
 		if(strcmp(linebuf, "SMBIOS")==0)
 		{
 			fp=strtol(addr, NULL, 0);
-			printf("# SMBIOS entry point at 0x%08x\n", fp);
+			printf("# SMBIOS entry point at 0x%08lx\n", fp);
 			fp_last=fp+16;
 		}
 	}
 	if(fclose(efi_systab)!=0)
 		perror("/proc/efi/systab");
-#endif /* __IA64__ */
+
+#ifdef USE_MMAP
+	psize=getpagesize();
+	mmbase=div(fp, psize);
+	mmp=mmap(0, mmbase.rem+0x20, PROT_READ, MAP_PRIVATE, fd, mmbase.quot*psize);
+    if(mmp==MAP_FAILED)
+    {
+       perror(devmem);
+       exit(1);
+    }
+
+	smbios_decode(((u8 *)mmp)+mmbase.rem, fd, argv[0], devmem);
+
+	if(munmap(mmp, mmbase.rem+0x20)==-1)
+		perror("munmap");
+#else /* USE_MMAP */
+	if(lseek(fd, fp, SEEK_SET)==-1)
+	{
+		perror(devmem);
+		exit(1);
+	}
+	if(myread(fd, buf, 0x20, devmem)==-1)
+		exit(1);
+
+	smbios_decode(buf, fd, argv[0], devmem);
+#endif /* USE_MMAP */
+#else /* __IA64__ */
 	if(lseek(fd, fp, SEEK_SET)==-1)
 	{
 		perror(devmem);
@@ -3899,15 +3960,8 @@ int main(int argc, const char *argv[])
 				exit(1);
 			fp+=16;
 			
-			if(checksum(buf, buf[0x05])
-			 && memcmp(buf+0x10, "_DMI_", 5)==0
-			 && checksum(buf+0x10, 0x0F))
+			if(smbios_decode(buf, fd, argv[0], devmem))
 			{
-				printf("SMBIOS %u.%u present.\n",
-					buf[0x06], buf[0x07]);
-				dmi_table(fd, DWORD(buf+0x18), WORD(buf+0x16), WORD(buf+0x1C),
-					(buf[0x06]<<8)+buf[0x07], argv[0], devmem);
-				
 				/* dmi_table moved us far away */
 				lseek(fd, fp, SEEK_SET);
 			}
@@ -3924,6 +3978,7 @@ int main(int argc, const char *argv[])
 			lseek(fd, fp, SEEK_SET);
 		}
 	}
+#endif /* __IA64__ */
 	
 	if(close(fd)==-1)
 	{
