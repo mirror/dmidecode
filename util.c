@@ -116,7 +116,7 @@ void *mem_chunk(off_t base, off_t len, const char *devmem)
 	 * but to workaround problems many people encountered when trying
 	 * to read from /dev/mem using regular read() calls.
 	 */
-	mmp=mmap(0, mmoffset+len, PROT_READ, MAP_PRIVATE, fd, base-mmoffset);
+	mmp=mmap(0, mmoffset+len, PROT_READ, MAP_SHARED, fd, base-mmoffset);
 	if(mmp==MAP_FAILED)
 	{
 		fprintf(stderr, "%s: ", devmem);
