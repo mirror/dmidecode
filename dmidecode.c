@@ -33,7 +33,7 @@
  * information does not come from the above mentioned specification.
  *
  * Additional references:
- *	- Intel AP-485 revision 23
+ *  - Intel AP-485 revision 25
  *    "Intel Processor Identification and the CPUID Instruction"
  *    http://developer.intel.com/design/xeon/applnots/241618.htm
  *  - DMTF Master MIF version 030621
@@ -3837,9 +3837,7 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 	if(myread(fd, buf, len, devmem)==-1)
 	{
 		free(buf);
-		printf("Table is unreachable, sorry. Try compiling dmidecode with -DUSE_MMAP.\n"
-			"This problem is known on the IBM T23, T30 and X30 laptops, the Fujitsu-Siemens\n"
-			"S-4582 laptop as well as IA-64 systems. If your system differ, please report\n");
+		printf("Table is unreachable, sorry. Try compiling dmidecode with -DUSE_MMAP.\n");
 		exit(1);
 	}
 #endif /* USE_MMAP */
