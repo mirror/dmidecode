@@ -26,7 +26,7 @@
  *
  * References:
  *  - DMTF "System Management BIOS Reference Specification"
- *    Version 2.3.3
+ *    Version 2.3.4
  *    http://www.dmtf.org/standards/bios.php.
  *	- Intel "Preboot Execution Environment (PXE) Specification"
  *    Version 2.1
@@ -46,6 +46,9 @@
  *  - Compaq "Technical Reference Guide for Compaq Deskpro 4000 and 6000"
  *    First Edition
  *    http://h18000.www1.hp.com/support/techpubs/technical_reference_guides/113a1097.html
+ *  - IBM "Using the BIOS Build ID to identify IBM Thinkpad systems"
+ *    Modified 2003-08-21
+ *    http://www.pc.ibm.com/qtechinfo/MIGR-45120.html
  */
 
 #include <sys/types.h>
@@ -267,9 +270,9 @@ static size_t sony_length(const u8 *p)
 	return(p[0x05]);
 }
 
-static int sony_decode(const u8 *p, __attribute__ ((unused)) size_t len)
+static int sony_decode(const u8 *p, size_t len)
 {
-	if(!checksum(p, p[0x05]))
+	if(!checksum(p, len))
 		return 0;
 	
 	printf("Sony system detected.\n");
@@ -400,18 +403,23 @@ static size_t compaq_length(const u8 *p)
 
 static int compaq_decode(const u8 *p, __attribute__ ((unused)) size_t len)
 {
-	int i;
+	size_t i;
 
 	printf("Compaq-specific entries present.\n");
 
 	/* integrity checking (lack of checksum) */
 	for(i=0; i<p[4]; i++)
 	{
+		/*
+		 * We do not check for truncated entries, because the length was
+		 * computer from the number of records in compaq_length right above,
+		 * so it can't be wrong.
+		 */
 		if(p[5+i*10]!='$' || !(p[6+i*10]>='A' && p[6+i*10]<='Z')
 			|| !(p[7+i*10]>='A' && p[7+i*10]<='Z')
 			|| !(p[8+i*10]>='A' && p[8+i*10]<='Z'))
 		{
-			printf("\t Abnormal Entry! Please report. [%02X %02X %02X %02X]\n",
+			printf("\t Abnormal entry! Please report. [%02X %02X %02X %02X]\n",
 				p[5+i*10], p[6+i*10], p[7+i*10], p[8+i*10]);
 			return 0;
 		}
@@ -424,6 +432,42 @@ static int compaq_decode(const u8 *p, __attribute__ ((unused)) size_t len)
 			DWORD(p+9+i*10), WORD(p+13+i*10));
 	}
 
+	return 1;
+}
+
+/*
+ * VPD (vital product data, IBM-specific)
+ */
+
+static void vpd_print_entry(const char *name, const u8 *p, size_t len)
+{
+	size_t i;
+	
+	printf("\t%s: ", name);
+	for(i=0; i<len; i++)
+		if(p[i]>=32 && p[i]<127)
+			printf("%c", p[i]);
+	printf("\n");
+}
+
+static size_t vpd_length(const u8 *p)
+{
+	return (p[5]);
+}
+
+static int vpd_decode(const u8 *p, size_t len)
+{
+	/* The checksum does *not* include the first five bytes. */
+	if(len<0x30 || checksum(p+5, len-5))
+		return 0;
+	
+	printf("VPD present.\n");
+
+	vpd_print_entry("Bios Build ID", p+0x0D, 9);
+	vpd_print_entry("Box Serial Number", p+0x16, 7);
+	vpd_print_entry("Motherboard Serial Number", p+0x1D, 11);
+	vpd_print_entry("Machine Type/Model", p+0x28, 7);
+	
 	return 1;
 }
 
@@ -441,10 +485,11 @@ static struct bios_entry bios_entries[]={
 	{ "_32_", 0xE0000, 0xFFFFF, bios32_length, bios32_decode },
 	{ "$PIR", 0xF0000, 0xFFFFF, pir_length, pir_decode },
 	{ "32OS", 0xE0000, 0xFFFFF, compaq_length, compaq_decode },
+	{ "\252\125VPD", 0xF0000, 0xFFFFF, vpd_length, vpd_decode },
 	{ NULL, 0, 0, NULL, NULL }
 };
 
-int main(__attribute__ ((unused)) int argc, const char *argv[])
+int main(int argc, const char *argv[])
 {
 	u8 buf[16];
 	int fd;
