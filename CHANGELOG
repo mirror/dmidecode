@@ -1,3 +1,15 @@
+2004-03-24  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "PJ". Reported by Roger Koot.
+	* vpddecode.c: Rename two Netvista systems to use their real name
+	  instead of machine type.
+
+2004-03-20  Petter Reinholdtsen  <pere@hungry.com>
+
+	* Makefile: Make it easier to select where to install the binaries
+	  and manual pages, and to use different paths when building and
+	  installing.
+
 2004-03-19  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product ID "2A". Reported by Rafael Avila
