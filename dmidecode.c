@@ -3813,8 +3813,12 @@ int main(int argc, const char *argv[])
 {
 	u8 buf[0x20];
 	int fd;
-	off_t fp=0xF0000;
+	off_t fp=0xF0000, fp_last=0xFFFF0;
 	const char *devmem="/dev/mem";
+#ifdef __IA64__
+	FILE* efi_systab;
+	char linebuf[64];
+#endif
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4 || '\0'!=0)
 	{
@@ -3824,20 +3828,46 @@ int main(int argc, const char *argv[])
 	
 	if(argc>=2)
 		devmem=argv[1];
-	if((fd=open(devmem, O_RDONLY))==-1 || lseek(fd, fp, SEEK_SET)==-1)
+	if((fd=open(devmem, O_RDONLY))==-1)
 	{
 		perror(devmem);
 		exit(1);
 	}
 	
 	printf("# dmidecode %s\n", VERSION);
-	while(fp<0xFFFFF)
+	
+#ifdef __IA64__
+	if((efi_systab=fopen("/proc/efi/systab", "r"))==NULL)
+	{
+		perror("/proc/efi/systab");
+		exit(1);
+	}
+	while((fgets(linebuf, sizeof(linebuf)-1, efi_systab))!=NULL)
+	{
+		char* addr=memchr(linebuf, '=', strlen(linebuf));
+		*(addr++)='\0';
+		if(strcmp(linebuf, "SMBIOS")==0)
+		{
+			fp=strtol(addr, NULL, 0);
+			printf("# SMBIOS entry point at 0x%08x\n", fp);
+			fp_last=fp+16;
+		}
+	}
+	if(fclose(efi_systab)!=0)
+		perror("/proc/efi/systab");
+#endif
+	if(lseek(fd, fp, SEEK_SET)==-1)
+	{
+		perror(devmem);
+		exit(1);
+	}
+	while(fp<=fp_last)
 	{
 		if(myread(fd, buf, 0x10, devmem)==-1)
 			exit(1);
 		fp+=16;
 		
-		if(memcmp(buf, "_SM_", 4)==0 && fp<0xFFFFF)
+		if(memcmp(buf, "_SM_", 4)==0 && fp<=fp_last)
 		{
 			if(myread(fd, buf+0x10, 0x10, devmem)==-1)
 				exit(1);
