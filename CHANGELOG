@@ -1,3 +1,44 @@
+2004-05-02  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Move legacy DMI entry point decoding to a separate
+	  function.
+	* dmidecode.c: Use a 64 kB buffer for searching entry points,
+	  instead of repeated 16-byte reads.
+	* util.c, util.h: New mem_chunk function. It returns a buffer
+	  containing a copy of a given chunk of the physical memory.
+	* dmidecode.c: Make use of the new mem_chunk function.
+
+2004-04-30  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "JP". Reported by Bernd Krumboeck.
+
+2004-04-22  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c, biosdecode.c, ownership.c, types.h: Refactor WORD-like
+	  macros into types.h.
+
+2004-04-21  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c, biosdecode.c: Fix my contact information.
+	* dmidecode.c: Update copyright year.
+
+2004-04-20  Jean Delvare  <khali@linux-fr.org>
+
+	* README: Correct Chad Smith's name. Reported by Martin Pool.
+
+2004-04-15  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "PL". Reported by Mark Syms.
+
+2004-04-14  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "PD". Reported by Roger Koot.
+
+2004-04-11  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c, Makefile, README: Drop TABLE_LITTLEENDIAN.
+	* README: Update manual pages information.
+
 2004-04-02  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product ID "NV". Reported by Shawn Starr.
@@ -149,8 +190,8 @@
 2003-10-08  Jean Delvare  <khali@linux-fr.org>
 
 	* biosdecode.c: Fix potentially wrong checksum on Sony-specific entry.
-	* biosdecode.c: Unimportant changes (comment, typo...) in Compaq-specific
-	  section.
+	* biosdecode.c: Unimportant changes (comment, typo...) in
+	  Compaq-specific section.
 	* biosdecode.c: Add support for VPD (vital product data, IBM-specific).
 	* CHANGELOG: Various updates.
 
