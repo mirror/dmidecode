@@ -3861,7 +3861,7 @@ static int smbios_decode(u8 *buf, int fd, const char *pname, const char *devmem)
 
 int main(int argc, const char *argv[])
 {
-	int fd;
+	int fd, found=0;
 	off_t fp=0xF0000;
 	const char *devmem="/dev/mem";
 #ifdef __IA64__
@@ -3938,6 +3938,7 @@ int main(int argc, const char *argv[])
 
 	smbios_decode(buf, fd, argv[0], devmem);
 #endif /* USE_MMAP */
+	found++;
 #else /* __IA64__ */
 	if(lseek(fd, fp, SEEK_SET)==-1)
 	{
@@ -3960,6 +3961,7 @@ int main(int argc, const char *argv[])
 			{
 				/* dmi_table moved us far away */
 				lseek(fd, fp, SEEK_SET);
+				found++;
 			}
 		}
 		else if(memcmp(buf, "_DMI_", 5)==0
@@ -3972,6 +3974,7 @@ int main(int argc, const char *argv[])
 			
 			/* dmi_table moved us far away */
 			lseek(fd, fp, SEEK_SET);
+			found++;
 		}
 	}
 #endif /* __IA64__ */
@@ -3982,5 +3985,8 @@ int main(int argc, const char *argv[])
 		exit(1);
 	}
 	
+	if(!found)
+		printf("# No SMBIOS nor DMI entry point found, sorry.\n");
+
 	return 0;
 }
