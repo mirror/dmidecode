@@ -25,8 +25,8 @@
  *
  * References:
  *  - IBM "Using the BIOS Build ID to identify IBM Thinkpad systems"
- *    Revision "November 17, 2003"
- *    http://www.pc.ibm.com/qtechinfo/MIGR-45120.html
+ *    Revision 2005-02-16
+ *    http://www-307.ibm.com/pc/support/site.wss/MIGR-45120.html
  *
  * Notes:
  *  - Main part of the code is taken directly from biosdecode, with an
@@ -64,7 +64,7 @@ static const char *product_name(const char *id)
 		                                confirmed by Scott Denham */
 		"GE", "eServer xSeries 345", /* added 2004-06-11,
 		                                reported by Doug Brenner */
-		"HR", "Thinkpad 650E",
+		"HR", "Thinkpad 560E",
 		"HV", "Thinkpad 760C/CD/L/LD",
 		"HX", "Thinkpad 760E/ED/X/XD/XL or 765/L/D (9385XGA)",
 		"HY", "Thinkpad 760E/EL/ELD (9320SVGA)",
@@ -170,6 +170,8 @@ static const char *product_name(const char *id)
 								reported by Marco Wertejuk */
 		"1S", "Thinkpad R40e", /* added 2003-11-29 (IBM) */
 		"1T", "Thinkpad G40",
+		"1W", "Thinkpad R50e", /* added 2005-02-17 (IBM) */
+		"1Y", "Thinkpad T43/p", /* added 2005-02-17 (IBM) */
 		"20", "Netvista A22p or M41", /* added 2003-10-09,
 		                                 updated 2004-02-23,
 		                                 updated 2004-03-24 */
