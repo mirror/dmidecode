@@ -66,9 +66,12 @@
 struct opt
 {
 	const char* devmem;
-	int version;
+	unsigned int flags;
 };
 static struct opt opt;
+
+#define FLAG_VERSION            (1<<0)
+#define FLAG_HELP               (1<<1)
 
 static const char *out_of_spec = "<OUT OF SPEC>";
 static const char *bad_index = "<BAD INDEX>";
@@ -3821,9 +3824,10 @@ static int legacy_decode(u8 *buf, const char *devmem)
 static int parse_command_line(int argc, char * const argv[])
 {
 	int option;
-	const char *optstring = "d:V";
+	const char *optstring = "d:hV";
 	struct option longopts[]={
 		{ "dev-mem", required_argument, NULL, 'd' },
+		{ "help", no_argument, NULL, 'h' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0, 0, 0, 0 }
 	};
@@ -3834,8 +3838,11 @@ static int parse_command_line(int argc, char * const argv[])
 			case 'd':
 				opt.devmem=optarg;
 				break;
+			case 'h':
+				opt.flags|=FLAG_HELP;
+				break;
 			case 'V':
-				opt.version=1;
+				opt.flags|=FLAG_VERSION;
 				break;
 			case ':':
 			case '?':
@@ -3843,6 +3850,18 @@ static int parse_command_line(int argc, char * const argv[])
 		}
 
 	return 0;
+}
+
+static void print_help(void)
+{
+	static const char *help=
+		"Usage: dmidecode [OPTIONS]\n"
+		"Options are:\n"
+		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
+		" -h, --help             Display this help text and exit\n"
+		" -V, --version          Display the version and exit\n";
+	
+	printf("%s", help);
 }
 
 int main(int argc, char * const argv[])
@@ -3864,12 +3883,18 @@ int main(int argc, char * const argv[])
 
 	/* Set default option values */
 	opt.devmem=DEFAULT_MEM_DEV;
-	opt.version=0;
+	opt.flags=0;
 
 	if(parse_command_line(argc, argv)<0)
 		exit(2);
 
-	if(opt.version)
+	if(opt.flags & FLAG_HELP)
+	{
+		print_help();
+		return 0;
+	}
+
+	if(opt.flags & FLAG_VERSION)
 	{
 		printf("%s\n", VERSION);
 		return 0;
