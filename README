@@ -67,7 +67,7 @@ below.
 
 MODEL SPECIFIC ISSUES
 
-Dmidecode used not to work on IBM T-series laptops and on Fujitsu-Siemens
+Dmidecode used not to work on IBM T-series laptops nor on Fujitsu-Siemens
 S-series laptops under Linux. This was due to the fact that the DMI table
 is at a memory location we couldn't seem to reach through /dev/mem. Although
 I believe this reveals a problem in the Linux kernel, which should be fixed,
@@ -101,7 +101,10 @@ MMAP
 
 Note that mmap() is now used by default on all systems, since this seems to
 solve a number of problems. If your system does not have the mmap() function,
-edit the Makefile file and disable USE_MMAP.
+edit the Makefile file and disable USE_MMAP. Just to make sure this is clear,
+mmap() is not used for performance reasons but to increase the number of
+systems on which dmidecode can be successfully run. See the IA-64 subsection
+above for details.
 
 
 ** MISCELLANEOUS TOOLS **
