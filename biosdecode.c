@@ -466,6 +466,8 @@ int main(__attribute__ ((unused)) int argc, const char *argv[])
 		exit(255);
 	}
 	
+	if(argc>=2)
+		devmem=argv[1];
 	if((fd=open(devmem, O_RDONLY))==-1 || lseek(fd, fp, SEEK_SET)==-1)
 	{
 		perror(devmem);
