@@ -1,3 +1,9 @@
+2004-11-11  Jean Delvare  <khali@linux-fr.org>
+
+	* util.c: More helpful error messages.
+	* util.c: Use MAP_SHARED instead of MAP_PRIVATE in mmap.
+	* version.h: Set version to 2.5.
+
 2004-11-10  Jean Delvare  <khali@linux-fr.org>
 
 	* README: Update dmidecode presentation (copied from the web page).
