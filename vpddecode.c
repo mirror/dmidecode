@@ -132,6 +132,8 @@ static const char *product_name(const char *id)
 		"1T", "Thinkpad G40",
 		"20", "Netvista 6792 or 6823", /* added 2003-10-09,
 		                                  updated 2004-02-23 */
+		"2A", "Thinkcentre M50", /* added 2004-03-19,
+		                            reported by Rafael Avila de Espindola */
 		NULL, "Unknown, please report!"
 	};
 	
@@ -172,11 +174,14 @@ static int decode(const u8 *p)
 	if(!(p[5]>=0x46 && checksum(p, 0x46))
 	/* Some Netvista seem to work with this. */
 	&& !(checksum(p, 0x30))
-	/* The Thinkpad checksum does *not* include the first 13 bytes. */
+	/* The Thinkpad/Thinkcentre checksum does *not* include the first
+	   13 bytes. */
 	&& !(checksum(p+0x0D, 0x30-0x0D)))
+	{
 		/* A few systems have a bad checksum (xSeries 330, 335 and 345 with
 		   early BIOS) but the record is otherwise valid. */
 		printf("Bad checksum! Please report.\n");
+	}
 	
 	print_entry("BIOS Build ID", p+0x0D, 9);
 	printf("Product Name: %s\n", product_name((const char *)(p+0x0D)));
