@@ -111,7 +111,10 @@ void *mem_chunk(off_t base, off_t len, const char *devmem)
 	}
 	
 	if((p=malloc(len))==NULL)
+	{
+		perror("malloc");
 		return NULL;
+	}
 	
 #ifdef USE_MMAP
 #ifdef _SC_PAGESIZE
