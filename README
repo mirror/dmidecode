@@ -69,7 +69,7 @@ Dmidecode used not to work on IBM T-series laptops nor on Fujitsu-Siemens
 S-series laptops under Linux. This was due to the fact that the DMI table
 is at a memory location we couldn't seem to reach through /dev/mem. Although
 I believe this reveals a problem in the Linux kernel, which should be fixed,
-a workaround was found by Smith Chad, and we are using it for now. See the
+a workaround was found by Chad Smith, and we are using it for now. See the
 IA-64 subsection below for more details. I posted about this problem on the
 LKML but did not have any answer. Since then, the list of affected systems
 was extended to IBM X-series laptops and xSeries x445 servers.
@@ -81,9 +81,9 @@ this is that dmidecode accesses the DMI table through /dev/mem, and reading
 this file on an IA-64 system sometimes leads to a crash. A second reason is
 that the method for locating the above-mentioned table differs on IA-64
 (compared to x86), so dmidecode was likely to miss the table entry point.
-This complex issue was reported by Glen Foster and Smith Chad from HP. We
+This complex issue was reported by Glen Foster and Chad Smith from HP. We
 have since been working on a solution, and dmidecode now supports IA-64
-systems. Smith Chad noticed that, for some obscure reason, accessing the
+systems. Chad Smith noticed that, for some obscure reason, accessing the
 /dev/mem file using mmap() instead of read() would work. Then, he wrote a
 patch to export the DMI table address from the internal EFI table to /proc,
 so dmidecode doesn't have to scan /dev/mem for it anymore. This patch was
