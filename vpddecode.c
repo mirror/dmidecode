@@ -179,6 +179,8 @@ static const char *product_name(const char *id)
 		                         reported by Paul Sturm */
 		"2A", "Thinkcentre M50", /* added 2004-03-19,
 		                            reported by Rafael Avila de Espindola */
+		"2C", "Thinkcentre A50", /* added 2005-02-24,
+		                            reported by Tomek Mateja */
 		NULL, "Unknown, please report!"
 	};
 	
