@@ -42,6 +42,9 @@
  *  - IPMI 1.5 revision 1.1
  *    "Intelligent Platform Management Interface Specification"
  *    http://developer.intel.com/design/servers/ipmi/spec.htm
+ *  - AMD publication #20734 revision 3.04
+ *    "AMD Processor Recognition Application Note"
+ *    http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/20734.pdf
  */
 
 #include <sys/types.h>
@@ -922,8 +925,8 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 	 * the CPUID instruction. Their means are explained in table 6, but
 	 * DMI doesn't support this yet.
 	 */
-	u32 eax;
-	int cpuid=0;
+	u32 eax, edx;
+	int sig=0;
 
 	/*
 	 * This might help learn about new processors supporting the
@@ -938,7 +941,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		/*
 		 * 80386 have a different signature.
 		 */
-		printf("%sSignature: Type %X, Family %X, Major Stepping %X, Minor Stepping %X\n",
+		printf("%sSignature: Type %u, Family %u, Major Stepping %u, Minor Stepping %u\n",
 			prefix, dx>>12, (dx>>8)&0xF, (dx>>4)&0xF, dx&0xF);
 		return;
 	}
@@ -950,16 +953,27 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		 * wether the one we have here does or not. Note that this trick
 		 * works only because we know that 80486 must be little-endian.
 		 */
-		if((dx&0x0F00)==0x0400 && ((dx&0x00F0)==0x0040 || (dx&0x00F0)>=0x0070))
-			cpuid=1;
+		if((dx&0x0F00)==0x0400
+		&& ((dx&0x00F0)==0x0040 || (dx&0x00F0)>=0x0070)
+		&& ((dx&0x000F)>=0x0003))
+			sig=1;
+		else
+		{
+			printf("%sSignature: Type %u, Family %u, Model %u, Stepping %u\n",
+				prefix, (dx>>12)&0x3, (dx>>8)&0xF, (dx>>4)&0xF, dx&0xF);
+			return;
+		}
 	}
 	else if((type>=0x0B && type<=0x13) /* Intel, Cyrix */
-	|| (type>=0x18 && type<=0x1D) || type==0x1F /* AMD */
 	|| (type>=0xB0 && type<=0xB3) /* Intel */
-	|| (type>=0xB5 && type<=0xB7) /* Intel, AMD */
-	|| (type==0xB9) /* Intel */
+	|| type==0xB5 /* Intel */
+	|| type==0xB9) /* Intel */
+		sig=1;
+	else if((type>=0x18 && type<=0x1D) /* AMD */
+	|| type==0x1F /* AMD */
+	|| (type>=0xB6 && type<=0xB7) /* AMD */
 	|| (type==0x83 || type==0x84)) /* AMD 64-bit */
-		cpuid=1;
+		sig=2;
 	else if(type==0x01 || type==0x02)
 	{
 		/*
@@ -969,7 +983,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		 */
 		if(strncmp(version, "AMD Athlon(TM)", 14)==0
 		|| strncmp(version, "AMD Opteron(tm)", 15)==0)
-			cpuid=1;
+			sig=2;
 		else
 			return;
 	}
@@ -977,25 +991,37 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		return;
 	
 	eax=DWORD(p);
-	printf("%sSignature: Type %X, Family %X, Model %X, Stepping %X\n",
-		prefix, (eax>>12)&0x3, ((eax>>16)&0xFF0)+((eax>>8)&0x00F),
-		((eax>>12)&0xF0)+((eax>>4)&0x0F), eax&0xF);
-	if(cpuid)
+	edx=DWORD(p+4);
+	switch(sig)
 	{
-		u32 edx=DWORD(p+4);
-		
-		printf("%sFlags:", prefix);
-		if((edx&0x3FF7FDFF)==0)
-			printf(" None\n");
-		else
-		{
-			int i;
-			
-			printf("\n");
-			for(i=0; i<=31; i++)
-				if(flags[i]!=NULL && edx&(1<<i))
-					printf("%s\t%s\n", prefix, flags[i]);
-		}
+		case 1: /* Intel */
+			printf("%sSignature: Type %u, Family %u, Model %u, Stepping %u\n",
+				prefix, (eax>>12)&0x3, ((eax>>16)&0xFF0)+((eax>>8)&0x00F),
+				((eax>>12)&0xF0)+((eax>>4)&0x0F), eax&0xF);
+			break;
+		case 2: /* AMD */
+			printf("%sSignature: %s %X, %s %X, Stepping %X\n",
+				prefix,
+				((eax>>8)&0xF)==0xF?"Extended Family":"Family",
+				((eax>>8)&0xF)==0xF?(eax>>20)&0xFF:(eax>>8)&0xF,
+				((eax>>4)&0xF)==0xF?"Extended Model":"Model",
+				((eax>>4)&0xF)==0xF?(eax>>16)&0xF:(eax>>4)&0xF,
+				eax&0xF);
+			break;
+	}
+
+	edx=DWORD(p+4);
+	printf("%sFlags:", prefix);
+	if((edx&0x3FF7FDFF)==0)
+		printf(" None\n");
+	else
+	{
+		int i;
+
+		printf("\n");
+		for(i=0; i<=31; i++)
+			if(flags[i]!=NULL && edx&(1<<i))
+				printf("%s\t%s\n", prefix, flags[i]);
 	}
 }
 
