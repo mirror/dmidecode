@@ -8,6 +8,7 @@
 	* dmidecode.c: Fix processor ID decoding for older 80486. Not very
 	  important since such systems are unlikely to support SMBIOS.
 	* dmidecode.c: Modify CPU signature display for AMD processors.
+	* vpddecode.c, biosdecode.c: Fix incorrect VPD checksumming.
 
 2003-10-24  Jean Delvare  <khali@linux-fr.org>
 

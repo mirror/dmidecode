@@ -463,8 +463,8 @@ static size_t vpd_length(const u8 *p)
 
 static int vpd_decode(const u8 *p, size_t len)
 {
-	/* The checksum does *not* include the first five bytes. */
-	if(len<0x30 || checksum(p+5, len-5))
+	/* The checksum does *not* include the first 13 bytes. */
+	if(len<0x30 || !checksum(p+0x0D, 0x30-0x0D))
 		return 0;
 	
 	printf("VPD present.\n");

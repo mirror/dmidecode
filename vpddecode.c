@@ -153,8 +153,8 @@ static void print_entry(const char *name, const u8 *p, size_t len)
 
 static int decode(const u8 *p)
 {
-	/* The checksum does *not* include the first five bytes. */
-	if(p[5]<0x30 || checksum(p+5, p[5]-5))
+	/* The checksum does *not* include the first 13 bytes. */
+	if(p[5]<0x30 || !checksum(p+0x0D, 0x30-0x0D))
 		return 0;
 	
 	print_entry("Bios Build ID", p+0x0D, 9);
