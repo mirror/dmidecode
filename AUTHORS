@@ -1,4 +1,4 @@
-MAINTAINER
+DEVELOPER AND MAINTAINER
 Jean Delvare <khali@linux-fr.org>
 
 ORIGINAL AUTHOR
@@ -30,3 +30,4 @@ Mike Cooper
 Marc Rieffel
 Klaus Ade Johnstad
 Jeff Moyer
+Josef Moellers
