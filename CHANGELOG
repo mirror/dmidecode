@@ -1,3 +1,9 @@
+2003-08-08  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Update the README file (mainly the now solved laptop
+	  and IA-64 issues, and add a section for biosdecode and ownership).
+	* version.h: Set version to 2.2.
+
 2003-07-18  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Display CPUID values as hexa, not decimal.
