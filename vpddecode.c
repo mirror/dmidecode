@@ -57,9 +57,11 @@ static struct opt opt;
 
 static const char *product_name(const char *id)
 {
+	/* Please keep IDs in alphabetical order */
 	static const char *name[]={
 		"AP", "eServer xSeries 336", /* added 2005-02-01,
-		                                reported by David Rosala */
+		                                reported by David Rosala,
+		                                confirmed by Scott Denham */
 		"GE", "eServer xSeries 345", /* added 2004-06-11,
 		                                reported by Doug Brenner */
 		"HR", "Thinkpad 650E",
@@ -102,7 +104,8 @@ static const char *product_name(const char *id)
 		"JP", "eServer xSeries 205", /* added 2004-04-30,
 		                                reported by Bernd Krumboeck */
 		"KP", "eServer xSeries 346", /* added 2005-02-01,
-		                                reported by David Rosala */
+		                                reported by David Rosala,
+		                                confirmed by Scott Denham */
 		"KQ", "Thinkpad i1200 or i1300",
 		"KR", "Thinkpad i1400 or i1500",
 		"KS", "Thinkpad 240X",
@@ -117,6 +120,8 @@ static const char *product_name(const char *id)
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
 		"NV", "PC 300PL", /* added 2004-04-02,
 		                     reported by Shawn Starr */
+		"OP", "Intellistation Z10", /* added 2005-02-17,
+		                               reported by Scott Denham */
 		"PD", "PC 300GL", /* added 2004-04-14,
 		                     reported by Roger Koot */
 		"PI", "Netvista A40/p", /* added 2004-02-23,
@@ -126,6 +131,8 @@ static const char *product_name(const char *id)
 		                     reported by Roger Koot */
 		"PL", "Intellistation M-Pro", /* added 2004-04-15,
 		                                 reported by Mark Syms */
+		"PN", "Intellistation A10", /* added 2005-02-17,
+		                               reported by Scott Denham */
 		"PT", "Netvista A20", /* added 2003-12-28,
 		                         reported by Ramiro Barreiro */
 		"RE", "eServer xSeries 445", /* added 2003-12-17,
