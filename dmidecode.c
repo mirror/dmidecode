@@ -58,6 +58,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef __ia64__
+#define USE_EFI
+#endif /* __ia64__ */
+
 #include "version.h"
 #include "types.h"
 #include "util.h"
@@ -3889,18 +3893,17 @@ int main(int argc, const char *argv[])
 	int fd, found=0;
 	off_t fp=0xF0000;
 	const char *devmem="/dev/mem";
-#ifdef __IA64__
+#ifdef USE_EFI
 	FILE *efi_systab;
 	char linebuf[64];
 #ifdef USE_MMAP
 	u32 mmoffset;
 	void *mmp;
-#else /* USE_MMAP */
-	u8 buf[0x20];
 #endif /* USE_MMAP */
-#else /* __IA64__ */
+#endif /* USE_EFI */
+#if !(defined(USE_EFI) && defined(USE_MMAP))
 	u8 buf[0x20];
-#endif /* __IA64__ */
+#endif
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4 || '\0'!=0)
 	{
@@ -3918,7 +3921,7 @@ int main(int argc, const char *argv[])
 	
 	printf("# dmidecode %s\n", VERSION);
 	
-#ifdef __IA64__
+#ifdef USE_EFI
 	if((efi_systab=fopen("/proc/efi/systab", "r"))==NULL)
 	{
 		perror("/proc/efi/systab");
@@ -3962,7 +3965,7 @@ int main(int argc, const char *argv[])
 	smbios_decode(buf, fd, argv[0], devmem);
 #endif /* USE_MMAP */
 	found++;
-#else /* __IA64__ */
+#else /* USE_EFI */
 	if(lseek(fd, fp, SEEK_SET)==-1)
 	{
 		perror(devmem);
@@ -4004,7 +4007,7 @@ int main(int argc, const char *argv[])
 			found++;
 		}
 	}
-#endif /* __IA64__ */
+#endif /* USE_EFI */
 	
 	if(close(fd)==-1)
 	{
