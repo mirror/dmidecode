@@ -63,22 +63,6 @@
 #include "types.h"
 #include "util.h"
 
-#ifdef BIGENDIAN
-typedef struct {
-	u32 h;
-	u32 l;
-} u64;
-#else /* BIGENDIAN */
-typedef struct {
-	u32 l;
-	u32 h;
-} u64;
-#endif /* BIGENDIAN */
-
-#define WORD(x) (*(const u16 *)(x))
-#define DWORD(x) (*(const u32 *)(x))
-#define QWORD(x) (*(const u64 *)(x))
-
 struct bios_entry {
 	const char *anchor;
 	off_t low_address;

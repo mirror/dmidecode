@@ -40,8 +40,6 @@
 #include "types.h"
 #include "util.h"
 
-#define DWORD(x) (*(const u32 *)(x))
-
 static void ownership(int fd, u32 base, const char *pname, const char *devmem)
 {
 	u8 *buf;
