@@ -99,11 +99,15 @@ static const char *product_name(const char *id)
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
 		"NV", "PC 300PL", /* added 2004-04-02,
 		                     reported by Shawn Starr */
+		"PD", "PC 300GL", /* added 2004-04-14,
+		                     reported by Roger Koot */
 		"PI", "Netvista A40/p", /* added 2004-02-23,
 		                           updated 2004-03-24,
 		                           reported by Zing Zing Shishak */
 		"PJ", "PC 300GL", /* added 2004-03-23,
 		                     reported by Roger Koot */
+		"PL", "Intellistation M-Pro", /* added 2004-04-15,
+		                                 reported by Mark Syms */
 		"PT", "Netvista A20", /* added 2003-12-28,
 		                         reported by Ramiro Barreiro */
 		"RE", "eServer xSeries 445", /* added 2003-12-17,
