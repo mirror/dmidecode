@@ -2786,7 +2786,7 @@ static const char *dmi_ipmi_register_spacing(u8 code)
 	static const char *spacing[]={
 		"Successive Byte Boundaries", /* 0x00 */
 		"32-bit Boundaries",
-		"16 bit Boundaries" /* 0x02 */
+		"16-byte Boundaries" /* 0x02 */
 	};
 	
 	if(code<=0x02)
