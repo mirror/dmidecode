@@ -3827,6 +3827,20 @@ static int smbios_decode(u8 *buf, int fd, const char *pname, const char *devmem)
 	return 0;
 }
 
+static int legacy_decode(u8 *buf, int fd, const char *pname, const char *devmem)
+{
+	if(checksum(buf, 0x0F))
+	{
+		printf("Legacy DMI %u.%u present.\n",
+			buf[0x0E]>>4, buf[0x0E]&0x0F);
+		dmi_table(fd, DWORD(buf+0x08), WORD(buf+0x06), WORD(buf+0x0C),
+			((buf[0x0E]&0xF0)<<4)+(buf[0x0E]&0x0F), pname, devmem);
+		return 1;
+	}
+	
+	return 0;
+}
+
 int main(int argc, const char *argv[])
 {
 	int fd, found=0;
@@ -3931,19 +3945,16 @@ int main(int argc, const char *argv[])
 				found++;
 			}
 		}
-		else if(memcmp(buf, "_DMI_", 5)==0
-		 && checksum(buf, 0x0F))
+		else if(memcmp(buf, "_DMI_", 5)==0)
 		{
-			printf("Legacy DMI %u.%u present.\n",
-				buf[0x0E]>>4, buf[0x0E]&0x0F);
-			dmi_table(fd, DWORD(buf+0x08), WORD(buf+0x06), WORD(buf+0x0C),
-				((buf[0x0E]&0xF0)<<4)+(buf[0x0E]&0x0F), argv[0], devmem);
-			
+			if (legacy_decode(buf, fd, argv[0], devmem))
+			{
 #ifndef USE_MMAP
-			/* dmi_table moved us far away */
-			lseek(fd, fp, SEEK_SET);
+				/* dmi_table moved us far away */
+				lseek(fd, fp, SEEK_SET);
 #endif /* USE_MMAP */
-			found++;
+				found++;
+			}
 		}
 	}
 #endif /* USE_EFI */
