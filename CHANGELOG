@@ -1,3 +1,34 @@
+2005-02-11  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Discard -pedantic, we don't really need this.
+	* util.c: Display an error message on memory shortage. Suggested
+	  by Don Howard.
+
+	Fix a bug causing dmidecode to crash on some systems with more than
+	2 GB of memory. This is a signedness issue, which existed up to
+	version 2.2, was fixed in 2.3 but reintroduced in a different form
+	in 2.5 as part of a code clean up and refactoring.
+	https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=112355
+	Thanks to Petter Reinholdtsen for reporting. Thanks to Don Howard
+	for additional insight.
+	
+	* dmidecode.c, util.c, util.h: Use size_t instead of off_t when
+	  handling memory addresses.
+
+2005-02-10  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Add option -h, --help, display a usage summary.
+	* biosdecode.c, ownership.c, vpddecode.c: Copy command-line handling
+	  from dmidecode.c.
+	* biosdecode.8, dmidecode.8, ownership.8, vpddecode.8: Document
+	  the new command-line interface.
+
+2005-02-06  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Everything depends on config.h.
+	* dmidecode.c: Add basic command-line handling. This was suggested
+	  a long time ago by Erwan Velu.
+
 2005-02-01  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product IDs "AP", "KP" and "RD". Reported by
