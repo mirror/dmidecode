@@ -1,3 +1,13 @@
+2003-10-07  Jean Delvare  <khali@linux-fr.org>
+
+	* ownership.c: Fix a harmless warning on x86_64. Reported by Mike
+	  Cooper.
+
+2003-09-19  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Explicitely say when no SMBIOS nor DMI entry point
+	  was found. Implicitly suggested by Sergey Leonovich.
+
 2003-09-11  Jean Delvare  <khali@linux-fr.org>
 
 	* Makefile: Don't use $^ since it isn't supported by BSD make.
