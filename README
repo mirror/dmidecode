@@ -28,8 +28,12 @@ you can change this behavior by editing the Makefile file and setting PREFIX
 to wherever you want. You may change the C compiler and the compilation
 flags as well.
 
+Optionally, you can run "make strip" prior to "make install" if you want
+smaller binaries. However, know that this will prevent any further
+attempt to debug programs.
+
 Four parameters can be set in the Makefile to make dmidecode work on
-non-i386 systems. The first two (BIGENDIAN and ALIGNMENT_WORKAROND) should
+non-i386 systems. The first two (BIGENDIAN and ALIGNMENT_WORKAROUND) should
 be used if your system uses the big endian byte ordering (Motorola) or
 doesn't support unaligned memory accesses, respectively. For example,
 compiling for a SPARC processor would require both. The third parameter
@@ -77,15 +81,15 @@ Dmidecode used to have problems on IA-64 systems. The first reason for
 this is that dmidecode accesses the DMI table through /dev/mem, and reading
 this file on an IA-64 system sometimes leads to a crash. A second reason is
 that the method for locating the above-mentioned table differs on IA-64
-(compared to IA-32), so dmidecode was likely to miss the table entry point.
+(compared to x86), so dmidecode was likely to miss the table entry point.
 This complex issue was reported by Glen Foster and Smith Chad from HP. We
 have since been working on a solution, and dmidecode now supports IA-64
 systems. Smith Chad noticed that, for some obscure reason, accessing the
 /dev/mem file using mmap() instead of read() would work. Then, he wrote a
 patch to export the DMI table address from the internal EFI table to /proc,
 so dmidecode doesn't have to scan /dev/mem for it anymore. This patch was
-since integrated into the main ia64 patch. Finally, I add the requied code
-to make it all work. So, in order to have dmidecode work on your IA-64
+since integrated into the main ia64 patch. Finally, I added the required
+code to make it all work. So, in order to have dmidecode work on your IA-64
 system, you need three things:
  - dmidecode version 2.2 or later;
  - an ia64 patched kernel, using linux-2.4.21-ia64-030702.diff or any later
@@ -97,12 +101,13 @@ MMAP
 
 Note that mmap() is now used by default on all systems, since this seems to
 solve a number of problems. If your system does not have the mmap() function,
-edit the Makefile and unset USE_MMAP.
+edit the Makefile file and disable USE_MMAP.
 
 
 ** MISCELLANEOUS TOOLS **
 
-Two other tools come along with dmidecode: biosdecode and ownership.
+Three other tools come along with dmidecode: biosdecode, ownership and
+vpddecode.
 
 BIOSDECODE
 
@@ -116,4 +121,11 @@ This tool was written on a request by Luc Van de Velde for use with Novell
 tools in his company. It retrieves the "ownership tag" that can be set on
 most Compaq computers. Since it uses the same mechanisms dmidecode and
 biosdecode use, and could be of some use for other people as well, we
-decided to make it part of our project.
+decided to make it part of the project.
+
+VPDDECODE
+
+This tool prints the contents of the "vital product data" structure as
+found in most IBM computers. It roughly shows the same information as
+biosdecode does with regard to this structure, but has an additional
+lookup table for the machine name.
