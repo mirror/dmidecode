@@ -3757,8 +3757,7 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 	u8 *data;
 	int i=0;
 #ifdef USE_MMAP
-	div_t mmbase;
-	size_t psize;
+	u32 mmoffset;
 	void *mmp;
 #endif /* USE_MMAP */
 	
@@ -3768,21 +3767,20 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 		base);
 	
 #ifdef USE_MMAP
-	psize=getpagesize();
-	mmbase=div(base, psize);
+	mmoffset=base%getpagesize();
 	/*
 	 * We need PROT_WRITE for ASCII filtering in dmi_string. Do NOT change MAP_PRIVATE
 	 * to MAP_SHARED unless you also remove PROT_WRITE and disable ASCII filtering, because
 	 * we DO NOT WANT to write to /dev/mem. Thanks a lot to Gabriel Forte for helping
 	 * me hunting down an annoying bug related to this.
 	 */
-	mmp=mmap(0, mmbase.rem+len, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, mmbase.quot*psize);
+	mmp=mmap(0, mmoffset+len, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, base-mmoffset);
     if(mmp==MAP_FAILED)
     {
        perror("mmap");
        return;
     }
-	buf=(u8 *)mmp+mmbase.rem;
+	buf=(u8 *)mmp+mmoffset;
 #else /* USE_MMAP */
 	if((buf=malloc(len))==NULL)
 	{
@@ -3835,7 +3833,7 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 			len, (unsigned int)(data-buf));
 	
 #ifdef USE_MMAP
-	if(munmap(mmp, mmbase.rem+len)==-1)
+	if(munmap(mmp, mmoffset+len)==-1)
 		perror("munmap");
 #else /* USE_MMAP */
 	free(buf);
@@ -3868,8 +3866,7 @@ int main(int argc, const char *argv[])
 	FILE *efi_systab;
 	char linebuf[64];
 #ifdef USE_MMAP
-	div_t mmbase;
-	size_t psize;
+	u32 mmoffset;
 	void *mmp;
 #else /* USE_MMAP */
 	u8 buf[0x20];
@@ -3914,18 +3911,17 @@ int main(int argc, const char *argv[])
 		perror("/proc/efi/systab");
 
 #ifdef USE_MMAP
-	psize=getpagesize();
-	mmbase=div(fp, psize);
-	mmp=mmap(0, mmbase.rem+0x20, PROT_READ, MAP_PRIVATE, fd, mmbase.quot*psize);
+	mmoffset=fp%getpagesize();
+	mmp=mmap(0, mmoffset+0x20, PROT_READ, MAP_PRIVATE, fd, fp-mmoffset);
     if(mmp==MAP_FAILED)
     {
        perror(devmem);
        exit(1);
     }
 
-	smbios_decode(((u8 *)mmp)+mmbase.rem, fd, argv[0], devmem);
+	smbios_decode(((u8 *)mmp)+mmoffset, fd, argv[0], devmem);
 
-	if(munmap(mmp, mmbase.rem+0x20)==-1)
+	if(munmap(mmp, mmoffset+0x20)==-1)
 		perror("munmap");
 #else /* USE_MMAP */
 	if(lseek(fd, fp, SEEK_SET)==-1)
