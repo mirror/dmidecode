@@ -985,7 +985,9 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		 * we use the version string to determine if they are known to
 		 * support the CPUID instruction.
 		 */
-		if(strncmp(version, "AMD Athlon(TM)", 14)==0
+		if(strncmp(version, "Pentium III MMX", 15)==0)
+			sig=1;
+		else if(strncmp(version, "AMD Athlon(TM)", 14)==0
 		|| strncmp(version, "AMD Opteron(tm)", 15)==0)
 			sig=2;
 		else
@@ -1720,8 +1722,12 @@ static void dmi_on_board_devices(struct dmi_header *h, const char *prefix)
 
 	for(i=0; i<count; i++)
 	{
-		printf("%sOn Board Device Information\n",
-			prefix);
+		if(count==1)
+			printf("%sOn Board Device Information\n",
+				prefix);
+		else
+			printf("%sOn Board Device %d Information\n",
+				prefix, i+1);
 		printf("%s\tType: %s\n",
 			prefix, dmi_on_board_devices_type(p[2*i]&0x7F));
 		printf("%s\tStatus: %s\n",
