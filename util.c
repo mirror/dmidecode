@@ -28,9 +28,14 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+
 #ifdef USE_MMAP
 #include <sys/mman.h>
+#ifndef MAP_FAILED
+#define MAP_FAILED ((void *) -1)
+#endif /* !MAP_FAILED */
 #endif /* USE MMAP */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
