@@ -52,7 +52,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef __ia64__
+#if __ia64__
 #define USE_EFI
 #endif /* __ia64__ */
 
@@ -3788,6 +3788,7 @@ static int smbios_decode(u8 *buf, const char *devmem)
 	return 0;
 }
 
+#ifndef USE_EFI
 static int legacy_decode(u8 *buf, const char *devmem)
 {
 	if(checksum(buf, 0x0F))
@@ -3801,6 +3802,7 @@ static int legacy_decode(u8 *buf, const char *devmem)
 	
 	return 0;
 }
+#endif /* USE_EFI */
 
 int main(int argc, const char *argv[])
 {
@@ -3809,6 +3811,7 @@ int main(int argc, const char *argv[])
 	const char *devmem="/dev/mem";
 #ifdef USE_EFI
 	FILE *efi_systab;
+	const char *filename;
 	char linebuf[64];
 #endif /* USE_EFI */
 	u8 *buf;
@@ -3825,11 +3828,17 @@ int main(int argc, const char *argv[])
 	printf("# dmidecode %s\n", VERSION);
 	
 #ifdef USE_EFI
-	if((efi_systab=fopen("/proc/efi/systab", "r"))==NULL)
+	/*
+	 * Linux up to 2.6.6-rc2: /proc/efi/systab
+	 * Linux 2.6.6-rc3 and up: /sys/firmware/efi/systab
+	 */
+	if((efi_systab=fopen(filename="/proc/efi/systab", "r"))==NULL
+	&& (efi_systab=fopen(filename="/sys/firmware/efi/systab", "r"))==NULL)
 	{
-		perror("/proc/efi/systab");
+		perror(filename);
 		exit(1);
 	}
+	fp=0;
 	while((fgets(linebuf, sizeof(linebuf)-1, efi_systab))!=NULL)
 	{
 		char* addr=memchr(linebuf, '=', strlen(linebuf));
@@ -3841,9 +3850,14 @@ int main(int argc, const char *argv[])
 		}
 	}
 	if(fclose(efi_systab)!=0)
-		perror("/proc/efi/systab");
+		perror(filename);
+	if(fp==0)
+	{
+		fprintf(stderr, "%s: SMBIOS entry point missing\n", filename);
+		exit(1);
+	}
 
-	if((buf=mem_chunk(fp, 0x20, devmem))=NULL)
+	if((buf=mem_chunk(fp, 0x20, devmem))==NULL)
 		exit(1);
 	
 	if(smbios_decode(buf, devmem))
