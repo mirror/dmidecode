@@ -56,6 +56,7 @@
 #include <stdlib.h>
 
 #include "version.h"
+#include "config.h"
 #include "types.h"
 #include "util.h"
 
@@ -503,7 +504,7 @@ int main(int argc, const char *argv[])
 {
 	u8 *buf;
 	off_t fp;
-	const char *devmem="/dev/mem";
+	const char *devmem=DEFAULT_MEM_DEV;
 	int i;
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4)

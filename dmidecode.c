@@ -56,6 +56,7 @@
 #endif /* __ia64__ */
 
 #include "version.h"
+#include "config.h"
 #include "types.h"
 #include "util.h"
 
@@ -3810,7 +3811,7 @@ int main(int argc, const char *argv[])
 {
 	int found=0;
 	off_t fp;
-	const char *devmem="/dev/mem";
+	const char *devmem=DEFAULT_MEM_DEV;
 #ifdef USE_EFI
 	FILE *efi_systab;
 	const char *filename;

@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "config.h"
 #include "types.h"
 #include "util.h"
 
@@ -97,7 +98,7 @@ int main(int argc, const char *argv[])
 {
 	u8 *buf;
 	off_t fp;
-	const char *devmem="/dev/mem";
+	const char *devmem=DEFAULT_MEM_DEV;
 	int ok=0;
 	
 	if(sizeof(u8)!=1 || sizeof(u32)!=4)

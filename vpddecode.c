@@ -38,6 +38,7 @@
 #include <string.h>
 
 #include "version.h"
+#include "config.h"
 #include "types.h"
 #include "util.h"
 
@@ -219,7 +220,7 @@ int main(int argc, const char *argv[])
 	u8 *buf;
 	int found=0;
 	off_t fp;
-	const char *devmem="/dev/mem";
+	const char *devmem=DEFAULT_MEM_DEV;
 	
 	if(sizeof(u8)!=1)
 	{
