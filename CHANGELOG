@@ -1,3 +1,9 @@
+2003-07-18  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Display CPUID values as hexa, not decimal.
+	* dmidecode.c: Shift the I2C slave address by one bit to the right
+	  (DMI case 38).
+
 2003-06-27  Jean Delvare  <khali@linux-fr.org>
 
 	* biosdecode.c: Better display of Compaq-specific entries (thank to
