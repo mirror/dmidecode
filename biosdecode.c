@@ -43,6 +43,9 @@
  *  - Microsoft "PCI IRQ Routing Table Specification"
  *    Version 1.0
  *    http://www.microsoft.com/hwdev/archive/BUSBIOS/pciirq.asp
+ *  - Compaq "Technical Reference Guide for Compaq Deskpro 4000 and 6000"
+ *    First Edition
+ *    http://h18000.www1.hp.com/support/techpubs/technical_reference_guides/113a1097.html
  */
 
 #include <sys/types.h>
@@ -408,7 +411,7 @@ static int compaq_decode(const u8 *p, __attribute__ ((unused)) size_t len)
 			|| !(p[7+i*10]>='A' && p[7+i*10]<='Z')
 			|| !(p[8+i*10]>='A' && p[8+i*10]<='Z'))
 		{
-			printf("\t Abnormal Entry! Please report. [%02x %02x %02x %02x]\n",
+			printf("\t Abnormal Entry! Please report. [%02X %02X %02X %02X]\n",
 				p[5+i*10], p[6+i*10], p[7+i*10], p[8+i*10]);
 			return 0;
 		}
@@ -416,7 +419,7 @@ static int compaq_decode(const u8 *p, __attribute__ ((unused)) size_t len)
 	
 	for(i=0; i<p[4]; i++)
 	{
-		printf("\tEntry %u: %c%c%c%c at 0x%08x (data=0x%04x)\n",
+		printf("\tEntry %u: %c%c%c%c at 0x%08X (%u bytes)\n",
 			i+1, p[5+i*10], p[6+i*10], p[7+i*10], p[8+i*10],
 			DWORD(p+9+i*10), WORD(p+13+i*10));
 	}
