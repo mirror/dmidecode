@@ -1,3 +1,9 @@
+2003-10-19  Jean Delvare  <khali@linux-fr.org>
+
+	* README: Clarify why mmap is used. Fix typo.
+	* Makefile: Add deleting core to the clean target.
+	* version.h: Set version to 2.3.
+
 2003-10-17  Jean Delvare  <khali@linux-fr.org>
 
 	* biosdecode.c: Use (void) instead of __attribute__ ((usused)) to
