@@ -1,3 +1,12 @@
+2005-02-17  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product IDs "OP" and "PN". Reported by Scott
+	  Denham.
+	* vpddecode.c: Fix typo in one product name (560E improperly
+	  spelled 650E).
+	* vpddecode.c: Add product IDs "IW" and "IY", as added recently
+	  on IBM's reference web page. Update reference.
+
 2005-02-12  Jean Delvare  <khali@linux-fr.org>
 
 	* util.c: Fix incorrect length in munmap call.
