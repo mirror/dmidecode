@@ -16,10 +16,10 @@ PREFIX  = /usr/local
 
 all : dmidecode biosdecode
 
-dmidecode : dmidecode.c
+dmidecode : dmidecode.c version.h
 	$(CC) $(CFLAGS) $< -o $@
 
-biosdecode : biosdecode.c
+biosdecode : biosdecode.c version.h
 	$(CC) $(CFLAGS) $< -o $@
 
 install : dmidecode biosdecode

@@ -54,7 +54,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#define VERSION "2.0"
+#include "version.h"
 
 static const char *out_of_spec = "<OUT OF SPEC>";
 static const char *bad_index = "<BAD INDEX>";

@@ -58,7 +58,7 @@
 #include <errno.h>
 #include <ctype.h>
 
-#define VERSION "2.0"
+#include "version.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
