@@ -236,7 +236,7 @@ static void dmi_dump(struct dmi_header *h, const char *prefix)
 	int row, i;
 	const char *s;
 	
-	printf("%sHeader And Data:\n", prefix);
+	printf("%sHeader and Data:\n", prefix);
 	for(row=0; row<((h->length-1)>>4)+1; row++)
 	{
 		printf("%s\t", prefix);
@@ -246,7 +246,7 @@ static void dmi_dump(struct dmi_header *h, const char *prefix)
 	}
 
 	if(((u8 *)h)[h->length] || ((u8 *)h)[h->length+1])
-	{	
+	{
 		printf("%sStrings:\n", prefix);
 		i=1;
 		while((s=dmi_string(h, i++))!=bad_index)
@@ -2635,7 +2635,7 @@ static const char *dmi_system_boot_status(u8 code)
 		return status[code];
 	if(code>=128 && code<=191)
 		return "OEM-specific";
-	if(code>=192 && code<=255)
+	if(code>=192)
 		return "Product-specific";
 	return out_of_spec;
 }
