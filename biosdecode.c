@@ -2,7 +2,7 @@
  * BIOS Decode
  *
  *   (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   (C) 2002-2003 Jean Delvare <khali@linux-fr>
+ *   (C) 2002-2004 Jean Delvare <khali@linux-fr>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -463,8 +463,10 @@ static size_t vpd_length(const u8 *p)
 
 static int vpd_decode(const u8 *p, size_t len)
 {
-	/* XSeries have longer records and a different checksumming method. */
+	/* XSeries have longer records. */
 	if(!(len>=0x46 && checksum(p, 0x46))
+	/* Some Netvista seem to work with this. */
+	&& !(checksum(p, 0x30))
 	/* The Thinkpad checksum does *not* include the first 13 bytes. */
 	&& !(len>=0x30 && checksum(p+0x0D, 0x30-0x0D)))
 		return 0;
