@@ -1,3 +1,13 @@
+2004-04-02  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "NV". Reported by Shawn Starr.
+
+2004-03-27  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "24". Reported by Paul Sturm.
+	* dmidecode.c: Fix two missing comas in string enumerations. Thanks to
+	  Joshua Goldenhar for reporting the first one.
+
 2004-03-24  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product ID "PJ". Reported by Roger Koot.
