@@ -2,7 +2,7 @@
  * DMI Decode
  *
  *   (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   (C) 2002-2004 Jean Delvare <khali@linux-fr.org>
+ *   (C) 2002-2005 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -3877,7 +3877,7 @@ int main(int argc, char * const argv[])
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4 || '\0'!=0)
 	{
-		fprintf(stderr,"%s: compiler incompatibility\n", argv[0]);
+		fprintf(stderr, "%s: compiler incompatibility\n", argv[0]);
 		exit(255);
 	}
 
