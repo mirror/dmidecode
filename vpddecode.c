@@ -142,7 +142,9 @@ static const char *product_name(const char *id)
 		"1P", "Thinkpad R40", /* added 2003-11-29 (IBM),
 		                         types 2722, 2723 and 2724 */
 		"1Q", "Thinkpad X31",
-		"1R", "Thinkpad T40, T41, R50 or R50p", /* updated 2003-11-29 (IBM) */
+		"1R", "Thinkpad T40, T41, R50, R50p or R51", /* updated 2003-11-29 (IBM),
+		                                                updated 2004-11-08,
+								reported by Marco Wertejuk */
 		"1S", "Thinkpad R40e", /* added 2003-11-29 (IBM) */
 		"1T", "Thinkpad G40",
 		"20", "Netvista A22p or M41", /* added 2003-10-09,
