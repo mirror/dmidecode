@@ -1,3 +1,9 @@
+2005-03-08  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Update lookup table from revision 2005-03-08 of IBM
+	  reference document (add product ID "1V", update product ID "1R").
+	  Thanks to Ingo van Lil for reporting about product ID "1V".
+
 2005-03-06  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Add option -u, --dump. It disables decoding of the
