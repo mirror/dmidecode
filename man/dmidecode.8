@@ -35,21 +35,21 @@ Handle 0x0002
         Serial Number: INCY92700942
 
 Each record has:
-.IP \[bu]
+.IP \(bu "\w'\(bu'u+1n"
 A handle. This is a unique identifier, which allows records to
 reference each other. For example, processor records usually reference
 cache memory records using their handles.
-.IP \[bu]
+.IP \(bu
 A type. The \s-1SMBIOS\s0 specification defines different types of elements
 a computer can be made of. In this example, the type is 2, which
 means that the record contains "Base Board Information".
-.IP \[bu]
+.IP \(bu
 A size. Each record has a 4-byte header (2 for the handle, 1 for the type,
 1 for the size), the rest is used by the record data. This value doesn't
 take text strings into account (these are placed at the end of the record),
 so the actual length of the record may be (and is often) greater than the
 displayed value.
-.IP \[bu]
+.IP \(bu
 Decoded values. The information presented of course depends on the type
 of record. Here, we learn about the board's manufacturer, model, version
 and serial number.
