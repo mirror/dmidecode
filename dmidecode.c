@@ -3852,11 +3852,12 @@ int main(int argc, const char *argv[])
 #ifdef USE_MMAP
 	u32 mmoffset;
 	void *mmp;
-#endif /* USE_MMAP */
-#endif /* USE_EFI */
-#if !(defined(USE_EFI) && defined(USE_MMAP))
+#else /* USE_MMAP */
 	u8 buf[0x20];
-#endif
+#endif /* USE_MMAP */
+#else /* USE_EFI */
+	u8 *buf;
+#endif /* USE_EFI */
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4 || '\0'!=0)
 	{
@@ -3924,39 +3925,29 @@ int main(int argc, const char *argv[])
 		perror(devmem);
 		exit(1);
 	}
-	while(fp<=0xFFFF0)
+	if((buf=malloc(0x10000))==NULL)
 	{
-		if(myread(fd, buf, 0x10, devmem)==-1)
-			exit(1);
-		fp+=16;
-		
-		if(memcmp(buf, "_SM_", 4)==0 && fp<=0xFFFF0)
+		perror(argv[0]);
+		exit(1);
+	}
+	if(myread(fd, buf, 0x10000, devmem)==-1)
+		exit(1);
+
+	for(fp=0;fp<=0xFFF0;fp+=16)
+	{
+		if(memcmp(buf+fp, "_SM_", 4)==0 && fp<=0xFFE0)
 		{
-			if(myread(fd, buf+0x10, 0x10, devmem)==-1)
-				exit(1);
+			if(smbios_decode(buf+fp, fd, argv[0], devmem))
+				found++;
 			fp+=16;
-			
-			if(smbios_decode(buf, fd, argv[0], devmem))
-			{
-#ifndef USE_MMAP
-				/* dmi_table moved us far away */
-				lseek(fd, fp, SEEK_SET);
-#endif /* USE_MMAP */
-				found++;
-			}
 		}
-		else if(memcmp(buf, "_DMI_", 5)==0)
+		else if(memcmp(buf+fp, "_DMI_", 5)==0)
 		{
-			if (legacy_decode(buf, fd, argv[0], devmem))
-			{
-#ifndef USE_MMAP
-				/* dmi_table moved us far away */
-				lseek(fd, fp, SEEK_SET);
-#endif /* USE_MMAP */
+			if (legacy_decode(buf+fp, fd, argv[0], devmem))
 				found++;
-			}
 		}
 	}
+	free(buf);
 #endif /* USE_EFI */
 	
 	if(close(fd)==-1)
