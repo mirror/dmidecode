@@ -46,6 +46,9 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef USE_MMAP
+#include <sys/mman.h>
+#endif /* USE MMAP */
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -3752,12 +3755,28 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 	u8 *buf;
 	u8 *data;
 	int i=0;
+#ifdef USE_MMAP
+	div_t mmbase;
+	size_t psize;
+	void *mmp;
+#endif /* USE_MMAP */
 	
 	printf("%u structures occupying %u bytes.\n",
 		num, len);
 	printf("Table at 0x%08X.\n",
 		base);
 	
+#ifdef USE_MMAP
+	psize=getpagesize();
+	mmbase=div(base, psize);
+	mmp=mmap(0, mmbase.rem+len, PROT_READ, MAP_PRIVATE, fd, mmbase.quot*psize);
+    if(mmp==MAP_FAILED)
+    {
+       perror("mmap");
+       return;
+    }
+	buf=(u8 *)mmp+mmbase.rem;
+#else /* USE_MMAP */
 	if((buf=malloc(len))==NULL)
 	{
 		perror(pname);
@@ -3776,6 +3795,7 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 			"report.\n");
 		exit(1);
 	}
+#endif /* USE_MMAP */
 	
 	data=buf;
 	while(i<num && data+sizeof(struct dmi_header)<=buf+len)
@@ -3807,7 +3827,11 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 		printf("Wrong DMI structures length: %d bytes announced, strutures occupy %d bytes.\n",
 			len, data-buf);
 	
+#ifdef USE_MMAP
+	munmap(mmp, mmbase.rem+len);
+#else /* USE_MMAP */
 	free(buf);
+#endif /* USE_MMAP */
 }
 
 
@@ -3820,7 +3844,7 @@ int main(int argc, const char *argv[])
 #ifdef __IA64__
 	FILE* efi_systab;
 	char linebuf[64];
-#endif
+#endif /* __IA64__ */
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4 || '\0'!=0)
 	{
@@ -3857,7 +3881,7 @@ int main(int argc, const char *argv[])
 	}
 	if(fclose(efi_systab)!=0)
 		perror("/proc/efi/systab");
-#endif
+#endif /* __IA64__ */
 	if(lseek(fd, fp, SEEK_SET)==-1)
 	{
 		perror(devmem);

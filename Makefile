@@ -16,6 +16,7 @@ CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
 #CFLAGS += -DALIGNMENT_WORKAROUND
 #CFLAGS += -DTABLE_LITTLEENDIAN
 #CFLAGS += -D__IA64__
+#CFLAGS += -DUSE_MMAP
 PREFIX  = /usr/local
 
 all : dmidecode biosdecode ownership
