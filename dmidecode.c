@@ -1218,7 +1218,7 @@ static void dmi_memory_module_size(u8 code)
 			break;
 		case 0x7F:
 			printf(" Not Installed");
-			break;
+			return;
 		default:
 			printf(" %u MB", 1<<(code&0x7F));
 	}
@@ -1860,7 +1860,7 @@ static const char *dmi_event_log_descriptor_format(u8 code)
 
 static void dmi_event_log_descriptors(u8 count, u8 len, u8 *p, const char *prefix)
 {
-	/* 3.3.16.1, , 3.3.16.6.2 */
+	/* 3.3.16.1 */
 	int i;
 	
 	for(i=0; i<count; i++)
@@ -3343,9 +3343,11 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\tSystem Reset\n");
 			if(h->length<0x0D) break;
 			printf("\t\tStatus: %s\n",
-				data[4]&(1<<0)?"Enabled":"Disabled");
+				data[0x04]&(1<<0)?"Enabled":"Disabled");
 			printf("\t\tWatchdog Timer: %s\n",
-				data[4]&(1<<5)?"Present":"No");
+				data[0x04]&(1<<5)?"Present":"Not Present");
+			if(!(data[0x04]&(1<<5)))
+				break;
 			printf("\t\tBoot Option: %s\n",
 				dmi_system_reset_boot_option((data[0x04]>>1)&0x3));
 			printf("\t\tBoot Option On Limit: %s\n",
