@@ -10,6 +10,6 @@
 #endif
 
 /* Use mmap or not */
-#ifdef __linux__
+#ifndef __BEOS__
 #define USE_MMAP
 #endif
