@@ -20,7 +20,11 @@ CFLAGS += -DUSE_MMAP
 CFLAGS += -O2
 #CFLAGS += -g
 
-PREFIX  = /usr/local
+DESTDIR =
+prefix  = /usr/local
+sbindir = $(prefix)/sbin
+mandir  = $(prefix)/man
+man8dir = $(mandir)/man8
 
 all : dmidecode biosdecode ownership vpddecode
 
@@ -67,20 +71,21 @@ strip : all
 	strip dmidecode biosdecode ownership vpddecode
 
 install : all
-	install -m 755 dmidecode $(PREFIX)/sbin
-	install -m 755 biosdecode $(PREFIX)/sbin
-	install -m 755 ownership $(PREFIX)/sbin
-	install -m 755 vpddecode $(PREFIX)/sbin
-	install -m 644 man/dmidecode.8 $(PREFIX)/man/man8
-	install -m 644 man/biosdecode.8 $(PREFIX)/man/man8
-	install -m 644 man/ownership.8 $(PREFIX)/man/man8
-	install -m 644 man/vpddecode.8 $(PREFIX)/man/man8
+	install -d $(DESTDIR)$(sbindir) $(DESTDIR)$(man8dir)
+	install -m 755 dmidecode $(DESTDIR)$(sbindir)
+	install -m 755 biosdecode $(DESTDIR)$(sbindir)
+	install -m 755 ownership $(DESTDIR)$(sbindir)
+	install -m 755 vpddecode $(DESTDIR)$(sbindir)
+	install -m 644 man/dmidecode.8 $(DESTDIR)$(man8dir)
+	install -m 644 man/biosdecode.8 $(DESTDIR)$(man8dir)
+	install -m 644 man/ownership.8 $(DESTDIR)$(man8dir)
+	install -m 644 man/vpddecode.8 $(DESTDIR)$(man8dir)
 
 uninstall :
-	rm -f $(PREFIX)/sbin/dmidecode $(PREFIX)/man/man8/dmidecode.8
-	rm -f $(PREFIX)/sbin/biosdecode $(PREFIX)/man/man8/biosdecode.8
-	rm -f $(PREFIX)/sbin/ownership $(PREFIX)/man/man8/ownership.8
-	rm -f $(PREFIX)/sbin/vpddecode $(PREFIX)/man/man8/vpddecode.8
+	rm -f $(DESTDIR)$(sbindir)/dmidecode $(DESTDIR)$(man8dir)/dmidecode.8
+	rm -f $(DESTDIR)$(sbindir)/biosdecode $(DESTDIR)$(man8dir)/biosdecode.8
+	rm -f $(DESTDIR)$(sbindir)/ownership $(DESTDIR)$(man8dir)/ownership.8
+	rm -f $(DESTDIR)$(sbindir)/vpddecode $(DESTDIR)$(man8dir)/vpddecode.8
 
 clean :
 	rm -f *.o dmidecode biosdecode ownership vpddecode core
