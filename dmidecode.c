@@ -3800,9 +3800,9 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 	if(myread(fd, buf, len, devmem)==-1)
 	{
 		free(buf);
-		printf("Table is unreachable, sorry. This problem is known on IBM T23 and T30 laptops,\n"
-			"as well as on the Fujitsu-Siemens S-4582 laptop. If your system differ, please\n"
-			"report.\n");
+		printf("Table is unreachable, sorry. Try compiling dmidecode with -DUSE_MMAP.\n"
+			"This problem is known on the IBM T23, T30 and X30 laptops, the Fujitsu-Siemens\n"
+			"S-4582 laptop as well as IA-64 systems. If your system differ, please report\n");
 		exit(1);
 	}
 #endif /* USE_MMAP */
@@ -3865,7 +3865,7 @@ static int smbios_decode(u8 *buf, int fd, const char *pname, const char *devmem)
 int main(int argc, const char *argv[])
 {
 	int fd;
-	off_t fp=0xF0000, fp_last=0xFFFF0;
+	off_t fp=0xF0000;
 	const char *devmem="/dev/mem";
 #ifdef __IA64__
 	FILE *efi_systab;
@@ -3911,7 +3911,6 @@ int main(int argc, const char *argv[])
 		{
 			fp=strtol(addr, NULL, 0);
 			printf("# SMBIOS entry point at 0x%08lx\n", fp);
-			fp_last=fp+16;
 		}
 	}
 	if(fclose(efi_systab)!=0)
@@ -3948,13 +3947,13 @@ int main(int argc, const char *argv[])
 		perror(devmem);
 		exit(1);
 	}
-	while(fp<=fp_last)
+	while(fp<=0xFFFF0)
 	{
 		if(myread(fd, buf, 0x10, devmem)==-1)
 			exit(1);
 		fp+=16;
 		
-		if(memcmp(buf, "_SM_", 4)==0 && fp<=fp_last)
+		if(memcmp(buf, "_SM_", 4)==0 && fp<=0xFFFF0)
 		{
 			if(myread(fd, buf+0x10, 0x10, devmem)==-1)
 				exit(1);
