@@ -36,7 +36,7 @@
  *	- Intel AP-485 revision 23
  *    "Intel Processor Identification and the CPUID Instruction"
  *    http://developer.intel.com/design/xeon/applnots/241618.htm
- *  - DMTF Master MIF version 021205
+ *  - DMTF Master MIF version 030621
  *    "DMTF approved standard groups"
  *    http://www.dmtf.org/standards/standard_dmi.php
  *  - IPMI 1.5 revision 1.1
@@ -801,8 +801,8 @@ static const char *dmi_processor_family(u8 code)
 		"Athlon XP",
 		"Athlon MP",
 		"Itanium 2",
-		NULL, /* 0xB9 */
-		NULL,
+		"Pentium M",
+		NULL, /* 0xBA */
 		NULL,
 		NULL,
 		NULL,
@@ -956,7 +956,8 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 	else if((type>=0x0B && type<=0x13) /* Intel, Cyrix */
 	|| (type>=0x18 && type<=0x1D) || type==0x1F /* AMD */
 	|| (type>=0xB0 && type<=0xB3) /* Intel */
-	|| (type>=0xB5 && type<=0xB7)) /* Intel, AMD */
+	|| (type>=0xB5 && type<=0xB7) /* Intel, AMD */
+	|| (type==0x84)) /* AMD Opteron */
 		cpuid=1;
 	else if(type==0x01)
 	{
@@ -1009,9 +1010,13 @@ static void dmi_processor_voltage(u8 code)
 	if(code&0x80)
 		printf(" %.1f V", (float)(code&0x7f)/10);
 	else
+	{
 		for(i=0; i<=2; i++)
 			if(code&(1<<i))
 				printf(" %s", voltage[i]);
+		if(code==0x00)
+			printf(" Unknown");
+	}
 }
 
 static void dmi_processor_frequency(u16 code)
@@ -1766,7 +1771,7 @@ static const char *dmi_event_log_method(u8 code)
 		"Indexed I/O, two 8-bit index ports, one 8-bit data port",
 		"Indexed I/O, one 16-bit index port, one 8-bit data port",
 		"Memory-mapped physical 32-bit address",
-		"General-pupose non-volatile data functions" /* 0x04 */
+		"General-purpose non-volatile data functions" /* 0x04 */
 	};
 	
 	if(code<=0x04)
