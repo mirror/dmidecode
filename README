@@ -33,7 +33,7 @@ on FreeBSD as well.
 There's no configure script, so simply run "make" to build dmidecode, and
 "make install" to install it. You also can use "make uninstall" to remove
 all files you installed. By default, files are installed in /usr/local but
-you can change this behavior by editing the Makefile file and setting PREFIX
+you can change this behavior by editing the Makefile file and setting prefix
 to wherever you want. You may change the C compiler and the compilation
 flags as well.
 
