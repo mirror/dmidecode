@@ -25,7 +25,7 @@
  *
  * References:
  *  - IBM "Using the BIOS Build ID to identify IBM Thinkpad systems"
- *    Revision 2005-02-16
+ *    Revision 2005-03-02
  *    http://www-307.ibm.com/pc/support/site.wss/MIGR-45120.html
  *
  * Notes:
@@ -165,11 +165,14 @@ static const char *product_name(const char *id)
 		"1P", "Thinkpad R40", /* added 2003-11-29 (IBM),
 		                         types 2722, 2723 and 2724 */
 		"1Q", "Thinkpad X31",
-		"1R", "Thinkpad T40, T41, R50, R50p or R51", /* updated 2003-11-29 (IBM),
-		                                                updated 2004-11-08,
-								reported by Marco Wertejuk */
+		"1R", "Thinkpad T40, T41, T42, R50, R50p or R51", /* updated 2003-11-29 (IBM),
+		                                                     updated 2004-11-08,
+								     reported by Marco Wertejuk,
+								     updated 2005-03-08 (IBM) */
 		"1S", "Thinkpad R40e", /* added 2003-11-29 (IBM) */
 		"1T", "Thinkpad G40",
+		"1V", "Thinkpad R51", /* added 2005-03-08 (IBM),
+		                         confirmed by Ingo van Lil */
 		"1W", "Thinkpad R50e", /* added 2005-02-17 (IBM) */
 		"1Y", "Thinkpad T43/p", /* added 2005-02-17 (IBM) */
 		"20", "Netvista A22p or M41", /* added 2003-10-09,
