@@ -1,7 +1,7 @@
 /*
  * IBM Vital Product Data decoder
  *
- *   (C) 2003 Jean Delvare <khali@linux-fr.org>
+ *   (C) 2003-2004 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -97,6 +97,8 @@ static const char *product_name(const char *id)
 		                                  confirmed by Pamela Huntley */
 		"KY", "Thinkpad A21p or A22p", /* fixed 2003-11-29 (IBM) */
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
+		"PI", "Netvista 6578", /* added 2004-04-23,
+		                          reported by Zing Zing Shishak */
 		"PT", "Netvista A20", /* added 2003-12-28,
 		                         reported by Ramiro Barreiro */
 		"RE", "eServer xSeries 445", /* added 2003-12-17,
@@ -128,7 +130,8 @@ static const char *product_name(const char *id)
 		"1R", "Thinkpad T40, T41, R50 or R50p", /* updated 2003-11-29 (IBM) */
 		"1S", "Thinkpad R40e", /* added 2003-11-29 (IBM) */
 		"1T", "Thinkpad G40",
-		"20", "Netvista 6823", /* added 2003-10-09 */
+		"20", "Netvista 6792 or 6823", /* added 2003-10-09,
+		                                  updated 2004-02-23 */
 		NULL, "Unknown, please report!"
 	};
 	
@@ -165,8 +168,10 @@ static int decode(const u8 *p)
 	if(p[5]<0x30)
 		return 0;
 	
-	/* XSeries have longer records and a different checksumming method. */
+	/* XSeries have longer records. */
 	if(!(p[5]>=0x46 && checksum(p, 0x46))
+	/* Some Netvista seem to work with this. */
+	&& !(checksum(p, 0x30))
 	/* The Thinkpad checksum does *not* include the first 13 bytes. */
 	&& !(checksum(p+0x0D, 0x30-0x0D)))
 		/* A few systems have a bad checksum (xSeries 330, 335 and 345 with
