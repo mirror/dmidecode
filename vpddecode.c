@@ -97,6 +97,10 @@ static const char *product_name(const char *id)
 		                                  confirmed by Pamela Huntley */
 		"KY", "Thinkpad A21p or A22p", /* fixed 2003-11-29 (IBM) */
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
+		"RE", "eServer xSeries 445", /* added 2003-12-17,
+		                                reported by Josef Moellers */
+		"TT", "eServer xSeries 330", /* added 2003-12-03,
+		                                reported by Hugues Lepesant */
 		"10", "Thinkpad A21e or A22e", /* Celeron models */
 		"11", "Thinkpad 240Z",
 		"13", "Thinkpad A22m", /* 2628-Sxx models */
@@ -156,15 +160,28 @@ static void print_entry(const char *name, const u8 *p, size_t len)
 
 static int decode(const u8 *p)
 {
-	/* The checksum does *not* include the first 13 bytes. */
-	if(p[5]<0x30 || !checksum(p+0x0D, 0x30-0x0D))
+	if(p[5]<0x30)
 		return 0;
 	
-	print_entry("Bios Build ID", p+0x0D, 9);
+	/* XSeries have longer records and a different checksumming method. */
+	if(!(p[5]>=0x46 && checksum(p, 0x46))
+	/* The checksum does *not* include the first 13 bytes. */
+	&& !(checksum(p+0x0D, 0x30-0x0D)))
+		/* A few systems have a bad checksum (xSeries 330, 335 and 345 with
+		   early BIOS) but the record is otherwise valid. */
+		printf("Bad checksum! Please report.\n");
+	
+	print_entry("BIOS Build ID", p+0x0D, 9);
 	printf("Product Name: %s\n", product_name((const char *)(p+0x0D)));
 	print_entry("Box Serial Number", p+0x16, 7);
 	print_entry("Motherboard Serial Number", p+0x1D, 11);
 	print_entry("Machine Type/Model", p+0x28, 7);
+	
+	if(p[5]<0x45)
+		return 1;
+	
+	print_entry("BIOS Release Date", p+0x30, 8);
+	print_entry("Default Flash Image File Name", p+0x38, 13);
 	
 	return 1;
 }
