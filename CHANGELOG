@@ -1,3 +1,13 @@
+2003-06-27  Jean Delvare  <khali@linux-fr.org>
+
+	* biosdecode.c: Better display of Compaq-specific entries (thank to
+	  some documentation).
+
+2003-06-25  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Removed fp_last (not useful anymore). Reworded the "table
+	  is unreachable" message to mention the -DUSE_MMAP solution.
+
 2003-06-19  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Added support for IA-64.
