@@ -3,10 +3,9 @@
 #	BIOS Decode
 #
 #	(C) 2000-2002 Alan Cox <alan@redhat.com>
-#	(C) 2002-2003 Jean Delvare <khali@linux-fr.org>
+#	(C) 2002-2004 Jean Delvare <khali@linux-fr.org>
 #
-#	Licensed under the GNU Public license. If you want to use it in with
-#	another license just ask.
+#	Licensed under the GNU Public License.
 #
 
 CC      = gcc
@@ -72,12 +71,16 @@ install : all
 	install -m 755 biosdecode $(PREFIX)/sbin
 	install -m 755 ownership $(PREFIX)/sbin
 	install -m 755 vpddecode $(PREFIX)/sbin
+	install -m 644 man/dmidecode.8 $(PREFIX)/man/man8
+	install -m 644 man/biosdecode.8 $(PREFIX)/man/man8
+	install -m 644 man/ownership.8 $(PREFIX)/man/man8
+	install -m 644 man/vpddecode.8 $(PREFIX)/man/man8
 
 uninstall :
-	rm -f $(PREFIX)/sbin/dmidecode
-	rm -f $(PREFIX)/sbin/biosdecode
-	rm -f $(PREFIX)/sbin/ownership
-	rm -f $(PREFIX)/sbin/vpddecode
+	rm -f $(PREFIX)/sbin/dmidecode $(PREFIX)/man/man8/dmidecode.8
+	rm -f $(PREFIX)/sbin/biosdecode $(PREFIX)/man/man8/biosdecode.8
+	rm -f $(PREFIX)/sbin/ownership $(PREFIX)/man/man8/ownership.8
+	rm -f $(PREFIX)/sbin/vpddecode $(PREFIX)/man/man8/vpddecode.8
 
 clean :
 	rm -f *.o dmidecode biosdecode ownership vpddecode core
