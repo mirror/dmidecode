@@ -1,7 +1,7 @@
 /*
  * Compaq Ownership Tag
  *
- *   (C) 2003 Jean Delvare <khali@linux-fr.org>
+ *   (C) 2003-2004 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -29,38 +29,23 @@
  *    http://h18000.www1.hp.com/support/techpubs/technical_reference_guides/113a1097.html
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 
 #include "types.h"
 #include "util.h"
 
-static void ownership(int fd, u32 base, const char *pname, const char *devmem)
+static void ownership(u32 base, const char *pname, const char *devmem)
 {
 	u8 *buf;
 	int i;
-	
-	if((buf=malloc(0x51))==NULL)
+
+	/* read the ownership tag */
+	if((buf=mem_chunk(base, 0x51, devmem))==NULL)
 	{
 		perror(pname);
 		return;
-	}
-	
-	/* read the ownership tag */
-	if(lseek(fd, (off_t)base, SEEK_SET)==-1)
-	{
-		perror(devmem);
-		return;
-	}
-	if(myread(fd, buf, 0x50, devmem)==-1)
-	{
-		free(buf);
-		exit(1);
 	}
 	
 	/* chop the trailing garbage */
@@ -110,9 +95,8 @@ static u32 decode(const u8 *p)
 
 int main(int argc, const char *argv[])
 {
-	u8 buf[16];
-	int fd;
-	off_t fp=0xE0000;
+	u8 *buf;
+	off_t fp;
 	const char *devmem="/dev/mem";
 	int ok=0;
 	
@@ -124,60 +108,32 @@ int main(int argc, const char *argv[])
 	
 	if(argc>=2)
 		devmem=argv[1];
-	if((fd=open(devmem, O_RDONLY))==-1 || lseek(fd, fp, SEEK_SET)==-1)
-	{
-		perror(devmem);
+
+	if((buf=mem_chunk(0xE0000, 0x20000, devmem))==NULL)
 		exit(1);
-	}
 
-	while(!ok && fp<0xFFFFF)
+	for(fp=0; !ok && fp<=0x1FFF0; fp+=16)
 	{
-		if(myread(fd, buf, 16, devmem)==-1)
-			exit(1);
-		
-		if(memcmp((char *)buf, "32OS", 4)==0)
-		{
-			off_t len=buf[4]*10+5;
-			u8 *p;
+		u8 *p=buf+fp;
 
-			if(fp+len-1<=0xFFFFF)
+		if(memcmp((char *)p, "32OS", 4)==0)
+		{
+			off_t len=p[4]*10+5;
+
+			if(fp+len-1<=0x1FFFF)
 			{
 				u32 base;
 				
-				if((p=malloc(len))==NULL)
-				{
-					perror("malloc");
-					exit(1);
-				}
-
-				memcpy(p, buf, 16);
-				if(len>16)
-				{
-					/* buffer completion */
-					if(myread(fd, p+16, len-16, devmem)==-1)
-					{
-						free(p);
-						exit(1);
-					}
-				}
 				if((base=decode(p)))
 				{
 					ok=1;
-					ownership(fd, base, argv[0], devmem);
+					ownership(base, argv[0], devmem);
 				}
-				else
-					lseek(fd, fp+16, SEEK_SET);
-				free(p);
 			}
 		}
-		fp+=16;
 	}
 	
-	if(close(fd)==-1)
-	{
-		perror(devmem);
-		exit(1);
-	}
+	free(buf);
 	
 	return 0;
 }
