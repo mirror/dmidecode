@@ -3867,7 +3867,7 @@ static void print_help(void)
 int main(int argc, char * const argv[])
 {
 	int found=0;
-	off_t fp;
+	size_t fp;
 #ifdef USE_EFI
 	FILE *efi_systab;
 	const char *filename;
@@ -3920,7 +3920,7 @@ int main(int argc, char * const argv[])
 		*(addr++)='\0';
 		if(strcmp(linebuf, "SMBIOS")==0)
 		{
-			fp=strtol(addr, NULL, 0);
+			fp=strtoul(addr, NULL, 0);
 			printf("# SMBIOS entry point at 0x%08lx\n", fp);
 		}
 	}
