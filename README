@@ -32,19 +32,19 @@ Optionally, you can run "make strip" prior to "make install" if you want
 smaller binaries. However, know that this will prevent any further
 attempt to debug programs.
 
-Three parameters can be set in the Makefile file to make dmidecode work on
-non-i386 systems. The first two (BIGENDIAN and ALIGNMENT_WORKAROUND) should
-be used if your system uses the big endian byte ordering (Motorola) or
-doesn't support unaligned memory accesses, respectively. For example,
-compiling for a SPARC processor would require both. The third parameter
-(TABLE_LITTLEENDIAN) is there for debugging purposes only and shouldn't be
-set by users.
+Two parameters can be set in the Makefile file to make dmidecode work on
+non-i386 systems. They should be used if your system uses the big endian
+byte ordering (Motorola) or doesn't support unaligned memory accesses,
+respectively. For example, compiling for a SPARC processor would require
+both. Note that this hasn't been much tested though, because the data
+manipulated by dmidecode and the other tools is only found on i386 and
+similar processors anyway.
 
 
 ** DOCUMENTATION **
 
-There's no man page nor info page at this time. I don't know if there ever
-will be one. I don't really feel a need for it.
+Each tool has a manual page, found in the man/ subdirectory. Manual pages
+are installed by "make install".
 
 This program was first written for Linux, and has since be reported to work
 on FreeBSD as well.
