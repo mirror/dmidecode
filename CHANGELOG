@@ -1,3 +1,11 @@
+2005-03-06  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Add option -u, --dump. It disables decoding of the
+	  entries, raw dumps are displayed instead. This option is mainly
+	  intended for debugging.
+	* Makefile: Use -Winline.
+	* dmidecode.c: Make ASCII filtering of strings faster.
+
 2005-02-28  Jean Delvare  <khali@linux-fr.org>
 
 	* version.h: Set version to 2.6.
