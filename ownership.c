@@ -24,7 +24,9 @@
  *   are deemed to be part of the source code.
  *
  * References:
- *   None, this is guess work.
+ *  - Compaq "Technical Reference Guide for Compaq Deskpro 4000 and 6000"
+ *    First Edition
+ *    http://h18000.www1.hp.com/support/techpubs/technical_reference_guides/113a1097.html
  */
 
 #include <sys/types.h>
@@ -38,7 +40,6 @@
 #include "types.h"
 #include "util.h"
 
-#define WORD(x) (*(const u16 *)(x))
 #define DWORD(x) (*(const u32 *)(x))
 
 static void ownership(int fd, u32 base, const char *pname, const char *devmem)
@@ -109,7 +110,7 @@ static u32 decode(const u8 *p)
 	return 0;
 }
 
-int main(__attribute__ ((unused)) int argc, const char *argv[])
+int main(int argc, const char *argv[])
 {
 	u8 buf[16];
 	int fd;
@@ -117,7 +118,7 @@ int main(__attribute__ ((unused)) int argc, const char *argv[])
 	const char *devmem="/dev/mem";
 	int ok=0;
 	
-	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4)
+	if(sizeof(u8)!=1 || sizeof(u32)!=4)
 	{
 		fprintf(stderr,"%s: compiler incompatibility\n", argv[0]);
 		exit(255);
