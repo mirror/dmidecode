@@ -3793,6 +3793,8 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 		next+=2;
 		if(next-buf<=len)
 			dmi_decode(data, ver);
+		else
+			printf("\t<TRUNCATED>\n");
 		
 		data=next;
 		i++;
@@ -3802,7 +3804,7 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 		printf("Wrong DMI structures count: %d announced, only %d decoded.\n",
 			num, i);
 	if(data-buf!=len)
-		printf("Wrong DMI structures length: %d bytes announced, %d bytes decoded.\n",
+		printf("Wrong DMI structures length: %d bytes announced, strutures occupy %d bytes.\n",
 			len, data-buf);
 	
 	free(buf);
