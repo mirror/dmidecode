@@ -51,11 +51,7 @@
  *    http://www.pc.ibm.com/qtechinfo/MIGR-45120.html
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -491,9 +487,8 @@ static struct bios_entry bios_entries[]={
 
 int main(int argc, const char *argv[])
 {
-	u8 buf[16];
-	int fd;
-	off_t fp=0xE0000;
+	u8 *buf;
+	off_t fp;
 	const char *devmem="/dev/mem";
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4)
@@ -504,62 +499,37 @@ int main(int argc, const char *argv[])
 	
 	if(argc>=2)
 		devmem=argv[1];
-	if((fd=open(devmem, O_RDONLY))==-1 || lseek(fd, fp, SEEK_SET)==-1)
-	{
-		perror(devmem);
-		exit(1);
-	}
 	
 	printf("# biosdecode %s\n", VERSION);
-	while(fp<0xFFFFF)
+
+	if((buf=mem_chunk(0xE0000, 0x20000, devmem))==NULL)
+		exit(1);
+
+	for(fp=0xE0000; fp<=0xFFFF0; fp+=16)
 	{
 		int i;
-		
-		if(myread(fd, buf, 16, devmem)==-1)
-			exit(1);
+		u8 *p=buf+fp-0xE0000;
 		
 		for(i=0; bios_entries[i].anchor!=NULL; i++)
 		{
-			if(strncmp((char *)buf, bios_entries[i].anchor, strlen(bios_entries[i].anchor))==0
+			if(strncmp((char *)p, bios_entries[i].anchor, strlen(bios_entries[i].anchor))==0
 			 && fp>=bios_entries[i].low_address
 			 && fp<bios_entries[i].high_address)
 			{
-				off_t len=bios_entries[i].length(buf);
-				u8 *p;
+				off_t len=bios_entries[i].length(p);
 				
 				if(fp+len-1<=bios_entries[i].high_address)
 				{
-					if((p=malloc(len))==NULL)
-					{
-						perror("malloc");
-						exit(1);
-					}
-
-					memcpy(p, buf, (len>16?16:len));
-					if(len>16)
-					{
-						/* buffer completion */
-						if(myread(fd, p+16, len-16, devmem)==-1)
-						{
-							free(p);
-							exit(1);
-						}
-					}
-					if(bios_entries[i].decode(p, len))
+					if(bios_entries[i].decode(p, len)) {
 						fp+=(((len-1)>>4)<<4);
-					lseek(fd, fp+16, SEEK_SET);
-					free(p);
+						break;
+					}
 				}
 			}
 		}
-		fp+=16;
 	}
-	
-	if(close(fd)==-1)
-	{
-		perror(devmem);
-		exit(1);
-	}
+
+	free(buf);	
 	
 	return 0;
 }
