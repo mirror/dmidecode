@@ -97,8 +97,11 @@ static const char *product_name(const char *id)
 		                                  confirmed by Pamela Huntley */
 		"KY", "Thinkpad A21p or A22p", /* fixed 2003-11-29 (IBM) */
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
-		"PI", "Netvista 6578", /* added 2004-04-23,
-		                          reported by Zing Zing Shishak */
+		"PI", "Netvista A40/p", /* added 2004-02-23,
+		                           updated 2004-03-24,
+		                           reported by Zing Zing Shishak */
+		"PJ", "PC 300GL", /* added 2004-03-23,
+		                     reported by Roger Koot */
 		"PT", "Netvista A20", /* added 2003-12-28,
 		                         reported by Ramiro Barreiro */
 		"RE", "eServer xSeries 445", /* added 2003-12-17,
@@ -130,8 +133,9 @@ static const char *product_name(const char *id)
 		"1R", "Thinkpad T40, T41, R50 or R50p", /* updated 2003-11-29 (IBM) */
 		"1S", "Thinkpad R40e", /* added 2003-11-29 (IBM) */
 		"1T", "Thinkpad G40",
-		"20", "Netvista 6792 or 6823", /* added 2003-10-09,
-		                                  updated 2004-02-23 */
+		"20", "Netvista A22p or M41", /* added 2003-10-09,
+		                                 updated 2004-02-23,
+		                                 updated 2004-03-24 */
 		"2A", "Thinkcentre M50", /* added 2004-03-19,
 		                            reported by Rafael Avila de Espindola */
 		NULL, "Unknown, please report!"
