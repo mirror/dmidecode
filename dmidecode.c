@@ -98,7 +98,7 @@ struct dmi_header
 static const char *dmi_string(struct dmi_header *dm, u8 s)
 {
 	char *bp=(char *)dm;
-	size_t i;
+	size_t i, len;
 
 	if(s==0)
 		return "Not Specified";
@@ -115,7 +115,8 @@ static const char *dmi_string(struct dmi_header *dm, u8 s)
 		return bad_index;
 	
 	/* ASCII filtering */
-	for(i=0; i<strlen(bp); i++)
+	len=strlen(bp);
+	for(i=0; i<len; i++)
 		if(bp[i]<32 || bp[i]==127)
 			bp[i]='.';
 	
