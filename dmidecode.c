@@ -80,49 +80,22 @@ static const char *bad_index = "<BAD INDEX>";
  * - Define ALIGNMENT_WORKAROUND if your system doesn't support
  *   non-aligned memory access. In this case, we use a slower, but safer,
  *   memory access method.
- * - If it happens that the table is supposed to be always little-endian
- *   ordered regardless of the architecture, define TABLE_LITTLEENDIAN.
- * You most probably will have to define none or the three of them.
+ * You most probably will have to define none or the two of them.
  */
 
-#ifndef TABLE_LITTLEENDIAN
-#	ifdef BIGENDIAN
-	typedef struct {
-		u32 h;
-		u32 l;
-	} u64;
-#	else /* BIGENDIAN */
-	typedef struct {
-		u32 l;
-		u32 h;
-	} u64;
-#	endif /* BIGENDIAN */
-#	ifdef ALIGNMENT_WORKAROUND
-#		ifdef BIGENDIAN
-#		define WORD(x) (u16)((x)[1]+((x)[0]<<8))
-#		define DWORD(x) (u32)((x)[3]+((x)[2]<<8)+((x)[1]<<16)+((x)[0]<<24))
-#		define QWORD(x) (U64(DWORD(x+4), DWORD(x)))
-#		else /* BIGENDIAN */
-#		define WORD(x) (u16)((x)[0]+((x)[1]<<8))
-#		define DWORD(x) (u32)((x)[0]+((x)[1]<<8)+((x)[2]<<16)+((x)[3]<<24))
-#		define QWORD(x) (U64(DWORD(x), DWORD(x+4)))
-#		endif /* BIGENDIAN */
-#	else /* ALIGNMENT_WORKAROUND */
-#	define WORD(x) (u16)(*(u16 *)(x))
-#	define DWORD(x) (u32)(*(u32 *)(x))
-#	define QWORD(x) (*(u64 *)(x))
-#	endif /* ALIGNMENT_WORKAROUND */
-#else /* TABLE_LITTLEENDIAN */
+#ifdef BIGENDIAN
+typedef struct {
+	u32 h;
+	u32 l;
+} u64;
+#else
 typedef struct {
 	u32 l;
 	u32 h;
 } u64;
-#define WORD(x) (u16)((x)[0]+((x)[1]<<8))
-#define DWORD(x) (u32)((x)[0]+((x)[1]<<8)+((x)[2]<<16)+((x)[3]<<24))
-#define QWORD(x) (U64(DWORD(x), DWORD(x+4)))
-#endif /* TABLE_LITTLEENDIAN */
+#endif
 
-#if defined ALIGNMENT_WORKAROUND || defined TABLE_LITTLEENDIAN
+#ifdef ALIGNMENT_WORKAROUND
 static u64 U64(u32 low, u32 high)
 {
 	u64 self;
@@ -134,6 +107,22 @@ static u64 U64(u32 low, u32 high)
 }
 #endif
 
+#ifdef ALIGNMENT_WORKAROUND
+#	ifdef BIGENDIAN
+#	define WORD(x) (u16)((x)[1]+((x)[0]<<8))
+#	define DWORD(x) (u32)((x)[3]+((x)[2]<<8)+((x)[1]<<16)+((x)[0]<<24))
+#	define QWORD(x) (U64(DWORD(x+4), DWORD(x)))
+#	else /* BIGENDIAN */
+#	define WORD(x) (u16)((x)[0]+((x)[1]<<8))
+#	define DWORD(x) (u32)((x)[0]+((x)[1]<<8)+((x)[2]<<16)+((x)[3]<<24))
+#	define QWORD(x) (U64(DWORD(x), DWORD(x+4)))
+#	endif /* BIGENDIAN */
+#else /* ALIGNMENT_WORKAROUND */
+#define WORD(x) (u16)(*(u16 *)(x))
+#define DWORD(x) (u32)(*(u32 *)(x))
+#define QWORD(x) (*(u64 *)(x))
+#endif /* ALIGNMENT_WORKAROUND */
+
 struct dmi_header
 {
 	u8 type;
@@ -141,7 +130,7 @@ struct dmi_header
 	u16 handle;
 };
 
-#if ((defined BIGENDIAN && defined TABLE_LITTLEENDIAN) || defined ALIGNMENT_WORKAROUND)
+#ifdef ALIGNMENT_WORKAROUND
 #define HANDLE(x) WORD((u8 *)&(x->handle))
 #else
 #define HANDLE(x) x->handle

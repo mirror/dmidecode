@@ -13,7 +13,6 @@ CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
           -Wcast-align -Wwrite-strings -pedantic
 #CFLAGS += -DBIGENDIAN
 #CFLAGS += -DALIGNMENT_WORKAROUND
-#CFLAGS += -DTABLE_LITTLEENDIAN
 CFLAGS += -DUSE_MMAP
 
 # When debugging, disable -O2 and enable -g.
