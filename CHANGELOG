@@ -1,3 +1,8 @@
+2003-11-13  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Automatically detect architectures on which to use EFI
+	  (ia64 for now). Suggested by Jeff Moyer.
+
 2003-11-11  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product ID "KX". Reported by Klaus Ade Johnstad,
