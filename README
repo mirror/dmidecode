@@ -17,7 +17,7 @@ too unreliable to be blindly trusted.
 ** INSTALLATION **
 
 Dmidecode's home page is hosted on Savannah:
-  https://savannah.nongnu.org/projects/dmidecode/
+  http://www.nongnu.org/dmidecode/
 You will find the latest version (including CVS) there, as well as fresh news
 and other interesting material, such as a list of related projects.
 
@@ -71,7 +71,8 @@ is at a memory location we couldn't seem to reach through /dev/mem. Although
 I believe this reveals a problem in the Linux kernel, which should be fixed,
 a workaround was found by Smith Chad, and we are using it for now. See the
 IA-64 subsection below for more details. I posted about this problem on the
-LKML but did not have any answer.
+LKML but did not have any answer. Since then, the list of affected systems
+was extended to IBM X-series laptops and xSeries x445 servers.
 
 IA-64
 
