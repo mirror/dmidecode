@@ -61,6 +61,7 @@
 
 struct bios_entry {
 	const char *anchor;
+	size_t anchor_len; /* computed */
 	off_t low_address;
 	off_t high_address;
 	size_t (*length)(const u8 *);
@@ -472,24 +473,37 @@ static int vpd_decode(const u8 *p, size_t len)
  */
 
 static struct bios_entry bios_entries[]={
-	{ "_SM_", 0xF0000, 0xFFFFF, smbios_length, smbios_decode },
-	{ "_DMI_", 0xF0000, 0xFFFFF, dmi_length, dmi_decode },
-	{ "_SYSID_", 0xE0000, 0xFFFFF, sysid_length, sysid_decode },
-	{ "$PnP", 0xF0000, 0xFFFFF, pnp_length, pnp_decode },
-	{ "RSD PTR ", 0xE0000, 0xFFFFF, acpi_length, acpi_decode },
-	{ "$SNY", 0xE0000, 0xFFFFF, sony_length, sony_decode },
-	{ "_32_", 0xE0000, 0xFFFFF, bios32_length, bios32_decode },
-	{ "$PIR", 0xF0000, 0xFFFFF, pir_length, pir_decode },
-	{ "32OS", 0xE0000, 0xFFFFF, compaq_length, compaq_decode },
-	{ "\252\125VPD", 0xF0000, 0xFFFFF, vpd_length, vpd_decode },
-	{ NULL, 0, 0, NULL, NULL }
+	{ "_SM_", 0, 0xF0000, 0xFFFFF, smbios_length, smbios_decode },
+	{ "_DMI_", 0, 0xF0000, 0xFFFFF, dmi_length, dmi_decode },
+	{ "_SYSID_", 0, 0xE0000, 0xFFFFF, sysid_length, sysid_decode },
+	{ "$PnP", 0, 0xF0000, 0xFFFFF, pnp_length, pnp_decode },
+	{ "RSD PTR ", 0, 0xE0000, 0xFFFFF, acpi_length, acpi_decode },
+	{ "$SNY", 0, 0xE0000, 0xFFFFF, sony_length, sony_decode },
+	{ "_32_", 0, 0xE0000, 0xFFFFF, bios32_length, bios32_decode },
+	{ "$PIR", 0, 0xF0000, 0xFFFFF, pir_length, pir_decode },
+	{ "32OS", 0, 0xE0000, 0xFFFFF, compaq_length, compaq_decode },
+	{ "\252\125VPD", 0, 0xF0000, 0xFFFFF, vpd_length, vpd_decode },
+	{ NULL, 0, 0, 0, NULL, NULL }
 };
+
+/* Believe it or not, this is significantly faster than memcmp and strncmp */
+static inline int anchor_match(const struct bios_entry *entry, const char *p)
+{
+	size_t i;
+	
+	for(i=0; i<entry->anchor_len; i++)
+		if(entry->anchor[i]!=p[i])
+			return 0;
+
+	return 1;
+}
 
 int main(int argc, const char *argv[])
 {
 	u8 *buf;
 	off_t fp;
 	const char *devmem="/dev/mem";
+	int i;
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4)
 	{
@@ -505,14 +519,17 @@ int main(int argc, const char *argv[])
 	if((buf=mem_chunk(0xE0000, 0x20000, devmem))==NULL)
 		exit(1);
 
+	/* Compute anchor lengths once and for all */
+	for(i=0; bios_entries[i].anchor!=NULL; i++)
+		bios_entries[i].anchor_len = strlen(bios_entries[i].anchor);
+
 	for(fp=0xE0000; fp<=0xFFFF0; fp+=16)
 	{
-		int i;
 		u8 *p=buf+fp-0xE0000;
 		
 		for(i=0; bios_entries[i].anchor!=NULL; i++)
 		{
-			if(strncmp((char *)p, bios_entries[i].anchor, strlen(bios_entries[i].anchor))==0
+			if(anchor_match(&bios_entries[i], (char *)p)
 			 && fp>=bios_entries[i].low_address
 			 && fp<bios_entries[i].high_address)
 			{
