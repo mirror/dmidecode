@@ -52,7 +52,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#if __ia64__
+#ifdef __ia64__
 #define USE_EFI
 #endif /* __ia64__ */
 
