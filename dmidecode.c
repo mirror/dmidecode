@@ -960,14 +960,15 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 	|| (type==0xB9) /* Intel */
 	|| (type==0x83 || type==0x84)) /* AMD 64-bit */
 		cpuid=1;
-	else if(type==0x01)
+	else if(type==0x01 || type==0x02)
 	{
 		/*
-		 * Some X86-class CPU have family "Other". In this case, we use
-		 * the version string to determine if they are known to support the
-		 * CPUID instruction.
+		 * Some X86-class CPU have family "Other" or "Unknown". In this case,
+		 * we use the version string to determine if they are known to
+		 * support the CPUID instruction.
 		 */
-		if(strcmp(version, "AMD Athlon(TM) Processor")==0)
+		if(strncmp(version, "AMD Athlon(TM)", 14)==0
+		|| strncmp(version, "AMD Opteron(tm)", 15)==0)
 			cpuid=1;
 		else
 			return;
