@@ -22,13 +22,13 @@ PREFIX  = /usr/local
 all : dmidecode biosdecode ownership
 
 ownership : ownership.o util.o
-	$(CC) $^ -o $@
+	$(CC) ownership.o util.o -o $@
 
 dmidecode : dmidecode.o util.o
-	$(CC) $^ -o $@
+	$(CC) dmidecode.o util.o -o $@
 
 biosdecode : biosdecode.o util.o
-	$(CC) $^ -o $@
+	$(CC) biosdecode.o util.o -o $@
 
 dmidecode.o : dmidecode.c version.h types.h util.h
 	$(CC) $(CFLAGS) -c $< -o $@
