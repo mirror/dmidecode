@@ -97,6 +97,8 @@ static const char *product_name(const char *id)
 		                                  confirmed by Pamela Huntley */
 		"KY", "Thinkpad A21p or A22p", /* fixed 2003-11-29 (IBM) */
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
+		"PT", "Netvista A20", /* added 2003-12-28,
+		                         reported by Ramiro Barreiro */
 		"RE", "eServer xSeries 445", /* added 2003-12-17,
 		                                reported by Josef Moellers */
 		"TT", "eServer xSeries 330", /* added 2003-12-03,
@@ -165,7 +167,7 @@ static int decode(const u8 *p)
 	
 	/* XSeries have longer records and a different checksumming method. */
 	if(!(p[5]>=0x46 && checksum(p, 0x46))
-	/* The checksum does *not* include the first 13 bytes. */
+	/* The Thinkpad checksum does *not* include the first 13 bytes. */
 	&& !(checksum(p+0x0D, 0x30-0x0D)))
 		/* A few systems have a bad checksum (xSeries 330, 335 and 345 with
 		   early BIOS) but the record is otherwise valid. */

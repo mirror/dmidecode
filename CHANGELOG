@@ -1,3 +1,7 @@
+2003-12-28  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "PT". Reported by Ramiro Barreiro.
+
 2003-12-17  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product ID "RE". Reported by Josef Moellers.
