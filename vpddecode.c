@@ -97,6 +97,8 @@ static const char *product_name(const char *id)
 		                                  confirmed by Pamela Huntley */
 		"KY", "Thinkpad A21p or A22p", /* fixed 2003-11-29 (IBM) */
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
+		"NV", "PC 300PL", /* added 2004-04-02,
+		                     reported by Shawn Starr */
 		"PI", "Netvista A40/p", /* added 2004-02-23,
 		                           updated 2004-03-24,
 		                           reported by Zing Zing Shishak */
@@ -136,6 +138,8 @@ static const char *product_name(const char *id)
 		"20", "Netvista A22p or M41", /* added 2003-10-09,
 		                                 updated 2004-02-23,
 		                                 updated 2004-03-24 */
+		"24", "Netvista M42", /* added 2004-03-27,
+		                         reported by Paul Sturm */
 		"2A", "Thinkcentre M50", /* added 2004-03-19,
 		                            reported by Rafael Avila de Espindola */
 		NULL, "Unknown, please report!"
