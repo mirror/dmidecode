@@ -4,6 +4,10 @@
 	* util.c, util.h: New.
 	* types.h: New.
 	* Makefile: Updated accordingly.
+	* biosdecode.c: Added detection of Compaq-specific entries.
+	* ownership.c: New program for finding a machine's ownership tag
+	  (only found in Compaq machines). Requested by Luc Van de Velde.
+	* Makefile: Updated again.
 
 2003-06-10  Jean Delvare  <khali@linux-fr.org>
 
