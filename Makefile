@@ -1,7 +1,9 @@
 #
-#	DMI decode
+#	DMI Decode
+#	BIOS Decode
 #
 #	(C) 2000-2002 Alan Cox <alan@redhat.com>
+#	(C) 2001-2002 Jean Delvare <khali@linux-fr.org>
 #
 #	Licensed under the GNU Public license. If you want to use it in with
 #	another license just ask.
@@ -9,21 +11,24 @@
 
 CC      = gcc
 CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
-          -Wcast-align -Wwrite-strings -Wnested-externs -Winline -O2 \
-          -pedantic -g
-TARGET  = dmidecode
+          -Wcast-align -Wwrite-strings -O2 -pedantic -g
 PREFIX  = /usr/local
 
-all : $(TARGET)
+all : dmidecode biosdecode
 
-$(TARGET) : dmidecode.c
+dmidecode : dmidecode.c
 	$(CC) $(CFLAGS) $< -o $@
 
-install : $(TARGET)
-	install -m 755 $(TARGET) $(PREFIX)/sbin
+biosdecode : biosdecode.c
+	$(CC) $(CFLAGS) $< -o $@
+
+install : dmidecode biosdecode
+	install -m 755 dmidecode $(PREFIX)/sbin
+	install -m 755 biosdecode $(PREFIX)/sbin
 
 uninstall :
-	rm -f $(PREFIX)/sbin/$(TARGET)
+	rm -f $(PREFIX)/sbin/dmidecode
+	rm -f $(PREFIX)/sbin/biosdecode
 
 clean :
-	rm -f $(TARGET) 
+	rm -f dmidecode biosdecode
