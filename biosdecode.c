@@ -389,7 +389,7 @@ static size_t compaq_length(const u8 *p)
 
 static int compaq_decode(const u8 *p, size_t len)
 {
-	size_t i;
+	unsigned int i;
 	(void) len;
 
 	printf("Compaq-specific entries present.\n");
