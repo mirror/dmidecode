@@ -398,16 +398,17 @@ static int compaq_decode(const u8 *p, size_t len)
 	for(i=0; i<p[4]; i++)
 	{
 		/*
-		 * We do not check for truncated entries, because the length was
-		 * computed from the number of records in compaq_length right above,
-		 * so it can't be wrong.
+		 * We do not check for truncated entries, because the length
+		 * was computed from the number of records in compaq_length
+		 * right above, so it can't be wrong.
 		 */
 		if(p[5+i*10]!='$' || !(p[6+i*10]>='A' && p[6+i*10]<='Z')
 			|| !(p[7+i*10]>='A' && p[7+i*10]<='Z')
 			|| !(p[8+i*10]>='A' && p[8+i*10]<='Z'))
 		{
-			printf("\t Abnormal entry! Please report. [%02X %02X %02X %02X]\n",
-				p[5+i*10], p[6+i*10], p[7+i*10], p[8+i*10]);
+			printf("\t Abnormal entry! Please report. [%02X %02X "
+				"%02X %02X]\n", p[5+i*10], p[6+i*10],
+				p[7+i*10], p[8+i*10]);
 			return 0;
 		}
 	}
@@ -537,7 +538,8 @@ int main(int argc, const char *argv[])
 				
 				if(fp+len-1<=bios_entries[i].high_address)
 				{
-					if(bios_entries[i].decode(p, len)) {
+					if(bios_entries[i].decode(p, len))
+					{
 						fp+=(((len-1)>>4)<<4);
 						break;
 					}
