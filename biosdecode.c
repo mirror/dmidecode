@@ -387,6 +387,44 @@ static int pir_decode(const u8 *p, size_t len)
 }
 
 /*
+ * Compaq-specific entries
+ */
+
+static size_t compaq_length(const u8 *p)
+{
+	return (p[4]*10+5);
+}
+
+static int compaq_decode(const u8 *p, __attribute__ ((unused)) size_t len)
+{
+	int i;
+
+	printf("Compaq-specific entries present.\n");
+
+	/* integrity checking (lack of checksum) */
+	for(i=0; i<p[4]; i++)
+	{
+		if(p[5+i*10]!='$' || !(p[6+i*10]>='A' && p[6+i*10]<='Z')
+			|| !(p[7+i*10]>='A' && p[7+i*10]<='Z')
+			|| !(p[8+i*10]>='A' && p[8+i*10]<='Z'))
+		{
+			printf("\t Abnormal Entry! Please report. [%02x %02x %02x %02x]\n",
+				p[5+i*10], p[6+i*10], p[7+i*10], p[8+i*10]);
+			return 0;
+		}
+	}
+	
+	for(i=0; i<p[4]; i++)
+	{
+		printf("\tEntry %u: %c%c%c%c at 0x%08x (data=0x%04x)\n",
+			i+1, p[5+i*10], p[6+i*10], p[7+i*10], p[8+i*10],
+			DWORD(p+9+i*10), WORD(p+13+i*10));
+	}
+
+	return 1;
+}
+
+/*
  * Main
  */
 
@@ -399,6 +437,7 @@ static struct bios_entry bios_entries[]={
 	{ "$SNY", 0xE0000, 0xFFFFF, sony_length, sony_decode },
 	{ "_32_", 0xE0000, 0xFFFFF, bios32_length, bios32_decode },
 	{ "$PIR", 0xF0000, 0xFFFFF, pir_length, pir_decode },
+	{ "32OS", 0xE0000, 0xFFFFF, compaq_length, compaq_decode },
 	{ NULL, 0, 0, NULL, NULL }
 };
 
