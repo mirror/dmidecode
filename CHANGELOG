@@ -1,3 +1,9 @@
+2004-03-19  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "2A". Reported by Rafael Avila
+	  de Espindola.
+	* version.h: Set version to 2.4.
+
 2004-03-07  Jean Delvare  <khali@linux-fr.org>
 
 	* biosdecode.c, vpddecode.c: Add a third checksumming method for
