@@ -1,3 +1,10 @@
+2003-10-10  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Change mmap options to prevent dmidecode from being
+	  killed by the Linux kernel in some rare cases. Reported by
+	  Mike Cooper.
+	* dmidecode.c: Various code cleanups and optimizations.
+
 2003-10-09  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fix a bug that prevented dmidecode to reach DMI tables
