@@ -1,3 +1,14 @@
+2004-12-10  Jean Delvare  <khali@linux-fr.org>
+
+	Increase portability and configurability to in order to support BeOS.
+	
+	* config.h: New.
+	* config.h: Define a default memory device.
+	* biosdecode.c, dmidecode.c, ownership.c, vpddecide.c: Include
+	  config.h and use the defined default memory device.
+	* Makefile, config.h, util.c, README: Move USE_MMAP to config.h,
+	  use mmap on Linux only.
+
 2004-11-22  Jean Delvare  <khali@linux-fr.org>
 
 	* biosdecode.c: Avoid size_t in printf. Should remove a warning on
