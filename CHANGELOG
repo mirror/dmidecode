@@ -1,3 +1,18 @@
+2003-10-11  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support DMTF Master MIF version 030621 (was 021205).
+
+	* dmidecode.c: Handle unknown processor voltage.
+	* dmidecode.c: Fix typo in event log method.
+	* dmidecode.c: One additional processor type (Pentium M).
+	* vpddecode.c: New program for decoding a machine's VPD structure
+	  (only found in IBM machines).
+	* Makefile: Update accordingly.
+	* Makefile: Fix dependencies for ownership. Add strip target. Various
+	  cleanups (reordering, comments, optimization and debug flags).
+	* README: Update to reflect the addition of the strip target and the
+	  vpddecode program. Some additional changes and fixes.
+
 2003-10-10  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Change mmap options to prevent dmidecode from being
