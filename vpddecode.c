@@ -85,6 +85,8 @@ static const char *product_name(const char *id)
 		"IX", "Thinkpad i1400 or i1500",
 		"IY", "Thinkpad T20",
 		"IZ", "Thinkpad X20 or X21", /* updated 2003-11-29 (IBM) */
+		"JP", "eServer xSeries 205", /* added 2004-04-30,
+		                                reported by Bernd Krumboeck */
 		"KQ", "Thinkpad i1200 or i1300",
 		"KR", "Thinkpad i1400 or i1500",
 		"KS", "Thinkpad 240X",
