@@ -1,3 +1,10 @@
+2003-10-09  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix a bug that prevented dmidecode to reach DMI tables
+	  beyond the 2GB memory limit. Reported by Mike Cooper.
+	* ownership.c: Add one reference. Code cleanups.
+	* CHANGELOG: Fix typo.
+
 2003-10-08  Jean Delvare  <khali@linux-fr.org>
 
 	* biosdecode.c: Fix potentially wrong checksum on Sony-specific entry.
@@ -152,7 +159,7 @@
 	* dmidecode.c: Fix typo in dmi_memory_array_location.
 	* dmidecode.c: Replace Kbyte by kB in DMI case 16.
 	* dmidecode.c: Add DDR entry in dmi_memory_device_type.
-	* dmidecode.c: Fix extra s in SYSIS.
+	* dmidecode.c: Fix extra s in SYSID.
 
 2002-10-12  Jean Delvare  <khali@linux-fr.org>
 
