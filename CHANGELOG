@@ -1,3 +1,18 @@
+2003-10-17  Jean Delvare  <khali@linux-fr.org>
+
+	* biosdecode.c: Use (void) instead of __attribute__ ((usused)) to
+	  declare that a function parameter isn't used. According to Alexandre
+	  Duret-Lutz, this is the portable way do to it. Fix typo in comment.
+	* dmidecode.c: Fix typo.
+
+2003-10-16  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Remove useless comparison in dmi_system_boot_status.
+	  Thanks to Alexandre Duret-Lutz for pointing this out.
+	* biosdecode.c: Add a missing length check in acpi_decode. Found
+	  using Valgrind.
+	* biosdecode.c: Fix buffer overrun in main. Found using Valgrind.
+
 2003-10-14  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Update DMTF reference addresses.
