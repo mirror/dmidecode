@@ -47,14 +47,8 @@
  *    http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/20734.pdf
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#ifdef USE_MMAP
-#include <sys/mman.h>
-#endif /* USE MMAP */
 #include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -3725,57 +3719,24 @@ static void dmi_decode(u8 *data, u16 ver)
 	}
 }
 		
-static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *pname, const char *devmem)
+static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 {
 	u8 *buf;
 	u8 *data;
 	int i=0;
-#ifdef USE_MMAP
-	u32 mmoffset;
-	void *mmp;
-#endif /* USE_MMAP */
 	
 	printf("%u structures occupying %u bytes.\n",
 		num, len);
 	printf("Table at 0x%08X.\n",
 		base);
 	
-	if((buf=malloc(len))==NULL)
+	if((buf=mem_chunk(base, len, devmem))==NULL)
 	{
-		perror(pname);
-		return;
-	}
-#ifdef USE_MMAP
-	mmoffset=base%getpagesize();
-	/*
-	 * We were previously using PROT_WRITE and MAP_PRIVATE, but it caused
-	 * trouble once. So we are now mapping in read-only mode and copying
-	 * the interesting block into a regular memory buffer (similar to what
-	 * we do when not using mmap.)
-	 */
-	mmp=mmap(0, mmoffset+len, PROT_READ, MAP_SHARED, fd, base-mmoffset);
-	if(mmp==MAP_FAILED)
-	{
-		free(buf);
-    	perror(devmem);
-    	return;
-	}
-	memcpy(buf, (u8 *)mmp+mmoffset, len);
-	if(munmap(mmp, mmoffset+len)==-1)
-		perror(devmem);
-#else /* USE_MMAP */
-	if(lseek(fd, (off_t)base, SEEK_SET)==-1)
-	{
-		perror(devmem);
-		return;
-	}
-	if(myread(fd, buf, len, devmem)==-1)
-	{
-		free(buf);
+#ifndef USE_MMAP
 		printf("Table is unreachable, sorry. Try compiling dmidecode with -DUSE_MMAP.\n");
-		exit(1);
+#endif
+		return;
 	}
-#endif /* USE_MMAP */
 	
 	data=buf;
 	while(i<num && data+sizeof(struct dmi_header)<=buf+len)
@@ -3811,7 +3772,7 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 }
 
 
-static int smbios_decode(u8 *buf, int fd, const char *pname, const char *devmem)
+static int smbios_decode(u8 *buf, const char *devmem)
 {
 	if(checksum(buf, buf[0x05])
 	 && memcmp(buf+0x10, "_DMI_", 5)==0
@@ -3819,22 +3780,22 @@ static int smbios_decode(u8 *buf, int fd, const char *pname, const char *devmem)
 	{
 		printf("SMBIOS %u.%u present.\n",
 			buf[0x06], buf[0x07]);
-		dmi_table(fd, DWORD(buf+0x18), WORD(buf+0x16), WORD(buf+0x1C),
-			(buf[0x06]<<8)+buf[0x07], pname, devmem);
+		dmi_table(DWORD(buf+0x18), WORD(buf+0x16), WORD(buf+0x1C),
+			(buf[0x06]<<8)+buf[0x07], devmem);
 		return 1;
 	}
 	
 	return 0;
 }
 
-static int legacy_decode(u8 *buf, int fd, const char *pname, const char *devmem)
+static int legacy_decode(u8 *buf, const char *devmem)
 {
 	if(checksum(buf, 0x0F))
 	{
 		printf("Legacy DMI %u.%u present.\n",
 			buf[0x0E]>>4, buf[0x0E]&0x0F);
-		dmi_table(fd, DWORD(buf+0x08), WORD(buf+0x06), WORD(buf+0x0C),
-			((buf[0x0E]&0xF0)<<4)+(buf[0x0E]&0x0F), pname, devmem);
+		dmi_table(DWORD(buf+0x08), WORD(buf+0x06), WORD(buf+0x0C),
+			((buf[0x0E]&0xF0)<<4)+(buf[0x0E]&0x0F), devmem);
 		return 1;
 	}
 	
@@ -3843,21 +3804,14 @@ static int legacy_decode(u8 *buf, int fd, const char *pname, const char *devmem)
 
 int main(int argc, const char *argv[])
 {
-	int fd, found=0;
-	off_t fp=0xF0000;
+	int found=0;
+	off_t fp;
 	const char *devmem="/dev/mem";
 #ifdef USE_EFI
 	FILE *efi_systab;
 	char linebuf[64];
-#ifdef USE_MMAP
-	u32 mmoffset;
-	void *mmp;
-#else /* USE_MMAP */
-	u8 buf[0x20];
-#endif /* USE_MMAP */
-#else /* USE_EFI */
-	u8 *buf;
 #endif /* USE_EFI */
+	u8 *buf;
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4 || '\0'!=0)
 	{
@@ -3867,11 +3821,6 @@ int main(int argc, const char *argv[])
 	
 	if(argc>=2)
 		devmem=argv[1];
-	if((fd=open(devmem, O_RDONLY))==-1)
-	{
-		perror(devmem);
-		exit(1);
-	}
 	
 	printf("# dmidecode %s\n", VERSION);
 	
@@ -3894,67 +3843,34 @@ int main(int argc, const char *argv[])
 	if(fclose(efi_systab)!=0)
 		perror("/proc/efi/systab");
 
-#ifdef USE_MMAP
-	mmoffset=fp%getpagesize();
-	mmp=mmap(0, mmoffset+0x20, PROT_READ, MAP_PRIVATE, fd, fp-mmoffset);
-    if(mmp==MAP_FAILED)
-    {
-       perror(devmem);
-       exit(1);
-    }
-
-	smbios_decode(((u8 *)mmp)+mmoffset, fd, argv[0], devmem);
-
-	if(munmap(mmp, mmoffset+0x20)==-1)
-		perror(devmem);
-#else /* USE_MMAP */
-	if(lseek(fd, fp, SEEK_SET)==-1)
-	{
-		perror(devmem);
+	if((buf=mem_chunk(fp, 0x20, devmem))=NULL)
 		exit(1);
-	}
-	if(myread(fd, buf, 0x20, devmem)==-1)
-		exit(1);
-
-	smbios_decode(buf, fd, argv[0], devmem);
-#endif /* USE_MMAP */
-	found++;
+	
+	if(smbios_decode(buf, devmem))
+		found++;
+	
+	free(buf);
 #else /* USE_EFI */
-	if(lseek(fd, fp, SEEK_SET)==-1)
-	{
-		perror(devmem);
+	if((buf=mem_chunk(0xF0000, 0x10000, devmem))==NULL)
 		exit(1);
-	}
-	if((buf=malloc(0x10000))==NULL)
-	{
-		perror(argv[0]);
-		exit(1);
-	}
-	if(myread(fd, buf, 0x10000, devmem)==-1)
-		exit(1);
-
-	for(fp=0;fp<=0xFFF0;fp+=16)
+	
+	for(fp=0; fp<=0xFFF0; fp+=16)
 	{
 		if(memcmp(buf+fp, "_SM_", 4)==0 && fp<=0xFFE0)
 		{
-			if(smbios_decode(buf+fp, fd, argv[0], devmem))
+			if(smbios_decode(buf+fp, devmem))
 				found++;
 			fp+=16;
 		}
 		else if(memcmp(buf+fp, "_DMI_", 5)==0)
 		{
-			if (legacy_decode(buf+fp, fd, argv[0], devmem))
+			if (legacy_decode(buf+fp, devmem))
 				found++;
 		}
 	}
+	
 	free(buf);
 #endif /* USE_EFI */
-	
-	if(close(fd)==-1)
-	{
-		perror(devmem);
-		exit(1);
-	}
 	
 	if(!found)
 		printf("# No SMBIOS nor DMI entry point found, sorry.\n");
