@@ -3,14 +3,14 @@
 #	BIOS Decode
 #
 #	(C) 2000-2002 Alan Cox <alan@redhat.com>
-#	(C) 2002-2004 Jean Delvare <khali@linux-fr.org>
+#	(C) 2002-2005 Jean Delvare <khali@linux-fr.org>
 #
 #	Licensed under the GNU Public License.
 #
 
 CC      = gcc
 CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
-          -Wcast-align -Wwrite-strings
+          -Wcast-align -Wwrite-strings -Wmissing-prototypes
 #CFLAGS += -DBIGENDIAN
 #CFLAGS += -DALIGNMENT_WORKAROUND
 
