@@ -48,6 +48,8 @@
 static const char *product_name(const char *id)
 {
 	static const char *name[]={
+		"GE", "eServer xSeries 345", /* added 2004-06-11,
+		                                reported by Doug Brenner */
 		"HR", "Thinkpad 650E",
 		"HV", "Thinkpad 760C/CD/L/LD",
 		"HX", "Thinkpad 760E/ED/X/XD/XL or 765/L/D (9385XGA)",
@@ -114,6 +116,8 @@ static const char *product_name(const char *id)
 		                         reported by Ramiro Barreiro */
 		"RE", "eServer xSeries 445", /* added 2003-12-17,
 		                                reported by Josef Moellers */
+		"T2", "eServer xSeries 335", /* added 2004-06-11,
+		                                reported by Doug Brenner */
 		"TT", "eServer xSeries 330", /* added 2003-12-03,
 		                                reported by Hugues Lepesant */
 		"10", "Thinkpad A21e or A22e", /* Celeron models */
