@@ -1,3 +1,7 @@
+2003-05-30  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Cleaner handling of unreachable table.
+
 2003-05-27  Jean Delvare  <khali@linux-fr.org>
 
 	Updated to support Intel AP-485 specification (CPUID) revision 023

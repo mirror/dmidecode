@@ -3800,8 +3800,6 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 	printf("Table at 0x%08X.\n",
 		base);
 	
-	if(base>0xFFFFF) return;
-	
 	if((buf=malloc(len))==NULL)
 	{
 		perror(pname);
@@ -3815,6 +3813,9 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 	if(myread(fd, buf, len, devmem)==-1)
 	{
 		free(buf);
+		printf("Table is unreachable, sorry. This problem is known on IBM T23 and T30 laptops,\n"
+			"as well as on the Fujitsu-Siemens S-4582 laptop. If your system differ, please\n"
+			"report.\n");
 		exit(1);
 	}
 	
