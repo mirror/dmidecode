@@ -3747,11 +3747,7 @@ static void dmi_decode(u8 *data, u16 ver)
 	}
 }
 		
-#ifdef USE_MMAP
-static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, __attribute__ ((unused)) const char *pname, __attribute__ ((unused)) const char *devmem)
-#else /* USE_MMAP */
 static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *pname, const char *devmem)
-#endif /* USE_MMAP */
 {
 	u8 *buf;
 	u8 *data;
@@ -3766,27 +3762,30 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 	printf("Table at 0x%08X.\n",
 		base);
 	
-#ifdef USE_MMAP
-	mmoffset=base%getpagesize();
-	/*
-	 * We need PROT_WRITE for ASCII filtering in dmi_string. Do NOT change MAP_PRIVATE
-	 * to MAP_SHARED unless you also remove PROT_WRITE and disable ASCII filtering, because
-	 * we DO NOT WANT to write to /dev/mem. Thanks a lot to Gabriel Forte for helping
-	 * me hunting down an annoying bug related to this.
-	 */
-	mmp=mmap(0, mmoffset+len, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, base-mmoffset);
-    if(mmp==MAP_FAILED)
-    {
-       perror("mmap");
-       return;
-    }
-	buf=(u8 *)mmp+mmoffset;
-#else /* USE_MMAP */
 	if((buf=malloc(len))==NULL)
 	{
 		perror(pname);
 		return;
 	}
+#ifdef USE_MMAP
+	mmoffset=base%getpagesize();
+	/*
+	 * We were previously using PROT_WRITE and MAP_PRIVATE, but it caused
+	 * trouble once. So we are now mapping in read-only mode and copying
+	 * the interesting block into a regular memory buffer (similar to what
+	 * we do when not using mmap.)
+	 */
+	mmp=mmap(0, mmoffset+len, PROT_READ, MAP_SHARED, fd, base-mmoffset);
+	if(mmp==MAP_FAILED)
+	{
+		free(buf);
+    	perror(devmem);
+    	return;
+	}
+	memcpy(buf, (u8 *)mmp+mmoffset, len);
+	if(munmap(mmp, mmoffset+len)==-1)
+		perror(devmem);
+#else /* USE_MMAP */
 	if(lseek(fd, (off_t)base, SEEK_SET)==-1)
 	{
 		perror(devmem);
@@ -3832,12 +3831,7 @@ static void dmi_table(int fd, u32 base, u16 len, u16 num, u16 ver, const char *p
 		printf("Wrong DMI structures length: %d bytes announced, structures occupy %d bytes.\n",
 			len, (unsigned int)(data-buf));
 	
-#ifdef USE_MMAP
-	if(munmap(mmp, mmoffset+len)==-1)
-		perror("munmap");
-#else /* USE_MMAP */
 	free(buf);
-#endif /* USE_MMAP */
 }
 
 
@@ -3922,7 +3916,7 @@ int main(int argc, const char *argv[])
 	smbios_decode(((u8 *)mmp)+mmoffset, fd, argv[0], devmem);
 
 	if(munmap(mmp, mmoffset+0x20)==-1)
-		perror("munmap");
+		perror(devmem);
 #else /* USE_MMAP */
 	if(lseek(fd, fp, SEEK_SET)==-1)
 	{
@@ -3955,8 +3949,10 @@ int main(int argc, const char *argv[])
 			
 			if(smbios_decode(buf, fd, argv[0], devmem))
 			{
+#ifndef USE_MMAP
 				/* dmi_table moved us far away */
 				lseek(fd, fp, SEEK_SET);
+#endif /* USE_MMAP */
 				found++;
 			}
 		}
@@ -3968,8 +3964,10 @@ int main(int argc, const char *argv[])
 			dmi_table(fd, DWORD(buf+0x08), WORD(buf+0x06), WORD(buf+0x0C),
 				((buf[0x0E]&0xF0)<<4)+(buf[0x0E]&0x0F), argv[0], devmem);
 			
+#ifndef USE_MMAP
 			/* dmi_table moved us far away */
 			lseek(fd, fp, SEEK_SET);
+#endif /* USE_MMAP */
 			found++;
 		}
 	}
