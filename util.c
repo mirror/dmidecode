@@ -2,7 +2,7 @@
  * Common "util" functions
  * This file is part of the dmidecode project.
  *
- *   (C) 2002-2004 Jean Delvare <khali@linux-fr>
+ *   (C) 2002-2005 Jean Delvare <khali@linux-fr>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
  *   forms part of the process of creating an executable the information 
  *   including keys needed to generate an equivalently functional executable
  *   are deemed to be part of the source code.
- *
  */
 
 #include <sys/types.h>
@@ -138,7 +137,7 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 	
 	memcpy(p, (u8 *)mmp+mmoffset, len);
 	
-	if(munmap(mmp, mmoffset+0x20)==-1)
+	if(munmap(mmp, mmoffset+len)==-1)
 	{
 		fprintf(stderr, "%s: ", devmem);
 		perror("munmap");
