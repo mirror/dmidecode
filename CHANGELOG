@@ -1,3 +1,7 @@
+2004-10-01  Roberto Nibali  <ratz@tac.ch>
+
+	* Makefile: Be LDFLAGS aware.
+
 2004-07-24  Jean Delvare  <khali@linux-fr.org>
 
 	* util.c: Add missing header include.
