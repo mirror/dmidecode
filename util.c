@@ -119,7 +119,8 @@ void *mem_chunk(off_t base, off_t len, const char *devmem)
 	mmp=mmap(0, mmoffset+len, PROT_READ, MAP_PRIVATE, fd, base-mmoffset);
 	if(mmp==MAP_FAILED)
 	{
-		perror(devmem);
+		fprintf(stderr, "%s: ", devmem);
+		perror("mmap");
 		free(p);
 		return NULL;
 	}
@@ -127,11 +128,15 @@ void *mem_chunk(off_t base, off_t len, const char *devmem)
 	memcpy(p, (u8 *)mmp+mmoffset, len);
 	
 	if(munmap(mmp, mmoffset+0x20)==-1)
-		perror(devmem);
+	{
+		fprintf(stderr, "%s: ", devmem);
+		perror("munmap");
+	}
 #else /* USE_MMAP */
 	if(lseek(fd, base, SEEK_SET)==-1)
 	{
-		perror(devmem);
+		fprintf(stderr, "%s: ", devmem);
+		perror("lseek");
 		free(p);
 		return NULL;
 	}
