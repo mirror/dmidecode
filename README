@@ -28,7 +28,7 @@ You will find the latest version (including CVS) there, as well as fresh news
 and other interesting material, such as a list of related projects.
 
 This program was first written for Linux, and has since been reported to work
-on FreeBSD as well.
+on FreeBSD, BeOS and Cygwin as well.
 
 There's no configure script, so simply run "make" to build dmidecode, and
 "make install" to install it. You also can use "make uninstall" to remove
@@ -109,6 +109,12 @@ solve a number of problems. This default behavior can be changed in config.h.
 Just to make sure this is clear, mmap() is not used for performance reasons
 but to increase the number of systems on which dmidecode can be successfully
 run. See the IA-64 subsection above for details.
+
+CYGWIN
+
+Dmidecode was reported to work under Cygwin. It seems that /dev/mem doesn't
+work properly before version 1.5.10 though, so you will need to use at least
+this version.
 
 
 ** MISCELLANEOUS TOOLS **
