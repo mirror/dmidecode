@@ -32,15 +32,13 @@ Optionally, you can run "make strip" prior to "make install" if you want
 smaller binaries. However, know that this will prevent any further
 attempt to debug programs.
 
-Four parameters can be set in the Makefile to make dmidecode work on
+Three parameters can be set in the Makefile file to make dmidecode work on
 non-i386 systems. The first two (BIGENDIAN and ALIGNMENT_WORKAROUND) should
 be used if your system uses the big endian byte ordering (Motorola) or
 doesn't support unaligned memory accesses, respectively. For example,
 compiling for a SPARC processor would require both. The third parameter
 (TABLE_LITTLEENDIAN) is there for debugging purposes only and shouldn't be
-set by users. And finally, the __IA64__ parameter should be set for
-compilation on IA-64 systems. See the COMMON PROBLEMS section below for
-more details about compilation on IA-64 systems.
+set by users.
 
 
 ** DOCUMENTATION **
@@ -71,9 +69,9 @@ Dmidecode used not to work on IBM T-series laptops nor on Fujitsu-Siemens
 S-series laptops under Linux. This was due to the fact that the DMI table
 is at a memory location we couldn't seem to reach through /dev/mem. Although
 I believe this reveals a problem in the Linux kernel, which should be fixed,
-a workaround was found by Smith Chad. See the IA-64 subsection below for
-more details. I posted about this problem on the LKML but did not have
-any answer.
+a workaround was found by Smith Chad, and we are using it for now. See the
+IA-64 subsection below for more details. I posted about this problem on the
+LKML but did not have any answer.
 
 IA-64
 
@@ -90,12 +88,12 @@ patch to export the DMI table address from the internal EFI table to /proc,
 so dmidecode doesn't have to scan /dev/mem for it anymore. This patch was
 since integrated into the main ia64 patch. Finally, I added the required
 code to make it all work. So, in order to have dmidecode work on your IA-64
-system, you need three things:
+system, you need two things:
  - dmidecode version 2.2 or later;
  - an ia64 patched kernel, using linux-2.4.21-ia64-030702.diff or any later
-   version;
- - the -D__IA64__ compilation flag set in the Makefile.
-Chad Smith tested dmidecode successfully on two different IA-64 systems.
+   version.
+Chad Smith tested dmidecode successfully on two different IA-64 systems, and
+successes have been reported by other users too.
 
 MMAP
 

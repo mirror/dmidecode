@@ -15,7 +15,6 @@ CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
 #CFLAGS += -DBIGENDIAN
 #CFLAGS += -DALIGNMENT_WORKAROUND
 #CFLAGS += -DTABLE_LITTLEENDIAN
-#CFLAGS += -D__IA64__
 CFLAGS += -DUSE_MMAP
 
 # When debugging, disable -O2 and enable -g.
