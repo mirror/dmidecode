@@ -1,3 +1,8 @@
+2005-02-28  Jean Delvare  <khali@linux-fr.org>
+
+	* version.h: Set version to 2.6.
+	* Makefile: ownership.o depends on version.h.
+
 2005-02-24  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product ID "2C". Reported by Tomek Mateja.
