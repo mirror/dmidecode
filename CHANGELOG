@@ -1,3 +1,9 @@
+2005-02-12  Jean Delvare  <khali@linux-fr.org>
+
+	* util.c: Fix incorrect length in munmap call.
+	* Makefile: Use -Wmissing-prototypes.
+	* dmidecode.c: Fix maximum battery error value.
+
 2005-02-11  Jean Delvare  <khali@linux-fr.org>
 
 	* Makefile: Discard -pedantic, we don't really need this.
