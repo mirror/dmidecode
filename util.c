@@ -29,6 +29,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "config.h"
+
 #ifdef USE_MMAP
 #include <sys/mman.h>
 #ifndef MAP_FAILED

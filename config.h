@@ -8,3 +8,8 @@
 #else
 #define DEFAULT_MEM_DEV "/dev/mem"
 #endif
+
+/* Use mmap or not */
+#ifdef __linux__
+#define USE_MMAP
+#endif
