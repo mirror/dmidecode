@@ -2,7 +2,7 @@
  * BIOS Decode
  *
  *   (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   (C) 2002-2004 Jean Delvare <khali@linux-fr.org>
+ *   (C) 2002-2005 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -54,11 +54,24 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <getopt.h>
 
 #include "version.h"
 #include "config.h"
 #include "types.h"
 #include "util.h"
+
+/* Options are global */
+struct opt
+{
+	const char* devmem;
+	unsigned int flags;
+};
+static struct opt opt;
+
+#define FLAG_VERSION            (1<<0)
+#define FLAG_HELP               (1<<1)
 
 struct bios_entry {
 	const char *anchor;
@@ -500,25 +513,84 @@ static inline int anchor_match(const struct bios_entry *entry, const char *p)
 	return 1;
 }
 
-int main(int argc, const char *argv[])
+/* Return -1 on error, 0 on success */
+static int parse_command_line(int argc, char * const argv[])
+{
+	int option;
+	const char *optstring = "d:hV";
+	struct option longopts[]={
+		{ "dev-mem", required_argument, NULL, 'd' },
+		{ "help", no_argument, NULL, 'h' },
+		{ "version", no_argument, NULL, 'V' },
+		{ 0, 0, 0, 0 }
+	};
+
+	while((option=getopt_long(argc, argv, optstring, longopts, NULL))!=-1)
+		switch(option)
+		{
+			case 'd':
+				opt.devmem=optarg;
+				break;
+			case 'h':
+				opt.flags|=FLAG_HELP;
+				break;
+			case 'V':
+				opt.flags|=FLAG_VERSION;
+				break;
+			case ':':
+			case '?':
+				return -1;
+		}
+
+	return 0;
+}
+
+static void print_help(void)
+{
+	static const char *help=
+		"Usage: biosdecode [OPTIONS]\n"
+		"Options are:\n"
+		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
+		" -h, --help             Display this help text and exit\n"
+		" -V, --version          Display the version and exit\n";
+	
+	printf("%s", help);
+}
+
+int main(int argc, char * const argv[])
 {
 	u8 *buf;
 	off_t fp;
-	const char *devmem=DEFAULT_MEM_DEV;
 	int i;
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4)
 	{
-		fprintf(stderr,"%s: compiler incompatibility\n", argv[0]);
+		fprintf(stderr, "%s: compiler incompatibility\n", argv[0]);
 		exit(255);
 	}
 	
-	if(argc>=2)
-		devmem=argv[1];
+	/* Set default option values */
+	opt.devmem=DEFAULT_MEM_DEV;
+	opt.flags=0;
+
+	if(parse_command_line(argc, argv)<0)
+		exit(2);
+
+	if(opt.flags & FLAG_HELP)
+	{
+		print_help();
+		return 0;
+	}
+
+	if(opt.flags & FLAG_VERSION)
+	{
+		printf("%s\n", VERSION);
+		return 0;
+	}
 	
 	printf("# biosdecode %s\n", VERSION);
 
-	if((buf=mem_chunk(0xE0000, 0x20000, devmem))==NULL)
+	if((buf=mem_chunk(0xE0000, 0x20000, opt.devmem))==NULL)
 		exit(1);
 
 	/* Compute anchor lengths once and for all */

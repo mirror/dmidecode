@@ -1,7 +1,7 @@
 /*
  * Compaq Ownership Tag
  *
- *   (C) 2003-2004 Jean Delvare <khali@linux-fr.org>
+ *   (C) 2003-2005 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -32,10 +32,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <getopt.h>
 
+#include "version.h"
 #include "config.h"
 #include "types.h"
 #include "util.h"
+
+/* Options are global */
+struct opt
+{
+	const char* devmem;
+	unsigned int flags;
+};
+static struct opt opt;
+
+#define FLAG_VERSION            (1<<0)
+#define FLAG_HELP               (1<<1)
 
 static void ownership(u32 base, const char *pname, const char *devmem)
 {
@@ -94,23 +108,82 @@ static u32 decode(const u8 *p)
 	return 0;
 }
 
-int main(int argc, const char *argv[])
+/* Return -1 on error, 0 on success */
+static int parse_command_line(int argc, char * const argv[])
+{
+	int option;
+	const char *optstring = "d:hV";
+	struct option longopts[]={
+		{ "dev-mem", required_argument, NULL, 'd' },
+		{ "help", no_argument, NULL, 'h' },
+		{ "version", no_argument, NULL, 'V' },
+		{ 0, 0, 0, 0 }
+	};
+
+	while((option=getopt_long(argc, argv, optstring, longopts, NULL))!=-1)
+		switch(option)
+		{
+			case 'd':
+				opt.devmem=optarg;
+				break;
+			case 'h':
+				opt.flags|=FLAG_HELP;
+				break;
+			case 'V':
+				opt.flags|=FLAG_VERSION;
+				break;
+			case ':':
+			case '?':
+				return -1;
+		}
+
+	return 0;
+}
+
+static void print_help(void)
+{
+	static const char *help=
+		"Usage: ownership [OPTIONS]\n"
+		"Options are:\n"
+		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
+		" -h, --help             Display this help text and exit\n"
+		" -V, --version          Display the version and exit\n";
+	
+	printf("%s", help);
+}
+
+int main(int argc, char * const argv[])
 {
 	u8 *buf;
 	off_t fp;
-	const char *devmem=DEFAULT_MEM_DEV;
 	int ok=0;
 	
 	if(sizeof(u8)!=1 || sizeof(u32)!=4)
 	{
-		fprintf(stderr,"%s: compiler incompatibility\n", argv[0]);
+		fprintf(stderr, "%s: compiler incompatibility\n", argv[0]);
 		exit(255);
 	}
-	
-	if(argc>=2)
-		devmem=argv[1];
 
-	if((buf=mem_chunk(0xE0000, 0x20000, devmem))==NULL)
+	/* Set default option values */
+	opt.devmem=DEFAULT_MEM_DEV;
+	opt.flags=0;
+
+	if(parse_command_line(argc, argv)<0)
+		exit(2);
+
+	if(opt.flags & FLAG_HELP)
+	{
+		print_help();
+		return 0;
+	}
+
+	if(opt.flags & FLAG_VERSION)
+	{
+		printf("%s\n", VERSION);
+		return 0;
+	}
+	
+	if((buf=mem_chunk(0xE0000, 0x20000, opt.devmem))==NULL)
 		exit(1);
 
 	for(fp=0; !ok && fp<=0x1FFF0; fp+=16)
@@ -128,7 +201,7 @@ int main(int argc, const char *argv[])
 				if((base=decode(p)))
 				{
 					ok=1;
-					ownership(base, argv[0], devmem);
+					ownership(base, argv[0], opt.devmem);
 				}
 			}
 		}
