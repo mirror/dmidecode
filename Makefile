@@ -81,4 +81,4 @@ uninstall :
 	rm -f $(PREFIX)/sbin/vpddecode
 
 clean :
-	rm -f *.o dmidecode biosdecode ownership vpddecode
+	rm -f *.o dmidecode biosdecode ownership vpddecode core
