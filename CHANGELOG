@@ -1,3 +1,8 @@
+2004-10-24  Jean Delvare  <khali@linux-fr.org>
+
+	* util.c: Workaround missing MAP_FAILED definition, needed on
+	  old systems. Original patch from Durval Menezes.
+
 2004-10-14  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Search for EFI systab at /sys/firmware/efi/systab.
