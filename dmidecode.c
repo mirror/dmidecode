@@ -72,6 +72,7 @@ static struct opt opt;
 
 #define FLAG_VERSION            (1<<0)
 #define FLAG_HELP               (1<<1)
+#define FLAG_DUMP               (1<<2)
 
 static const char *out_of_spec = "<OUT OF SPEC>";
 static const char *bad_index = "<BAD INDEX>";
@@ -199,7 +200,23 @@ static void dmi_dump(struct dmi_header *h, const char *prefix)
 		printf("%sStrings:\n", prefix);
 		i=1;
 		while((s=dmi_string(h, i++))!=bad_index)
-			printf("%s\t%s\n", prefix, s);
+		{
+			if(opt.flags & FLAG_DUMP)
+			{
+				int j, l = strlen(s)+1;
+				for(row=0; row<((l-1)>>4)+1; row++)
+				{
+					printf("%s\t", prefix);
+					for(j=0; j<16 && j<l-(row<<4); j++)
+						printf("%s%02X", j?" ":"",
+						       s[(row<<4)+j]);
+					printf("\n");
+				}
+				printf("%s\t\"%s\"\n", prefix, s);
+			}
+			else
+				printf("%s\t%s\n", prefix, s);
+		}
 	}
 }
 
@@ -3769,7 +3786,12 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 			next++;
 		next+=2;
 		if(next-buf<=len)
-			dmi_decode(data, ver);
+		{
+			if (opt.flags & FLAG_DUMP)
+				dmi_dump(h, "\t\t");
+			else
+				dmi_decode(data, ver);
+		}
 		else
 			printf("\t<TRUNCATED>\n");
 		
@@ -3824,10 +3846,11 @@ static int legacy_decode(u8 *buf, const char *devmem)
 static int parse_command_line(int argc, char * const argv[])
 {
 	int option;
-	const char *optstring = "d:hV";
+	const char *optstring = "d:huV";
 	struct option longopts[]={
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
+		{ "dump", no_argument, NULL, 'u' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0, 0, 0, 0 }
 	};
@@ -3840,6 +3863,9 @@ static int parse_command_line(int argc, char * const argv[])
 				break;
 			case 'h':
 				opt.flags|=FLAG_HELP;
+				break;
+			case 'u':
+				opt.flags|=FLAG_DUMP;
 				break;
 			case 'V':
 				opt.flags|=FLAG_VERSION;
@@ -3859,6 +3885,7 @@ static void print_help(void)
 		"Options are:\n"
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
 		" -h, --help             Display this help text and exit\n"
+		" -u, --dump             Do not decode the entries\n"
 		" -V, --version          Display the version and exit\n";
 	
 	printf("%s", help);
