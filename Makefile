@@ -24,7 +24,7 @@ LDFLAGS =
 DESTDIR =
 prefix  = /usr/local
 sbindir = $(prefix)/sbin
-mandir  = $(prefix)/man
+mandir  = $(prefix)/share/man
 man8dir = $(mandir)/man8
 
 all : dmidecode biosdecode ownership vpddecode
