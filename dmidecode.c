@@ -3668,14 +3668,14 @@ static void dmi_decode(u8 *data, u16 ver)
 			dmi_memory_channel_devices(data[0x06], data+0x07, "\t\t\t");
 			break;
 		
-		/*
-		 * We use the word "Version" instead of "Revision", conforming to
-		 * IPMI 1.5 specification. This specification isn't very clear
-		 * regarding the I2C slave address. I couldn't understand wether
-		 * or not we are supposed to shift it by one bit to the right, so
-		 * I leave it untouched. Beware it might be wrong.
-		 */
 		case 38: /* 3.3.39 IPMI Device Information */
+			/*
+			 * We use the word "Version" instead of "Revision", conforming to
+			 * the IPMI 1.5 specification. This specification isn't very clear
+			 * regarding the I2C slave address. I couldn't understand wether
+			 * or not we are supposed to shift it by one bit to the right, so
+			 * I leave it untouched. Beware it might be wrong.
+			 */
 			printf("\tIPMI Device Information\n");
 			if(h->length<0x10) break;
 			printf("\t\tInterface Type: %s\n",
@@ -3697,10 +3697,23 @@ static void dmi_decode(u8 *data, u16 ver)
 				break;
 			}
 			printf("\t\tBase Address: 0x%08X%08X (%s)\n",
-				QWORD(data+0x08).h, (QWORD(data+0x08).l&~1)|((data[0x10]>>5)&1),
+				QWORD(data+0x08).h,
+				(QWORD(data+0x08).l&~1)|((data[0x10]>>5)&1),
 				QWORD(data+0x08).l&1?"I/O":"Memory-mapped");
 			printf("\t\tRegister Spacing: %s\n",
 				dmi_ipmi_register_spacing(data[0x10]>>6));
+			if(data[0x10]&(1<<3))
+			{
+				printf("\t\tInterrupt Polarity: %s\n",
+					data[0x10]&(1<<1)?"Active High":"Active Low");
+				printf("\t\tInterrupt Trigger Mode: %s\n",
+					data[0x10]&(1<<0)?"Level":"Edge");
+			}
+			if(data[0x11]!=0x00)
+			{
+				printf("\t\tInterrupt Number: %x\n",
+					data[0x11]);
+			}
 			break;
 		
 		case 39: /* 3.3.40 System Power Supply */

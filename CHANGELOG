@@ -1,3 +1,8 @@
+2003-03-08  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Decoded more fields according to the IPMI specification
+	(DMI case 38).
+
 2003-03-07  Jean Delvare  <khali@linux-fr.org>
 
 	Fixed IPMI device information (DMI case 38). Thanks to Richard Sharpe
@@ -5,12 +10,12 @@
 
 	* dmidecode.c: Fixed IPMI interface type being shifted by one.
 	* dmidecode.c: Fixed NV storage device being improperly displayed.
-	* dmidecode.c: Reword IPMI specification revision into specification
+	* dmidecode.c: Reworded IPMI specification revision into specification
 	version, as suggested in the IPMI specification itself.
 	* dmidecode.c: Added a reference to the IPMI specification.
 	* dmidecode.c: Show I2C address as hexadecimal.
 	* dmidecode.c: Base address is a QWORD, not DWORD.
-	* dmidecode.c: Decode some extra fields according to the IPMI
+	* dmidecode.c: Decoded some extra fields according to the IPMI
 	specification.
 
 2003-03-06  Jean Delvare  <khali@linux-fr.org>
