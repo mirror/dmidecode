@@ -20,7 +20,7 @@
  *
  *   For the avoidance of doubt the "preferred form" of this code is one which
  *   is in an open unpatent encumbered format. Where cryptographic key signing
- *   forms part of the process of creating an executable the information 
+ *   forms part of the process of creating an executable the information
  *   including keys needed to generate an equivalently functional executable
  *   are deemed to be part of the source code.
  *
@@ -1408,7 +1408,7 @@ static const char *dmi_port_connector_type(u8 code)
 		"DB-15 female",
 		"DB-9 male",
 		"DB-9 female",
-		"RJ-11", 
+		"RJ-11",
 		"RJ-45",
 		"50 Pin MiniSCSI",
 		"Mini DIN",
@@ -2328,7 +2328,7 @@ static const char *dmi_pointing_device_interface(u8 code)
 /*
  * 3.3.23 Portable Battery (Type 22)
  */
- 
+
 static const char *dmi_battery_chemistry(u8 code)
 {
 	/* 3.3.23.1 */
@@ -2849,9 +2849,9 @@ static void dmi_decode(u8 *data, u16 ver)
 		case 0: /* 3.3.1 BIOS Information */
 			printf("\tBIOS Information\n");
 			if(h->length<0x12) break;
-			printf("\t\tVendor: %s\n", 
+			printf("\t\tVendor: %s\n",
 				dmi_string(h, data[0x04]));
-			printf("\t\tVersion: %s\n", 
+			printf("\t\tVersion: %s\n",
 				dmi_string(h, data[0x05]));
 			printf("\t\tRelease Date: %s\n",
 				dmi_string(h, data[0x08]));
@@ -3126,7 +3126,7 @@ static void dmi_decode(u8 *data, u16 ver)
 		case 9: /* 3.3.10 System Slots */
 			printf("\tSystem Slot Information\n");
 			if(h->length<0x0C) break;
-			printf("\t\tDesignation: %s\n", 
+			printf("\t\tDesignation: %s\n",
 				dmi_string(h, data[0x04]));
 			printf("\t\tType: %s%s\n",
 				dmi_slot_bus_width(data[0x06]),

@@ -19,7 +19,7 @@
  *
  *   For the avoidance of doubt the "preferred form" of this code is one which
  *   is in an open unpatent encumbered format. Where cryptographic key signing
- *   forms part of the process of creating an executable the information 
+ *   forms part of the process of creating an executable the information
  *   including keys needed to generate an equivalently functional executable
  *   are deemed to be part of the source code.
  *

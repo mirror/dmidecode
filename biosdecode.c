@@ -20,7 +20,7 @@
  *
  *   For the avoidance of doubt the "preferred form" of this code is one which
  *   is in an open unpatent encumbered format. Where cryptographic key signing
- *   forms part of the process of creating an executable the information 
+ *   forms part of the process of creating an executable the information
  *   including keys needed to generate an equivalently functional executable
  *   are deemed to be part of the source code.
  *
@@ -242,7 +242,7 @@ static int acpi_decode(const u8 *p, size_t len)
 	printf("ACPI%s present.\n",
 		acpi_revision(p[15]));
 	printf("\tOEM Identifier: ");
-	fwrite(p+9, 6, 1, stdout); 
+	fwrite(p+9, 6, 1, stdout);
 	printf("\n");
 	printf("\tRSD Table 32-bit Address: 0x%08X\n",
 		DWORD(p+16));
