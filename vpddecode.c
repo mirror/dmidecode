@@ -220,9 +220,9 @@ static int decode(const u8 *p)
 
 int main(int argc, const char *argv[])
 {
-	u8 buf[16];
-	int fd, found=0;
-	off_t fp=0xF0000;
+	u8 *buf;
+	int found=0;
+	off_t fp;
 	const char *devmem="/dev/mem";
 	
 	if(sizeof(u8)!=1)
@@ -233,56 +233,29 @@ int main(int argc, const char *argv[])
 	
 	if(argc>=2)
 		devmem=argv[1];
-	if((fd=open(devmem, O_RDONLY))==-1 || lseek(fd, fp, SEEK_SET)==-1)
-	{
-		perror(devmem);
-		exit(1);
-	}
 
 	printf("# vpddecode %s\n", VERSION);
-	while(fp<0xFFFFF)
+
+	if((buf=mem_chunk(0xF0000, 0x10000, devmem))==NULL)
+		exit(1);
+
+	for(fp=0; fp<=0xFFF0; fp+=16)
 	{
-		if(myread(fd, buf, 16, devmem)==-1)
-			exit(1);
-		
-		if(memcmp((char *)buf, "\252\125VPD", 5)==0)
+		if(memcmp((char *)(buf+fp), "\252\125VPD", 5)==0)
 		{
-			off_t len=buf[5];
+			off_t len=buf[fp+5];
 			u8 *p;
 
-			if(fp+len-1<=0xFFFFF)
+			if(fp+len-1<=0xFFFF)
 			{
-				if((p=malloc(len))==NULL)
-				{
-					perror(argv[0]);
-					exit(1);
-				}
-
-				memcpy(p, buf, 16);
-				if(len>16)
-				{
-					/* buffer completion */
-					if(myread(fd, p+16, len-16, devmem)==-1)
-					{
-						free(p);
-						exit(1);
-					}
-					lseek(fd, fp+16, SEEK_SET);
-				}
-
+				p=buf+fp;
 				if(decode(p))
 					found++;
-				free(p);
 			}
 		}
-		fp+=16;
 	}
-	
-	if(close(fd)==-1)
-	{
-		perror(devmem);
-		exit(1);
-	}
+
+	free(buf);
 	
 	if(!found)
 		printf("# No VPD structure found, sorry.\n");
