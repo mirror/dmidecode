@@ -1,3 +1,27 @@
+2004-11-12  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Hide bank connection type for uninstalled memory
+	  modules.
+	* dmidecode.c: Reference comment fix.
+	* dmidecode.c: Hide watchdog timer details when no watchdog is
+	  present. Change label for no watchdog.
+	* README: Match case change for PREFIX (now prefix) in the Makefile
+	  file. Reported by Raul Nunez de Arenas Coronado.
+
+2004-11-12  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support DMTF Master MIF version 040707 (was 030621).
+
+	* dmidecode.c: One additional processor type (Sempron).
+	* dmidecode.c: One additional processor type (Efficeon TM8800).
+	* dmidecode.c: One additional processor upgrade type (Socket 939).
+	* dmidecode.c: Add the AMD Sempron to the list of x86-class
+	  processors.
+
+	Update to support Intel AP-485 (CPUID) revision 27 (was 25).
+
+	* dmidecode.c: Rename SBF flag to PBE.
+
 2004-11-11  Jean Delvare  <khali@linux-fr.org>
 
 	* util.c: More helpful error messages.
