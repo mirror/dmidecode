@@ -1,3 +1,7 @@
+2004-07-24  Jean Delvare  <khali@linux-fr.org>
+
+	* util.c: Add missing header include.
+
 2004-06-11  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product IDs "GE" and "T2". Reported by Doug Brenner.
