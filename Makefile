@@ -55,7 +55,7 @@ dmidecode.o : dmidecode.c version.h types.h util.h config.h
 biosdecode.o : biosdecode.c version.h types.h util.h config.h 
 	$(CC) $(CFLAGS) -c $< -o $@
 
-ownership.o : ownership.c types.h util.h config.h
+ownership.o : ownership.c version.h types.h util.h config.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 vpddecode.o : vpddecode.c version.h types.h util.h config.h 
