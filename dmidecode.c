@@ -3335,7 +3335,7 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\t\tSBDS Version: %s\n",
 				dmi_string(h, data[0x0E]));
 			printf("\t\tMaximum Error:");
-			dmi_battery_maximum_error(data[0x0E]);
+			dmi_battery_maximum_error(data[0x0F]);
 			printf("\n");
 			if(h->length<0x1A) break;
 			if(data[0x07]==0)
