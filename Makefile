@@ -17,7 +17,10 @@ CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
 #CFLAGS += -DTABLE_LITTLEENDIAN
 PREFIX  = /usr/local
 
-all : dmidecode biosdecode
+all : dmidecode biosdecode ownership
+
+ownership : ownership.o util.o
+	$(CC) $^ -o $@
 
 dmidecode : dmidecode.o util.o
 	$(CC) $^ -o $@
@@ -31,16 +34,21 @@ dmidecode.o : dmidecode.c version.h types.h util.h
 biosdecode.o : biosdecode.c version.h types.h util.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
+ownership.o : ownership.c version.h types.h util.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
 util.o : util.c types.h util.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 install : dmidecode biosdecode
 	install -m 755 dmidecode $(PREFIX)/sbin
 	install -m 755 biosdecode $(PREFIX)/sbin
+	install -m 755 ownership $(PREFIX)/sbin
 
 uninstall :
 	rm -f $(PREFIX)/sbin/dmidecode
 	rm -f $(PREFIX)/sbin/biosdecode
+	rm -f $(PREFIX)/sbin/ownership
 
 clean :
-	rm -f *.o dmidecode biosdecode
+	rm -f *.o dmidecode biosdecode ownership
