@@ -1,3 +1,11 @@
+2003-10-08  Jean Delvare  <khali@linux-fr.org>
+
+	* biosdecode.c: Fix potentially wrong checksum on Sony-specific entry.
+	* biosdecode.c: Unimportant changes (comment, typo...) in Compaq-specific
+	  section.
+	* biosdecode.c: Add support for VPD (vital product data, IBM-specific).
+	* CHANGELOG: Various updates.
+
 2003-10-07  Jean Delvare  <khali@linux-fr.org>
 
 	* ownership.c: Fix a harmless warning on x86_64. Reported by Mike
@@ -37,33 +45,33 @@
 
 2003-06-25  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Removed fp_last (not useful anymore). Reworded the "table
+	* dmidecode.c: Remove fp_last (not useful anymore). Reworded the "table
 	  is unreachable" message to mention the -DUSE_MMAP solution.
 
 2003-06-19  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Added support for IA-64.
-	* Makefile: Added new option CFLAGS modifier lines for IA-64.
+	* dmidecode.c: Add support for IA-64.
+	* Makefile: Add new option CFLAGS modifier lines for IA-64.
 
 2003-06-17  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c, biosdecode.c: Moved common "util" functions to util.c.
+	* dmidecode.c, biosdecode.c: Move common "util" functions to util.c.
 	* util.c, util.h: New.
 	* types.h: New.
-	* Makefile: Updated accordingly.
-	* biosdecode.c: Added detection of Compaq-specific entries.
+	* Makefile: Update accordingly.
+	* biosdecode.c: Add detection of Compaq-specific entries.
 	* ownership.c: New program for finding a machine's ownership tag
 	  (only found in Compaq machines). Requested by Luc Van de Velde.
-	* Makefile: Updated again.
+	* Makefile: Update again.
 
 2003-06-10  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Fixed typo in IPMI register spacing table. 
+	* dmidecode.c: Fix typo in IPMI register spacing table. 
 	* version.h: Set version to 2.1.
 
 2003-06-04  Jean Delvare  <khali@linux-fr.org>
 
-	* Makefile: Restored optional CFLAGS modifier lines.
+	* Makefile: Restore optional CFLAGS modifier lines.
 	* README: New.
 
 2003-05-30  Jean Delvare  <khali@linux-fr.org>
@@ -72,55 +80,55 @@
 
 2003-05-27  Jean Delvare  <khali@linux-fr.org>
 
-	Updated to support Intel AP-485 specification (CPUID) revision 023
+	Update to support Intel AP-485 specification (CPUID) revision 023
 	(was 021).
 
-	* dmidecode.c: Added SBF flag to processor ID (DMI case 4). Added comment
-	about new flags returned in ECX.
+	* dmidecode.c: Add SBF flag to processor ID (DMI case 4). Add comment
+	  about new flags returned in ECX.
 
 2003-05-26  Jean Delvare  <khali@linux-fr.org>
 
-	Updated to support SMBIOS specification version 2.3.4 (was 2.3.3).
+	Update to support SMBIOS specification version 2.3.4 (was 2.3.3).
 
-	* dmidecode.c: Added processor and processor upgrade names (DMI case 4).
-	* dmidecode.c: Added slot names (DMI case 9).
+	* dmidecode.c: Add processor and processor upgrade names (DMI case 4).
+	* dmidecode.c: Add slot names (DMI case 9).
 
 2003-05-22  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Fixed typo reported by David Wilson (DMI case 6).
+	* dmidecode.c: Fix typo reported by David Wilson (DMI case 6).
 
 2003-03-08  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Decoded more fields according to the IPMI specification
-	(DMI case 38).
+	* dmidecode.c: Decode more fields according to the IPMI specification
+	  (DMI case 38).
 
 2003-03-07  Jean Delvare  <khali@linux-fr.org>
 
 	Fixed IPMI device information (DMI case 38). Thanks to Richard Sharpe
 	for pointing the bugs out.
 
-	* dmidecode.c: Fixed IPMI interface type being shifted by one.
-	* dmidecode.c: Fixed NV storage device being improperly displayed.
-	* dmidecode.c: Reworded IPMI specification revision into specification
-	version, as suggested in the IPMI specification itself.
-	* dmidecode.c: Added a reference to the IPMI specification.
+	* dmidecode.c: Fix IPMI interface type being shifted by one.
+	* dmidecode.c: Fix NV storage device being improperly displayed.
+	* dmidecode.c: Reword IPMI specification revision into specification
+	  version, as suggested in the IPMI specification itself.
+	* dmidecode.c: Add a reference to the IPMI specification.
 	* dmidecode.c: Show I2C address as hexadecimal.
 	* dmidecode.c: Base address is a QWORD, not DWORD.
-	* dmidecode.c: Decoded some extra fields according to the IPMI
-	specification.
+	* dmidecode.c: Decode some extra fields according to the IPMI
+	  specification.
 
 2003-03-06  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c, biosdecode.c: Moved all changelog entries to CHANGELOG.
+	* dmidecode.c, biosdecode.c: Move all changelog entries to CHANGELOG.
 	* CHANGELOG: New. Format inspired by Heroes' ChangeLog file.
-	* dmidecode.c, biosdecode.c, Makefile: Updated copyright years.
-	* dmidecode.c, biosdecode.c, Makefile: Moved version definition to
-	version.h. Updated dependencies accordingly.
+	* dmidecode.c, biosdecode.c, Makefile: Update copyright years.
+	* dmidecode.c, biosdecode.c, Makefile: Move version definition to
+	  version.h. Update dependencies accordingly.
 	* version.h: New.
 
 2002-10-21  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Changed supported log type descriptors display.
+	* dmidecode.c: Change supported log type descriptors display.
 	* dmidecode.c: Code optimization in event log status.
 	* dmidecode.c: Remove extra newline in voltage probe accuracy.
 	* dmidecode.c: Display "OEM-specific" if type is 128 or more.
@@ -132,7 +140,7 @@
 
 	* dmidecode.c: Complete rewrite.
 	* dmidecode.c: Now complies with SMBIOS specification 2.3.3.
-	* dmidecode.c: Moved all non-DMI stuff to biosdecode.c.
+	* dmidecode.c: Move all non-DMI stuff to biosdecode.c.
 	* biosdecode.c: New.
 
 2002-10-15  Jean Delvare  <khali@linux-fr.org>
@@ -149,13 +157,13 @@
 2002-10-12  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fix maximum cache size and installed size being
-	inverted.
+	  inverted.
 	* dmidecode.c: Fix typos in port types.
 
 2002-10-10  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Remove extra semicolon at the end of
-	dmi_memory_array_use.
+	  dmi_memory_array_use.
 	* dmidecode.c: Fix compilation warnings.
 	* dmidecode.c: Add missing backslash in DMI case 37.
 	* dmidecode.c: Fix BIOS ROM size (DMI case 0).
@@ -172,17 +180,17 @@
 	* dmidecode.c: Better checks on file read and close.
 	* dmidecode.c: Define VERSION and display version at beginning.
 	* dmidecode.c: More secure decoding (won't run off the table in any
-	case).
+	  case).
 	* dmidecode.c: Do not try to decode more structures than announced.
 	* dmidecode.c: Fix an off-by-one error that caused the last address
-	being scanned to be 0x100000, not 0xFFFF0 as it should.
+	  being scanned to be 0x100000, not 0xFFFF0 as it should.
 
 2002-09-28  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fix missing coma in dmi_bus_name.
 	* dmidecode.c: Remove unwanted bitmaskings in dmi_mgmt_dev_type,
-	dmi_mgmt_addr_type, dmi_fan_type, dmi_volt_loc, dmi_temp_loc and
-	dmi_status.
+	  dmi_mgmt_addr_type, dmi_fan_type, dmi_volt_loc, dmi_temp_loc and
+	  dmi_status.
 	* dmidecode.c: Fix DMI table read bug ("dmi: read: Success").
 	* dmidecode.c: Make the code pass -W again.
 	* dmidecode.c: Fix return value of dmi_card_size.
@@ -201,7 +209,7 @@
 2002-08-23  Alan Cox  <alan@redhat.com>
 
 	* dmidecode.c: Make the code pass -Wall -pedantic by fixing a few
-	harmless sign of pointer mismatches.
+	  harmless sign of pointer mismatches.
 	* dmidecode.c: Correct main() prototype.
 	* dmidecode.c: Check for compilers with wrong type sizes.
 
@@ -213,7 +221,7 @@
 	* dmidecode.c: C++ style comments removed. Commented out code removed.
 	* dmidecode.c: DMI 0.0 case handled.
 	* dmideocde.c: Fix return value of dmi_port_type and
-	dmi_port_connector_type.
+	  dmi_port_connector_type.
 
 2002-08-06  Jean Delvare  <khali@linux-fr.org>
 
@@ -223,7 +231,7 @@
 	* dmidecode.c: Check for NULL after malloc.
 	* dmidecode.c: Use SEEK_* constants instead of numeric values.
 	* dmidecode.c: Code optimization (and warning fix) in DMI cases 10 and
-	14.
+	  14.
 	* dmidecode.c: Add else's to avoid unneeded cascaded if's in main loop.
 	* dmidecode.c: Code optimization in DMI information display.
 	* dmidecode.c: Fix all compilation warnings.
