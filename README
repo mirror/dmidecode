@@ -1,17 +1,23 @@
 ** INTRODUCTION **
 
-Dmidecode is a tool for dumping a computer's DMI (some say SMBIOS) table
-contents in a human-readable format. This table contains a description of the
-system's hardware components, as well as other useful pieces of information
-such as serial numbers and BIOS revision. Part of its code can be found in
-the Linux kernel, because DMI data may be used to enable or disable specific
-portions of code depending on the hardware vendor. Thus, dmidecode is mainly
-used to detect system "signatures" and add them to the kernel source code
-when needed.
+Dmidecode reports information about your system's hardware as described in
+your system BIOS according to the SMBIOS/DMI standard. This information
+typically includes system manufacturer, model name, serial number, BIOS
+version, asset tag as well as a lot of other details of varying level of
+interest and reliability depending on the manufacturer. This will often
+include usage status for the CPU sockets, expansion slots (e.g. AGP, PCI,
+ISA) and memory module slots, and the list of I/O ports (e.g. serial,
+parallel, USB).
 
-Apart from that, dmidecode is only scarcely used. It is said to be used as a
-back-end by some hardware detection programs, but DMI data have proven to be
-too unreliable to be blindly trusted.
+Part of dmidecode's code can be found in the Linux kernel, where DMI data
+is used to enable or disable specific portions of code depending on the
+specific hardware. Thus, one of dmidecode's use is for kernel developers to
+detect system "signatures" and add them to the kernel source code when
+needed.
+
+Beware that DMI data have proven to be too unreliable to be blindly trusted.
+Dmidecode does not scan your hardware, it only reports what the BIOS told it
+to.
 
 
 ** INSTALLATION **
@@ -21,7 +27,10 @@ Dmidecode's home page is hosted on Savannah:
 You will find the latest version (including CVS) there, as well as fresh news
 and other interesting material, such as a list of related projects.
 
-There's no configure script yet, so simply run "make" to build dmidecode, and
+This program was first written for Linux, and has since been reported to work
+on FreeBSD as well.
+
+There's no configure script, so simply run "make" to build dmidecode, and
 "make install" to install it. You also can use "make uninstall" to remove
 all files you installed. By default, files are installed in /usr/local but
 you can change this behavior by editing the Makefile file and setting PREFIX
@@ -38,16 +47,13 @@ byte ordering (Motorola) or doesn't support unaligned memory accesses,
 respectively. For example, compiling for a SPARC processor would require
 both. Note that this hasn't been much tested though, because the data
 manipulated by dmidecode and the other tools is only found on i386 and
-similar processors anyway.
+neighbour architectures (x86_64, ia64) anyway.
 
 
 ** DOCUMENTATION **
 
 Each tool has a manual page, found in the man/ subdirectory. Manual pages
 are installed by "make install".
-
-This program was first written for Linux, and has since be reported to work
-on FreeBSD as well.
 
 For an history of the changes made to dmidecode, see the CHANGELOG file.
 
