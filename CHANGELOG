@@ -6,6 +6,7 @@
 	  spelled 650E).
 	* vpddecode.c: Add product IDs "IW" and "IY", as added recently
 	  on IBM's reference web page. Update reference.
+	* config.h: Use mmap on all but BeOS, instead of only Linux.
 
 2005-02-12  Jean Delvare  <khali@linux-fr.org>
 
