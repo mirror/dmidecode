@@ -19,6 +19,9 @@ CFLAGS += -DUSE_MMAP
 CFLAGS += -O2
 #CFLAGS += -g
 
+# Pass linker flags here
+LDFLAGS =
+
 DESTDIR =
 prefix  = /usr/local
 sbindir = $(prefix)/sbin
@@ -32,16 +35,16 @@ all : dmidecode biosdecode ownership vpddecode
 #
 
 dmidecode : dmidecode.o util.o
-	$(CC) dmidecode.o util.o -o $@
+	$(CC) $(LDFLAGS) dmidecode.o util.o -o $@
 
 biosdecode : biosdecode.o util.o
-	$(CC) biosdecode.o util.o -o $@
+	$(CC) $(LDFLAGS) biosdecode.o util.o -o $@
 
 ownership : ownership.o util.o
-	$(CC) ownership.o util.o -o $@
+	$(CC) $(LDFLAGS) ownership.o util.o -o $@
 
 vpddecode : vpddecode.o util.o
-	$(CC) vpddecode.o util.o -o $@
+	$(CC) $(LDFLAGS) vpddecode.o util.o -o $@
 
 #
 # Objects
