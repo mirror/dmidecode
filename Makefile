@@ -42,7 +42,7 @@ ownership.o : ownership.c version.h types.h util.h
 util.o : util.c types.h util.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-install : dmidecode biosdecode
+install : all
 	install -m 755 dmidecode $(PREFIX)/sbin
 	install -m 755 biosdecode $(PREFIX)/sbin
 	install -m 755 ownership $(PREFIX)/sbin

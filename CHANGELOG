@@ -1,3 +1,8 @@
+2003-09-05  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Fix missing ownership dependency for install target.
+	  Reported by Mario Lang.
+
 2003-08-08  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Update the README file (mainly the now solved laptop
