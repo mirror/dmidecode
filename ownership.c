@@ -78,7 +78,7 @@ static void ownership(int fd, u32 base, const char *pname, const char *devmem)
 			if(buf[i]<32 || (buf[i]>=127 && buf[i]<160))
 				buf[i]='?';
 		}
-		printf("%s\n", buf);
+		printf("%s\n", (char *)buf);
 	}
 
 	free(buf);
