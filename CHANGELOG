@@ -1,3 +1,14 @@
+2003-11-11  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "KX". Reported by Klaus Ade Johnstad,
+	  confirmed by Pamela Huntley.
+	* dmidecode.c: Display CPUID values as decimal, not hexa. This is
+	  a reversal of the 2003-07-18 change to be consistent with
+	  /proc/cpuinfo under Linux.
+	* dmidecode.c: Fix processor ID decoding for older 80486. Not very
+	  important since such systems are unlikely to support SMBIOS.
+	* dmidecode.c: Modify CPU signature display for AMD processors.
+
 2003-10-24  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Add another exception to the CPUID-supporting CPU list.
