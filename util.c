@@ -46,7 +46,8 @@
 #include "types.h"
 #include "util.h"
 
-int myread(int fd, u8 *buf, size_t count, const char *prefix)
+#ifndef USE_MMAP
+static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 {
 	ssize_t r=1;
 	size_t r2=0;
@@ -76,6 +77,7 @@ int myread(int fd, u8 *buf, size_t count, const char *prefix)
 	
 	return 0;
 }
+#endif
 
 int checksum(const u8 *buf, size_t len)
 {
