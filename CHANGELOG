@@ -1,7 +1,26 @@
+2003-03-07  Jean Delvare  <khali@linux-fr.org>
+
+	Fixed IPMI device information (DMI case 38). Thanks to Richard Sharpe
+	for pointing the bugs out.
+
+	* dmidecode.c: Fixed IPMI interface type being shifted by one.
+	* dmidecode.c: Fixed NV storage device being improperly displayed.
+	* dmidecode.c: Reword IPMI specification revision into specification
+	version, as suggested in the IPMI specification itself.
+	* dmidecode.c: Added a reference to the IPMI specification.
+	* dmidecode.c: Show I2C address as hexadecimal.
+	* dmidecode.c: Base address is a QWORD, not DWORD.
+	* dmidecode.c: Decode some extra fields according to the IPMI
+	specification.
+
 2003-03-06  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c, biosdecode.c: Moved all changelog entries to CHANGELOG.
 	* CHANGELOG: New. Format inspired by Heroes' ChangeLog file.
+	* dmidecode.c, biosdecode.c, Makefile: Updated copyright years.
+	* dmidecode.c, biosdecode.c, Makefile: Moved version definition to
+	version.h. Updated dependencies accordingly.
+	* version.h: New.
 
 2002-10-21  Jean Delvare  <khali@linux-fr.org>
 

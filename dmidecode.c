@@ -43,6 +43,9 @@
  *  - DMTF Master MIF version 020507
  *    "DMTF approved standard groups"
  *    http://www.dmtf.org/standards/standard_dmi.php
+ *  - IPMI 1.5 revision 1.1
+ *    "Intelligent Platform Management Interface Specification"
+ *    http://developer.intel.com/design/servers/ipmi/spec.htm
  */
 
 #include <sys/types.h>
@@ -2765,7 +2768,21 @@ static const char *dmi_ipmi_interface_type(u8 code)
 	};
 	
 	if(code<=0x03)
-		return type[code-0x01];
+		return type[code];
+	return out_of_spec;
+}
+
+static const char *dmi_ipmi_register_spacing(u8 code)
+{
+	/* IPMI 1.5 */
+	static const char *spacing[]={
+		"Successive Byte Boundaries", /* 0x00 */
+		"32-bit Boundaries",
+		"16 bit Boundaries" /* 0x02 */
+	};
+	
+	if(code<=0x02)
+		return spacing[code];
 	return out_of_spec;
 }
 
@@ -3651,20 +3668,39 @@ static void dmi_decode(u8 *data, u16 ver)
 			dmi_memory_channel_devices(data[0x06], data+0x07, "\t\t\t");
 			break;
 		
+		/*
+		 * We use the word "Version" instead of "Revision", conforming to
+		 * IPMI 1.5 specification. This specification isn't very clear
+		 * regarding the I2C slave address. I couldn't understand wether
+		 * or not we are supposed to shift it by one bit to the right, so
+		 * I leave it untouched. Beware it might be wrong.
+		 */
 		case 38: /* 3.3.39 IPMI Device Information */
 			printf("\tIPMI Device Information\n");
 			if(h->length<0x10) break;
 			printf("\t\tInterface Type: %s\n",
 				dmi_ipmi_interface_type(data[0x04]));
-			printf("\t\tSpecification Revision: %u.%u\n",
+			printf("\t\tSpecification Version: %u.%u\n",
 				data[0x05]>>4, data[0x05]&0x0F);
-			printf("\t\tI2C Slave Address: %u\n",
+			printf("\t\tI2C Slave Address: 0x%02x\n",
 				data[0x06]);
-			if(data[0x07]==0xFF)
+			if(data[0x07]!=0xFF)
 				printf("\t\tNV Storage Device Address: %u\n",
 					data[0x07]);
-			printf("\t\tBase Address: 0x%08X (%s)\n",
-				DWORD(data+0x08), DWORD(data+0x08)&1?"I/O":"memory-mapped");
+			else
+				printf("\t\tNV Storage Device: Not Present\n");
+			if(h->length<0x12)
+			{
+				printf("\t\tBase Address: 0x%08X%08X (%s)\n",
+					QWORD(data+0x08).h, QWORD(data+0x08).l,
+					QWORD(data+0x08).l&1?"I/O":"Memory-mapped");
+				break;
+			}
+			printf("\t\tBase Address: 0x%08X%08X (%s)\n",
+				QWORD(data+0x08).h, (QWORD(data+0x08).l&~1)|((data[0x10]>>5)&1),
+				QWORD(data+0x08).l&1?"I/O":"Memory-mapped");
+			printf("\t\tRegister Spacing: %s\n",
+				dmi_ipmi_register_spacing(data[0x10]>>6));
 			break;
 		
 		case 39: /* 3.3.40 System Power Supply */
