@@ -1,3 +1,8 @@
+2003-06-19  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Added support for IA-64.
+	* Makefile: Added new option CFLAGS modifier lines for IA-64.
+
 2003-06-17  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c, biosdecode.c: Moved common "util" functions to util.c.
