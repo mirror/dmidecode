@@ -1,3 +1,7 @@
+2003-10-24  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Add another exception to the CPUID-supporting CPU list.
+
 2003-10-19  Jean Delvare  <khali@linux-fr.org>
 
 	* README: Clarify why mmap is used. Fix typo.
