@@ -1,3 +1,18 @@
+2003-12-17  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "RE". Reported by Josef Moellers.
+	* vpddecode.c, biosdecode.c: Handle longer VPD records as seen on
+	  xSeries. These have a different checksumming method.
+
+2003-12-03  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "TT". Reported by Hugues Lepesant.
+	* vpddecode.c, biosdecode.c: Fix typo ("Bios" becomes "BIOS").
+	* dmidecode.c: Add another exception to the CPUID-supporting CPU list
+	  ("Pentium III MMX").
+	* dmidecode.c: Number devices in multi-device on board device
+	  information structures (DMI case 10).
+
 2003-11-13  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Automatically detect architectures on which to use EFI
