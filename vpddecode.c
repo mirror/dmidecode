@@ -241,18 +241,12 @@ int main(int argc, const char *argv[])
 
 	for(fp=0; fp<=0xFFF0; fp+=16)
 	{
-		if(memcmp((char *)(buf+fp), "\252\125VPD", 5)==0)
-		{
-			off_t len=buf[fp+5];
-			u8 *p;
+		u8 *p=buf+fp;
 
-			if(fp+len-1<=0xFFFF)
-			{
-				p=buf+fp;
-				if(decode(p))
-					found++;
-			}
-		}
+		if(memcmp((char *)p, "\252\125VPD", 5)==0
+		&& fp+p[5]-1<=0xFFFF
+		&& decode(p))
+			found++;
 	}
 
 	free(buf);
