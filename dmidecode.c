@@ -2182,7 +2182,7 @@ static const char *dmi_memory_error_type(u8 code)
 	static const char *type[]={
 		"Other", /* 0x01 */
 		"Unknown",
-		"OK"
+		"OK",
 		"Bad Read",
 		"Parity Error",
 		"Single-bit Error",
@@ -2836,7 +2836,7 @@ static const char *dmi_power_supply_status(u8 code)
 		"Other", /* 0x01 */
 		"Unknown",
 		"OK",
-		"Non-critical"
+		"Non-critical",
 		"Critical" /* 0x05 */
 	};
 	
