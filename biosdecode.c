@@ -463,16 +463,24 @@ static size_t vpd_length(const u8 *p)
 
 static int vpd_decode(const u8 *p, size_t len)
 {
-	/* The checksum does *not* include the first 13 bytes. */
-	if(len<0x30 || !checksum(p+0x0D, 0x30-0x0D))
+	/* XSeries have longer records and a different checksumming method. */
+	if(!(len>=0x46 && checksum(p, 0x46))
+	/* The Thinkpad checksum does *not* include the first 13 bytes. */
+	&& !(len>=0x30 && checksum(p+0x0D, 0x30-0x0D)))
 		return 0;
 	
 	printf("VPD present.\n");
 
-	vpd_print_entry("Bios Build ID", p+0x0D, 9);
+	vpd_print_entry("BIOS Build ID", p+0x0D, 9);
 	vpd_print_entry("Box Serial Number", p+0x16, 7);
 	vpd_print_entry("Motherboard Serial Number", p+0x1D, 11);
 	vpd_print_entry("Machine Type/Model", p+0x28, 7);
+	
+	if(len<0x45)
+		return 1;
+
+	vpd_print_entry("BIOS Release Date", p+0x30, 8);
+	vpd_print_entry("Default Flash Image File Name", p+0x38, 13);
 	
 	return 1;
 }
