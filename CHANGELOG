@@ -1,3 +1,7 @@
+2005-02-24  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "2C". Reported by Tomek Mateja.
+
 2005-02-17  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product IDs "OP" and "PN". Reported by Scott
