@@ -25,7 +25,7 @@
  *
  * References:
  *  - IBM "Using the BIOS Build ID to identify IBM Thinkpad systems"
- *    Modified 2003-08-21
+ *    Revision "November 17, 2003"
  *    http://www.pc.ibm.com/qtechinfo/MIGR-45120.html
  *
  * Notes:
@@ -84,28 +84,28 @@ static const char *product_name(const char *id)
 		"IW", "Thinkpad A20m",
 		"IX", "Thinkpad i1400 or i1500",
 		"IY", "Thinkpad T20",
-		"IZ", "Thinkpad X20",
+		"IZ", "Thinkpad X20 or X21", /* updated 2003-11-29 (IBM) */
 		"KQ", "Thinkpad i1200 or i1300",
 		"KR", "Thinkpad i1400 or i1500",
 		"KS", "Thinkpad 240X",
 		"KT", "Thinkpad i1400 or i1500",
-		"KU", "Thinkpad A21e",
+		"KU", "Thinkpad A21e", /* type 2628 only */
 		"KV", "Transnote",
 		"KW", "Thinkpad i1200 or i1300",
 		"KX", "Thinkpad A21m or A22m", /* added 2003-11-11,
 		                                  reported by Klaus Ade Johnstad,
 		                                  confirmed by Pamela Huntley */
-		"KY", "Thinkpad A21m or A22m",
-		"KZ", "Thinkpad A21p or A22p",
-		"10", "Thinkpad A21e or A22e",
+		"KY", "Thinkpad A21p or A22p", /* fixed 2003-11-29 (IBM) */
+		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
+		"10", "Thinkpad A21e or A22e", /* Celeron models */
 		"11", "Thinkpad 240Z",
-		"13", "Thinkpad A22m",
+		"13", "Thinkpad A22m", /* 2628-Sxx models */
 		"15", "Thinkpad i1200",
 		"16", "Thinkpad T22",
 		"17", "Thinkpad i1200",
 		"18", "Thinkpad S30",
 		"1A", "Thinkpad T23",
-		"1B", "Thinkpad A22e",
+		"1B", "Thinkpad A22e", /* Pentium models */
 		"1C", "Thinkpad R30",
 		"1D", "Thinkpad X22, X23 or X24",
 		"1E", "Thinkpad A30/p",
@@ -115,9 +115,12 @@ static const char *product_name(const char *id)
 		"1K", "Thinkpad X30",
 		"1M", "Thinkpad R32",
 		"1N", "Thinkpad A31/p",
-		"1O", "Thinkpad R40",
+		"1O", "Thinkpad R40", /* types 2681, 2682 and 2683 */
+		"1P", "Thinkpad R40", /* added 2003-11-29 (IBM),
+		                         types 2722, 2723 and 2724 */
 		"1Q", "Thinkpad X31",
-		"1R", "Thinkpad T40",
+		"1R", "Thinkpad T40, T41, R50 or R50p", /* updated 2003-11-29 (IBM) */
+		"1S", "Thinkpad R40e", /* added 2003-11-29 (IBM) */
 		"1T", "Thinkpad G40",
 		"20", "Netvista 6823", /* added 2003-10-09 */
 		NULL, "Unknown, please report!"
