@@ -1,0 +1,80 @@
+** INTRODUCTION **
+
+Dmidecode is a tool for dumping a computer's DMI (some say SMBIOS) table
+contents in a human-readable format. This table contains a description of the
+system's hardware components, as well as other useful pieces of information
+such as serial numbers and BIOS revision. Part of its code can be found in
+the Linux kernel, because DMI data may be used to enable or disable specific
+portions of code depending on the hardware vendor. Thus, dmidecode is mainly
+used to detect system "signatures" and add them to the kernel source code
+when needed.
+
+Apart from that, dmidecode is only scarcely used. It is said to be used as a
+back-end by some hardware detection programs, but DMI data have proven to be
+too unreliable to be blindly trusted.
+
+
+** INSTALLATION **
+
+Dmidecode's home page is hosted on Savannah:
+  https://savannah.nongnu.org/projects/dmidecode/
+You will find the latest version (including CVS) there, as well as fresh news
+and other interesting material, such as a list of related projects.
+
+There's no configure script yet, so simply run "make" to build dmidecode, and
+"make install" to install it. You also can use "make uninstall" to remove
+all files you installed. By default, files are installed in /usr/local but
+you can change this behavior by editing the Makefile file and setting PREFIX
+to wherever you want. You may change the C compiler and the compilation
+flags as well.
+
+Three parameters can be set in the Makefile to make dmidecode work on
+non-i386 systems. The first two (BIGENDIAN and TABLE_LITTLEENDIAN) should be
+used if your system uses the big endian byte ordering (Motorola) or doesn't
+support unaligned memory accesses respectively. For example, compiling for
+a SPARC processor would require both. The third parameter
+(TABLE_LITTLEENDIAN) is there for debugging purposes only and shouldn't be
+set by users.
+
+
+** DOCUMENTATION **
+
+There's no man page nor info page at this time. I don't know if there ever
+will be one. I don't really feel a need for it.
+
+For an history of the changes made to dmidecode, see the CHANGELOG file.
+
+If you need help, your best chances are to visit the web page (see the
+INSTALLATION section above) or to get in touch with the developpers
+directly. Have a look at the AUTHORS file and contact one of the maintainers
+(or less likely someone else, but you'd need to have a good reason for doing
+so).
+
+The most common problems are detailed in the COMMON PROBLEMS section right
+below.
+
+
+** COMMON PROBLEMS **
+
+MODEL SPECIFIC ISSUES
+
+Dmidecode is known not to work on IBM T-series laptops nor on Fujitsu-
+Siemens S-series laptops. This is due to the fact that the DMI table is at a
+memory location we can't reach through /dev/mem. It's obviously to the kernel
+developpers to fix the issue, and there's almost nothing we can do on
+dmidecode's side. This problem was first reported by Werner Heuser from
+Tuxmobil for Fujitsu-Siemens S-4582, by Pamela Huntley from IBM for IBM T23
+and T30 models, and was then confirmed by Joshua Goldenhar from Cisco for
+IBM T30.
+
+IA-64
+
+Dmidecode is known to have problems on IA-64 systems. The first reason for
+this is that dmidecode accesses the DMI table through /dev/mem, and reading
+this file on an IA-64 system sometimes leads to a crash. This is mostly a
+kernel issue and there's probably nothing we can do to fix it on dmidecode's
+side. A second reason is that the method for locating the above-mentioned
+table differs on IA-64 (compared to IA-32), so dmidecode is likely to miss
+the table entry point. This is a complex issue that was reported by Glen
+Foster and Smith Chad from HP. No solution has been found yet, but we hope to
+get one someday.
