@@ -1,3 +1,8 @@
+2003-09-11  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Don't use $^ since it isn't supported by BSD make.
+	  Reported by Hugues Lepesant.
+
 2003-09-05  Jean Delvare  <khali@linux-fr.org>
 
 	* Makefile: Fix missing ownership dependency for install target.
