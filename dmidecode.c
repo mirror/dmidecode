@@ -33,10 +33,10 @@
  * information does not come from the above mentioned specification.
  *
  * Additional references:
- *  - Intel AP-485 revision 25
+ *  - Intel AP-485 revision 27
  *    "Intel Processor Identification and the CPUID Instruction"
  *    http://developer.intel.com/design/xeon/applnots/241618.htm
- *  - DMTF Master MIF version 030621
+ *  - DMTF Master MIF version 040707
  *    "DMTF approved standard groups"
  *    http://www.dmtf.org/standards/dmi
  *  - IPMI 1.5 revision 1.1
@@ -674,8 +674,8 @@ static const char *dmi_processor_family(u8 code)
 		NULL, /* 0x77 */
 		"Crusoe TM5000",
 		"Crusoe TM3000",
-		NULL, /* 0x7A */
-		NULL,
+		"Efficeon TM8000",
+		NULL, /* 0x7B */
 		NULL,
 		NULL,
 		NULL,
@@ -685,8 +685,8 @@ static const char *dmi_processor_family(u8 code)
 		"Itanium",
 		"Athlon 64",
 		"Opteron",
-		NULL, /* 0x85 */
-		NULL,
+		"Sempron",
+		NULL, /* 0x86 */
 		NULL,
 		NULL,
 		NULL,
@@ -818,7 +818,7 @@ static const char *dmi_processor_family(u8 code)
 
 static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *prefix)
 {
-	/* Intel AP-485 revision 23, table 5 */
+	/* Intel AP-485 revision 27, table 5 */
 	static const char *flags[32]={
 		"FPU (Floating-point unit on-chip)", /* 0 */
 		"VME (Virtual mode extension)",
@@ -851,7 +851,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		"HTT (Hyper-threading technology)",
 		"TM (Thermal monitor supported)",
 		NULL, /* 30 */
-		"SBF (Signal break on FERR)" /* 31 */
+		"PBE (Pending break enabled)" /* 31 */
 	};
 	/*
 	 * Extra flags are now returned in the ECX register when one calls
@@ -905,7 +905,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 	else if((type>=0x18 && type<=0x1D) /* AMD */
 	|| type==0x1F /* AMD */
 	|| (type>=0xB6 && type<=0xB7) /* AMD */
-	|| (type==0x83 || type==0x84)) /* AMD 64-bit */
+	|| (type>=0x83 && type<=0x85)) /* AMD */
 		sig=2;
 	else if(type==0x01 || type==0x02)
 	{
@@ -1028,7 +1028,8 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket A (Socket 462)",
 		"Socket 478",
 		"Socket 754",
-		"Socket 940" /* 0x11 */
+		"Socket 940",
+		"Socket 939" /* 0x12 */
 	};
 	
 	if(code>=0x01 && code<=0x11)
