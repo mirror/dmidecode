@@ -1,3 +1,9 @@
+2003-10-14  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Update DMTF reference addresses.
+	* dmidecode.c: List two more processors (Athlon64 and Pentium M)
+	  as x86-class (i.e. supporting CPUID).
+
 2003-10-11  Jean Delvare  <khali@linux-fr.org>
 
 	Update to support DMTF Master MIF version 030621 (was 021205).
@@ -5,6 +11,8 @@
 	* dmidecode.c: Handle unknown processor voltage.
 	* dmidecode.c: Fix typo in event log method.
 	* dmidecode.c: One additional processor type (Pentium M).
+	* dmidecode.c: Add the AMD Opteron to the list of x86-class
+	  processors. Thanks to Mike Cooper for providing information.
 	* vpddecode.c: New program for decoding a machine's VPD structure
 	  (only found in IBM machines).
 	* Makefile: Update accordingly.
