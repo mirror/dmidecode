@@ -10,7 +10,7 @@
 
 CC      = gcc
 CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
-          -Wcast-align -Wwrite-strings -Wmissing-prototypes
+          -Wcast-align -Wwrite-strings -Wmissing-prototypes -Winline
 #CFLAGS += -DBIGENDIAN
 #CFLAGS += -DALIGNMENT_WORKAROUND
 
