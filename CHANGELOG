@@ -1,3 +1,8 @@
+2005-01-17  Jean Delvare  <khali@linux-fr.org>
+
+	* README: Add a note about Cygwin. Thanks to Dominik Klein for
+	  reporting success.
+
 2004-12-10  Jean Delvare  <khali@linux-fr.org>
 
 	Increase portability and configurability to in order to support BeOS.
