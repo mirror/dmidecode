@@ -1,8 +1,10 @@
-.TH DMIDECODE 8 "December 2003" "dmidecode"
+.TH DMIDECODE 8 "February 2005" "dmidecode"
 .SH NAME
 dmidecode \- \s-1DMI\s0 table decoder
 .SH SYNOPSIS
 .B dmidecode
+.RB [ OPTIONS ]
+
 .SH DESCRIPTION
 .B dmidecode
 is a tool for dumping a computer's \s-1DMI\s0 (some say \s-1SMBIOS\s0) table
@@ -53,6 +55,18 @@ displayed value.
 Decoded values. The information presented of course depends on the type
 of record. Here, we learn about the board's manufacturer, model, version
 and serial number.
+
+.SH OPTIONS
+.TP
+.BR "-d" ", " "--dev-mem FILE"
+Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
+.TP
+.BR "-h" ", " "--help"
+Display usage information and exit
+.TP
+.BR "-V" ", " "--version"
+Display the version and exit
+
 .SH FILES
 .I /dev/mem
 .SH BUGS

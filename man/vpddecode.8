@@ -1,8 +1,10 @@
-.TH VPDDECODE 8 "February 2004" "dmidecode"
+.TH VPDDECODE 8 "February 2005" "dmidecode"
 .SH NAME
 vpddecode \- \s-1VPD\s0 structure decoder
 .SH SYNOPSIS
 .B vpddecode
+.RB [ OPTIONS ]
+
 .SH DESCRIPTION
 .B vpddecode
 prints the "vital product data" information that can be found in almost
@@ -29,6 +31,18 @@ Default Flash Image File Name
 Note that these additional items are not documented by IBM, so this is
 guess work, and as such should not be blindly trusted. Feedback about
 the accuracy of these labels is welcome.
+
+.SH OPTIONS
+.TP
+.BR "-d" ", " "--dev-mem FILE"
+Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
+.TP
+.BR "-h" ", " "--help"
+Display usage information and exit
+.TP
+.BR "-V" ", " "--version"
+Display the version and exit
+
 .SH FILES
 .I /dev/mem
 .SH BUGS
