@@ -938,7 +938,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		/*
 		 * 80386 have a different signature.
 		 */
-		printf("%sSignature: Type %u, Family %u, Major Stepping %u, Minor Stepping %u\n",
+		printf("%sSignature: Type %X, Family %X, Major Stepping %X, Minor Stepping %X\n",
 			prefix, dx>>12, (dx>>8)&0xF, (dx>>4)&0xF, dx&0xF);
 		return;
 	}
@@ -974,7 +974,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		return;
 	
 	eax=DWORD(p);
-	printf("%sSignature: Type %u, Family %u, Model %u, Stepping %u\n",
+	printf("%sSignature: Type %X, Family %X, Model %X, Stepping %X\n",
 		prefix, (eax>>12)&0x3, ((eax>>16)&0xFF0)+((eax>>8)&0x00F),
 		((eax>>12)&0xF0)+((eax>>4)&0x0F), eax&0xF);
 	if(cpuid)
@@ -3640,10 +3640,7 @@ static void dmi_decode(u8 *data, u16 ver)
 		case 38: /* 3.3.39 IPMI Device Information */
 			/*
 			 * We use the word "Version" instead of "Revision", conforming to
-			 * the IPMI 1.5 specification. This specification isn't very clear
-			 * regarding the I2C slave address. I couldn't understand wether
-			 * or not we are supposed to shift it by one bit to the right, so
-			 * I leave it untouched. Beware it might be wrong.
+			 * the IPMI 1.5 specification.
 			 */
 			printf("\tIPMI Device Information\n");
 			if(h->length<0x10) break;
@@ -3652,7 +3649,7 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\t\tSpecification Version: %u.%u\n",
 				data[0x05]>>4, data[0x05]&0x0F);
 			printf("\t\tI2C Slave Address: 0x%02x\n",
-				data[0x06]);
+				data[0x06]>>1);
 			if(data[0x07]!=0xFF)
 				printf("\t\tNV Storage Device Address: %u\n",
 					data[0x07]);
