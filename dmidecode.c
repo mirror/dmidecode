@@ -50,6 +50,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <getopt.h>
 
 #ifdef __ia64__
 #define USE_EFI
@@ -59,6 +61,14 @@
 #include "config.h"
 #include "types.h"
 #include "util.h"
+
+/* Options are global */
+struct opt
+{
+	const char* devmem;
+	int version;
+};
+static struct opt opt;
 
 static const char *out_of_spec = "<OUT OF SPEC>";
 static const char *bad_index = "<BAD INDEX>";
@@ -3807,11 +3817,38 @@ static int legacy_decode(u8 *buf, const char *devmem)
 }
 #endif /* USE_EFI */
 
-int main(int argc, const char *argv[])
+/* Return -1 on error, 0 on success */
+static int parse_command_line(int argc, char * const argv[])
+{
+	int option;
+	const char *optstring = "d:V";
+	struct option longopts[]={
+		{ "dev-mem", required_argument, NULL, 'd' },
+		{ "version", no_argument, NULL, 'V' },
+		{ 0, 0, 0, 0 }
+	};
+
+	while((option=getopt_long(argc, argv, optstring, longopts, NULL))!=-1)
+		switch(option)
+		{
+			case 'd':
+				opt.devmem=optarg;
+				break;
+			case 'V':
+				opt.version=1;
+				break;
+			case ':':
+			case '?':
+				return -1;
+		}
+
+	return 0;
+}
+
+int main(int argc, char * const argv[])
 {
 	int found=0;
 	off_t fp;
-	const char *devmem=DEFAULT_MEM_DEV;
 #ifdef USE_EFI
 	FILE *efi_systab;
 	const char *filename;
@@ -3824,9 +3861,19 @@ int main(int argc, const char *argv[])
 		fprintf(stderr,"%s: compiler incompatibility\n", argv[0]);
 		exit(255);
 	}
-	
-	if(argc>=2)
-		devmem=argv[1];
+
+	/* Set default option values */
+	opt.devmem=DEFAULT_MEM_DEV;
+	opt.version=0;
+
+	if(parse_command_line(argc, argv)<0)
+		exit(2);
+
+	if(opt.version)
+	{
+		printf("%s\n", VERSION);
+		return 0;
+	}
 	
 	printf("# dmidecode %s\n", VERSION);
 	
@@ -3860,28 +3907,28 @@ int main(int argc, const char *argv[])
 		exit(1);
 	}
 
-	if((buf=mem_chunk(fp, 0x20, devmem))==NULL)
+	if((buf=mem_chunk(fp, 0x20, opt.devmem))==NULL)
 		exit(1);
 	
-	if(smbios_decode(buf, devmem))
+	if(smbios_decode(buf, opt.devmem))
 		found++;
 	
 	free(buf);
 #else /* USE_EFI */
-	if((buf=mem_chunk(0xF0000, 0x10000, devmem))==NULL)
+	if((buf=mem_chunk(0xF0000, 0x10000, opt.devmem))==NULL)
 		exit(1);
 	
 	for(fp=0; fp<=0xFFF0; fp+=16)
 	{
 		if(memcmp(buf+fp, "_SM_", 4)==0 && fp<=0xFFE0)
 		{
-			if(smbios_decode(buf+fp, devmem))
+			if(smbios_decode(buf+fp, opt.devmem))
 				found++;
 			fp+=16;
 		}
 		else if(memcmp(buf+fp, "_DMI_", 5)==0)
 		{
-			if (legacy_decode(buf+fp, devmem))
+			if (legacy_decode(buf+fp, opt.devmem))
 				found++;
 		}
 	}
