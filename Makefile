@@ -19,11 +19,20 @@ PREFIX  = /usr/local
 
 all : dmidecode biosdecode
 
-dmidecode : dmidecode.c version.h
-	$(CC) $(CFLAGS) $< -o $@
+dmidecode : dmidecode.o util.o
+	$(CC) $^ -o $@
 
-biosdecode : biosdecode.c version.h
-	$(CC) $(CFLAGS) $< -o $@
+biosdecode : biosdecode.o util.o
+	$(CC) $^ -o $@
+
+dmidecode.o : dmidecode.c version.h types.h util.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+biosdecode.o : biosdecode.c version.h types.h util.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+util.o : util.c types.h util.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
 install : dmidecode biosdecode
 	install -m 755 dmidecode $(PREFIX)/sbin
@@ -34,4 +43,4 @@ uninstall :
 	rm -f $(PREFIX)/sbin/biosdecode
 
 clean :
-	rm -f dmidecode biosdecode
+	rm -f *.o dmidecode biosdecode

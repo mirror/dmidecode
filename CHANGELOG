@@ -1,3 +1,10 @@
+2003-06-17  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c, biosdecode.c: Moved common "util" functions to util.c.
+	* util.c, util.h: New.
+	* types.h: New.
+	* Makefile: Updated accordingly.
+
 2003-06-10  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fixed typo in IPMI register spacing table. 

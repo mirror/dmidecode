@@ -1,11 +1,8 @@
 /*
  * BIOS Decode
  *
- *      (C) 2000-2002 Alan Cox <alan@redhat.com>
- *      (C) 2002-2003 Jean Delvare <khali@linux-fr>
- *
- * Licensed under the GNU Public license. If you want to use it in with
- * another license just ask.
+ *   (C) 2000-2002 Alan Cox <alan@redhat.com>
+ *   (C) 2002-2003 Jean Delvare <khali@linux-fr>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -55,14 +52,10 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <ctype.h>
 
 #include "version.h"
-
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
+#include "types.h"
+#include "util.h"
 
 #ifdef BIGENDIAN
 typedef struct {
@@ -88,50 +81,6 @@ struct bios_entry {
 	int (*decode)(const u8*, size_t);
 };
 
-/*
- * Tools
- */
-
-static int myread(int fd, u8 *buf, size_t count, const char *prefix)
-{
-	ssize_t r=1;
-	size_t r2=0;
-	
-	while(r2!=count && r!=0)
-	{
-		r=read(fd, buf+r2, count-r2);
-		if(r==-1)
-		{
-			if(errno!=EINTR)
-			{
-				close(fd);
-				perror(prefix);
-				return -1;
-			}
-		}
-		else
-			r2+=r;
-	}
-	
-	if(r2!=count)
-	{
-		close(fd);
-		fprintf(stderr, "%s: Unexpected end of file\n", prefix);
-		return -1;
-	}
-	
-	return 0;
-}
-
-static __inline__ int checksum(const u8 *buf, size_t len)
-{
-	u8 sum=0;
-	size_t a;
-	
-	for(a=0; a<len; a++)
-		sum+=buf[a];
-	return (sum==0);
-}
 
 /*
  * SMBIOS
