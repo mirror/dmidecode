@@ -1,0 +1,11 @@
+MAINTAINER
+Jean Delvare <khali@linux-fr.org>
+
+ORIGINAL AUTHOR
+Alan Cox <alan@redhat.com>
+
+CONTRIBUTORS (IN CHRONOLOGICAL ORDER)
+Matt Domsch <Matt_Domsch@dell.com>
+Arjan van de Ven <arjanv@redhat.com>
+Mark D. Studebaker <mds@paradyne.com>
+Larry Lile <llile@dreamworks.com>
