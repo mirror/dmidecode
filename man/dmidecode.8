@@ -1,0 +1,67 @@
+.TH DMIDECODE 8 "December 2003" "dmidecode"
+.SH NAME
+dmidecode \- \s-1DMI\s0 table decoder
+.SH SYNOPSIS
+.B dmidecode
+.SH DESCRIPTION
+.B dmidecode
+is a tool for dumping a computer's \s-1DMI\s0 (some say \s-1SMBIOS\s0) table
+contents in a human-readable format. This table contains a description of the
+system's hardware components, as well as other useful pieces of information
+such as serial numbers and \s-1BIOS\s0 revision. Thanks to this table, you can
+retrieve this information without having to probe for the actual hardware.
+While this is a good point in terms of report speed and safeness, this also
+makes the presented information possibly unreliable.
+
+The \s-1DMI\s0 table doesn't only describe what the system is currently made
+of, it also can report the possible evolutions (such as the fastest supported
+\s-1CPU\s0 or the maximal amount of memory supported).
+
+\s-1SMBIOS\s0 stands for System Management \s-1BIOS\s0, while \s-1DMI\s0
+stands for Desktop Management Interface. Both standards are tightly related
+and developed by the \s-1DMTF\s0 (Desktop Management Task Force).
+
+As you run it,
+.B dmidecode
+will try to locate the \s-1DMI\s0 table. If it succeeds, it will then parse
+this table and display a list of records like this one:
+
+Handle 0x0002
+    DMI type 2, 8 bytes.
+    Base Board Information
+        Manufacturer: Intel
+        Product Name: C440GX+
+        Version: 727281-001
+        Serial Number: INCY92700942
+
+Each record has:
+.IP \[bu]
+A handle. This is a unique identifier, which allows records to
+reference each other. For example, processor records usually reference
+cache memory records using their handles.
+.IP \[bu]
+A type. The \s-1SMBIOS\s0 specification defines different types of elements
+a computer can be made of. In this example, the type is 2, which
+means that the record contains "Base Board Information".
+.IP \[bu]
+A size. Each record has a 4-byte header (2 for the handle, 1 for the type,
+1 for the size), the rest is used by the record data. This value doesn't
+take text strings into account (these are placed at the end of the record),
+so the actual length of the record may be (and is often) greater than the
+displayed value.
+.IP \[bu]
+Decoded values. The information presented of course depends on the type
+of record. Here, we learn about the board's manufacturer, model, version
+and serial number.
+.SH FILES
+.I /dev/mem
+.SH BUGS
+More often than not, information contained in the DMI tables is inaccurate,
+incomplete or simply wrong.
+.SH AUTHORS
+Alan Cox, Jean Delvare
+.SH "SEE ALSO"
+.BR biosdecode (8),
+.BR mem (4),
+.BR ownership (8),
+.BR vpddecode (8)
