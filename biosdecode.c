@@ -118,8 +118,10 @@ static int smbios_decode(const u8 *p, size_t len)
 	return 1;
 }
 
-static size_t dmi_length(__attribute__ ((unused)) const u8 *p)
+static size_t dmi_length(const u8 *p)
 {
+	(void) p;
+	
 	return(0x0F);
 }
 
@@ -249,6 +251,9 @@ static int acpi_decode(const u8 *p, size_t len)
 	printf("\n");
 	printf("\tRSD Table 32-bit Address: 0x%08X\n",
 		DWORD(p+16));
+	
+	if(len<36)
+		return 1;
 	
 	if(DWORD(p+20)>len || !checksum(p, DWORD(p+20)))
 		return 0;
@@ -401,9 +406,10 @@ static size_t compaq_length(const u8 *p)
 	return (p[4]*10+5);
 }
 
-static int compaq_decode(const u8 *p, __attribute__ ((unused)) size_t len)
+static int compaq_decode(const u8 *p, size_t len)
 {
 	size_t i;
+	(void) len;
 
 	printf("Compaq-specific entries present.\n");
 
@@ -412,7 +418,7 @@ static int compaq_decode(const u8 *p, __attribute__ ((unused)) size_t len)
 	{
 		/*
 		 * We do not check for truncated entries, because the length was
-		 * computer from the number of records in compaq_length right above,
+		 * computed from the number of records in compaq_length right above,
 		 * so it can't be wrong.
 		 */
 		if(p[5+i*10]!='$' || !(p[6+i*10]>='A' && p[6+i*10]<='Z')
@@ -535,7 +541,7 @@ int main(int argc, const char *argv[])
 						exit(1);
 					}
 
-					memcpy(p, buf, 16);
+					memcpy(p, buf, (len>16?16:len));
 					if(len>16)
 					{
 						/* buffer completion */
