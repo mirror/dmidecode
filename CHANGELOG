@@ -1,0 +1,129 @@
+2003-03-06  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c, biosdecode.c: Moved all changelog entries to CHANGELOG.
+	* CHANGELOG: New. Format inspired by Heroes' ChangeLog file.
+
+2002-10-21  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Changed supported log type descriptors display.
+	* dmidecode.c: Code optimization in event log status.
+	* dmidecode.c: Remove extra newline in voltage probe accuracy.
+	* dmidecode.c: Display "OEM-specific" if type is 128 or more.
+	* dmidecode.c: Do not display Strings on dump if there are no strings.
+	* dmidecode.c: Add ASCII-filtering to dmi_string.
+	* dmidecode.c: Convert all dates to ISO 8601.
+
+2002-10-18  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Complete rewrite.
+	* dmidecode.c: Now complies with SMBIOS specification 2.3.3.
+	* dmidecode.c: Moved all non-DMI stuff to biosdecode.c.
+	* biosdecode.c: New.
+
+2002-10-15  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix bad index in DMI case 27 (cooling device).
+
+2002-10-14  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix typo in dmi_memory_array_location.
+	* dmidecode.c: Replace Kbyte by kB in DMI case 16.
+	* dmidecode.c: Add DDR entry in dmi_memory_device_type.
+	* dmidecode.c: Fix extra s in SYSIS.
+
+2002-10-12  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix maximum cache size and installed size being
+	inverted.
+	* dmidecode.c: Fix typos in port types.
+
+2002-10-10  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Remove extra semicolon at the end of
+	dmi_memory_array_use.
+	* dmidecode.c: Fix compilation warnings.
+	* dmidecode.c: Add missing backslash in DMI case 37.
+	* dmidecode.c: Fix BIOS ROM size (DMI case 0).
+
+2002-10-05  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: More ACPI decoded.
+	* dmidecode.c: More PNP decoded.
+	* dmidecode.c: More SYSID decoded.
+	* dmidecode.c: PCI Interrupt Routing decoded.
+	* dmidecode.c: BIOS32 Service Directory decoded.
+	* dmidecode.c: Sony system detection (unconfirmed).
+	* dmidecode.c: Checksums verified whenever possible.
+	* dmidecode.c: Better checks on file read and close.
+	* dmidecode.c: Define VERSION and display version at beginning.
+	* dmidecode.c: More secure decoding (won't run off the table in any
+	case).
+	* dmidecode.c: Do not try to decode more structures than announced.
+	* dmidecode.c: Fix an off-by-one error that caused the last address
+	being scanned to be 0x100000, not 0xFFFF0 as it should.
+
+2002-09-28  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix missing coma in dmi_bus_name.
+	* dmidecode.c: Remove unwanted bitmaskings in dmi_mgmt_dev_type,
+	dmi_mgmt_addr_type, dmi_fan_type, dmi_volt_loc, dmi_temp_loc and
+	dmi_status.
+	* dmidecode.c: Fix DMI table read bug ("dmi: read: Success").
+	* dmidecode.c: Make the code pass -W again.
+	* dmidecode.c: Fix return value of dmi_card_size.
+
+2002-09-20  Dave Johnson  <ddj@cascv.brown.edu>
+
+	* dmidecode.c: Fix comparisons in dmi_bus_name.
+	* dmidecode.c: Fix comparison in dmi_processor_type.
+	* dmidecode.c: Fix bitmasking in dmi_onboard_type.
+	* dmidecode.c: Fix return value of dmi_temp_loc.
+
+2002-09-17  Larry Lile  <llile@dreamworks.com>
+
+	* dmidecode.c: Type 16 & 17 structures displayed per SMBIOS 2.3.1 spec.
+
+2002-08-23  Alan Cox  <alan@redhat.com>
+
+	* dmidecode.c: Make the code pass -Wall -pedantic by fixing a few
+	harmless sign of pointer mismatches.
+	* dmidecode.c: Correct main() prototype.
+	* dmidecode.c: Check for compilers with wrong type sizes.
+
+2002-08-09  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Better DMI struct count/size error display.
+	* dmidecode.c: More careful memory access in dmi_table.
+	* dmidecode.c: DMI case 13 (Language) decoded.
+	* dmidecode.c: C++ style comments removed. Commented out code removed.
+	* dmidecode.c: DMI 0.0 case handled.
+	* dmideocde.c: Fix return value of dmi_port_type and
+	dmi_port_connector_type.
+
+2002-08-06  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Reposition file pointer after DMI table display.
+	* dmidecode.c: Disable first RSD PTR checksum (was not correct anyway).
+	* dmidecode.c: Show actual DMI struct count and occupied size.
+	* dmidecode.c: Check for NULL after malloc.
+	* dmidecode.c: Use SEEK_* constants instead of numeric values.
+	* dmidecode.c: Code optimization (and warning fix) in DMI cases 10 and
+	14.
+	* dmidecode.c: Add else's to avoid unneeded cascaded if's in main loop.
+	* dmidecode.c: Code optimization in DMI information display.
+	* dmidecode.c: Fix all compilation warnings.
+
+2002-08-03  Mark D. Studebaker  <mds@paradyne.com>
+
+	* dmidecode.c: Better indent in dump_raw_data.
+	* dmidecode.c: Fix return value of dmi_bus_name.
+	* dmidecode.c: Additional sensor fields decoded.
+	* dmidecode.c: Fix compilation warnings.
+
+2001-12-13  Arjan van de Ven  <arjanv@redhat.com>
+
+	* dmidecode.c: Fix memory bank type (DMI case 6).
+
+2001-07-02  Matt Domsch  <Matt_Domsch@dell.com>
+
+	* dmidecode.c: Additional structures displayed per SMBIOS 2.3.1 spec.

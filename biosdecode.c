@@ -4,10 +4,6 @@
  *      (C) 2000-2002 Alan Cox <alan@redhat.com>
  *      (C) 2002 Jean Delvare <khali@linux-fr>
  *
- *      2002-10-24  Jean Delvare <khali@linux-fr.org>
- *      Initial release
- *      Original code from dmidecode
- *
  * Licensed under the GNU Public license. If you want to use it in with
  * another license just ask.
  *
