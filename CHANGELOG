@@ -1,3 +1,24 @@
+2005-03-25  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Install some documentation files (README, CHANGELOG,
+	  AUTHORS).
+
+	Update to support SMBIOS specification version 2.4 preliminary
+	[11/18/2004] (was 2.3.4).
+
+	* dmidecode.c: Add BIOS characteristics (DMI type 0).
+	* dmidecode.c: Display BIOS and firmware revisions where available
+	  (DMI type 0).
+	* dmidecode.c: Display system SKU number and family where available
+	  (DMI type 1).
+	* dmidecode.c: Add system slot types and widths (DMI type 9).
+	* dmidecode.c: Add memory device type "DDR2" (DMI type 17).
+
+2005-03-20  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Install manual pages under $(prefix)/share/man by
+	  default, instead of $(prefix)/man, so as to comply with the FHS.
+
 2005-03-08  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Update lookup table from revision 2005-03-08 of IBM
