@@ -1,8 +1,8 @@
 /*
- * BIOS decode rev 2.0
+ * BIOS Decode
  *
  *      (C) 2000-2002 Alan Cox <alan@redhat.com>
- *      (C) 2002 Jean Delvare <khali@linux-fr>
+ *      (C) 2002-2003 Jean Delvare <khali@linux-fr>
  *
  * Licensed under the GNU Public license. If you want to use it in with
  * another license just ask.

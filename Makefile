@@ -3,7 +3,7 @@
 #	BIOS Decode
 #
 #	(C) 2000-2002 Alan Cox <alan@redhat.com>
-#	(C) 2001-2002 Jean Delvare <khali@linux-fr.org>
+#	(C) 2002-2003 Jean Delvare <khali@linux-fr.org>
 #
 #	Licensed under the GNU Public license. If you want to use it in with
 #	another license just ask.
