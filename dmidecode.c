@@ -25,8 +25,8 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 2.3.4" document,
- * available from http://www.dmtf.org/standards/smbios.
+ * Management BIOS Reference Specification, Version 2.4, Preliminary"
+ * document, available from http://www.dmtf.org/standards/smbios/.
  *
  * Note to contributors:
  * Please reference every value you add or modify, especially if the
@@ -311,11 +311,12 @@ static void dmi_bios_characteristics_x2(u8 code, const char *prefix)
 	/* 3.3.1.2.2 */
 	static const char *characteristics[]={
 		"BIOS boot specification is supported", /* 0 */
-		"Function key-initiated network boot is supported" /* 1 */
+		"Function key-initiated network boot is supported",
+		"Targeted content distribution is supported" /* 2 */
 	};
 	int i;
 	
-	for(i=0; i<=1; i++)
+	for(i=0; i<=2; i++)
 		if(code&(1<<i))
 			printf("%s%s\n",
 				prefix, characteristics[i]);
@@ -1533,12 +1534,13 @@ static const char *dmi_slot_type(u8 code)
 		"PC-98/C24",
 		"PC-98/E",
 		"PC-98/Local Bus",
-		"PC-98/Card" /* 0xA4 */
+		"PC-98/Card",
+		"PCI Express" /* 0xA5 */
 	};
 	
 	if(code>=0x01 && code<=0x13)
 		return type[code-0x01];
-	if(code>=0xA0 && code<=0xA4)
+	if(code>=0xA0 && code<=0xA5)
 		return type_0xA0[code-0xA0];
 	return out_of_spec;
 }
@@ -1553,10 +1555,17 @@ static const char *dmi_slot_bus_width(u8 code)
 		"16-bit ",
 		"32-bit ",
 		"64-bit ",
-		"128-bit " /* 0x07 */
+		"128-bit ",
+		"x1 ",
+		"x2 ",
+		"x4 ",
+		"x8 ",
+		"x12 ",
+		"x16 ",
+		"x32 " /* 0x0E */
 	};
 	
-	if(code>=0x01 && code<=0x07)
+	if(code>=0x01 && code<=0x0E)
 		return width[code-0x01];
 	return out_of_spec;
 }
@@ -2087,10 +2096,11 @@ static const char *dmi_memory_device_type(u8 code)
 		"SDRAM",
 		"SGRAM",
 		"RDRAM",
-		"DDR" /* 0x12 */
+		"DDR",
+		"DDR2" /* 0x13 */
 	};
 	
-	if(code>=0x01 && code<=0x12)
+	if(code>=0x01 && code<=0x13)
 		return type[code-0x01];
 	return out_of_spec;
 }
@@ -2858,6 +2868,13 @@ static void dmi_decode(u8 *data, u16 ver)
 			dmi_bios_characteristics_x1(data[0x12], "\t\t\t");
 			if(h->length<0x14) break;
 			dmi_bios_characteristics_x2(data[0x13], "\t\t\t");
+			if(h->length<0x18) break;
+			if(data[0x14]!=0xFF && data[0x15]!=0xFF)
+				printf("\t\tBIOS Revision: %u.%u\n",
+					data[0x14], data[0x15]);
+			if(data[0x16]!=0xFF && data[0x17]!=0xFF)
+				printf("\t\tFirmware Revision: %u.%u\n",
+					data[0x16], data[0x17]);
 			break;
 		
 		case 1: /* 3.3.2 System Information */
@@ -2877,6 +2894,11 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\n");
 			printf("\t\tWake-up Type: %s\n",
 				dmi_system_wake_up_type(data[0x18]));
+			if(h->length<0x1B) break;
+			printf("\t\tSKU Number: %s\n",
+				dmi_string(h, data[0x19]));
+			printf("\t\tFamily: %s\n",
+				dmi_string(h, data[0x1A]));
 			break;
 		
 		case 2: /* 3.3.3 Base Board Information */
