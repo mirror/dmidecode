@@ -29,7 +29,7 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 2.3.3" document,
+ * Management BIOS Reference Specification, Version 2.3.4" document,
  * available from http://www.dmtf.org/standards/bios.php.
  *
  * Note to contributors:
@@ -37,10 +37,10 @@
  * information does not come from the above mentioned specification.
  *
  * Additional references:
- *	- Intel AP-485 revision 21
+ *	- Intel AP-485 revision 23
  *    "Intel Processor Identification and the CPUID Instruction"
  *    http://developer.intel.com/design/xeon/applnots/241618.htm
- *  - DMTF Master MIF version 020507
+ *  - DMTF Master MIF version 021205
  *    "DMTF approved standard groups"
  *    http://www.dmtf.org/standards/standard_dmi.php
  *  - IPMI 1.5 revision 1.1
@@ -786,9 +786,9 @@ static const char *dmi_processor_family(u8 code)
 		"Weitek",
 		NULL, /* 0x81 */
 		"Itanium",
-		NULL, /* 0x83 */
-		NULL,
-		NULL,
+		"Athlon 64",
+		"Opteron",
+		NULL, /* 0x85 */
 		NULL,
 		NULL,
 		NULL,
@@ -839,8 +839,8 @@ static const char *dmi_processor_family(u8 code)
 		"Xeon MP",
 		"Athlon XP",
 		"Athlon MP",
-		NULL, /* 0xB8 */
-		NULL,
+		"Itanium 2",
+		NULL, /* 0xB9 */
 		NULL,
 		NULL,
 		NULL,
@@ -921,7 +921,7 @@ static const char *dmi_processor_family(u8 code)
 
 static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *prefix)
 {
-	/* Intel AP-485 revision 21 */
+	/* Intel AP-485 revision 23, table 5 */
 	static const char *flags[32]={
 		"FPU (Floating-point unit on-chip)", /* 0 */
 		"VME (Virtual mode extension)",
@@ -954,8 +954,13 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		"HTT (Hyper-threading technology)",
 		"TM (Thermal monitor supported)",
 		NULL, /* 30 */
-		NULL /* 31 */
+		"SBF (Signal break on FERR)" /* 31 */
 	};
+	/*
+	 * Extra flags are now returned in the ECX register when one calls
+	 * the CPUID instruction. Their means are explained in table 6, but
+	 * DMI doesn't support this yet.
+	 */
 	u32 eax;
 	int cpuid=0;
 
@@ -1092,10 +1097,12 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Slot M",
 		"Socket 423",
 		"Socket A (Socket 462)",
-		"Socket 478" /* 0x0F */
+		"Socket 478",
+		"Socket 754",
+		"Socket 940" /* 0x11 */
 	};
 	
-	if(code>=0x01 && code<=0x0F)
+	if(code>=0x01 && code<=0x11)
 		return upgrade[code-0x01];
 	return out_of_spec;
 }
@@ -1557,7 +1564,8 @@ static const char *dmi_slot_type(u8 code)
 		"AGP",
 		"AGP 2x",
 		"AGP 4x",
-		"PCI-X" /* 0x12 */
+		"PCI-X",
+		"AGP 8x" /* 0x13 */
 	};
 	static const char *type_0xA0[]={
 		"PC-98/C20", /* 0xA0 */
@@ -1567,7 +1575,7 @@ static const char *dmi_slot_type(u8 code)
 		"PC-98/Card" /* 0xA4 */
 	};
 	
-	if(code>=0x01 && code<=0x12)
+	if(code>=0x01 && code<=0x13)
 		return type[code-0x01];
 	if(code>=0xA0 && code<=0xA4)
 		return type_0xA0[code-0xA0];

@@ -1,3 +1,18 @@
+2003-05-27  Jean Delvare  <khali@linux-fr.org>
+
+	Updated to support Intel AP-485 specification (CPUID) revision 023
+	(was 021).
+
+	* dmidecode.c: Added SBF flag to processor ID (DMI case 4). Added comment
+	about new flags returned in ECX.
+
+2003-05-26  Jean Delvare  <khali@linux-fr.org>
+
+	Updated to support SMBIOS specification version 2.3.4 (was 2.3.3).
+
+	* dmidecode.c: Added processor and processor upgrade names (DMI case 4).
+	* dmidecode.c: Added slot names (DMI case 9).
+
 2003-05-22  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fixed typo reported by David Wilson (DMI case 6).
