@@ -12,6 +12,9 @@
 CC      = gcc
 CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
           -Wcast-align -Wwrite-strings -O2 -pedantic -g
+#CFLAGS += -DBIGENDIAN
+#CFLAGS += -DALIGNMENT_WORKAROUND
+#CFLAGS += -DTABLE_LITTLEENDIAN
 PREFIX  = /usr/local
 
 all : dmidecode biosdecode
