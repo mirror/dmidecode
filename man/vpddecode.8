@@ -31,6 +31,15 @@ guess work, and as such should not be blindly trusted. Feedback about
 the accuracy of these labels is welcome.
 .SH FILES
 .I /dev/mem
+.SH BUGS
+The lookup table for product names is incomplete. If your system is missing
+from the table,
+.B vpddecode
+will ask you to report. See the
+.I AUTHORS
+file for maintainer contact information. Your report should include the
+product name of the machine, and the \s-1BIOS\s0 build \s-1ID\s0 as given by
+.BR vpddecode .
 .SH AUTHOR
 Jean Delvare
 .SH "SEE ALSO"
