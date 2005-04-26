@@ -1,3 +1,15 @@
+2005-04-26  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "M1". Reported by Myke Olson.
+	* vpddecode.c: Add option -u, --dump. It disables decoding of the
+	  VPD records, a raw dump is displayed instead. This option is
+	  mainly intended for debugging.
+
+2005-04-03  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Use variables for install and rm commands, so that these
+	  can be overriden by the caller.
+
 2005-03-25  Jean Delvare  <khali@linux-fr.org>
 
 	* Makefile: Install some documentation files (README, CHANGELOG,
