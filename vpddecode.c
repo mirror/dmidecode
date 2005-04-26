@@ -118,6 +118,8 @@ static const char *product_name(const char *id)
 		                                  confirmed by Pamela Huntley */
 		"KY", "Thinkpad A21p or A22p", /* fixed 2003-11-29 (IBM) */
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
+		"M1", "eServer xSeries 325", /* added 2005-04-26,
+		                                reported by Myke Olson */
 		"NV", "PC 300PL", /* added 2004-04-02,
 		                     reported by Shawn Starr */
 		"OP", "Intellistation Z10", /* added 2005-02-17,
@@ -228,8 +230,9 @@ static int decode(const u8 *p)
 	   13 bytes. */
 	&& !(checksum(p+0x0D, 0x30-0x0D)))
 	{
-		/* A few systems have a bad checksum (xSeries 330, 335 and 345 with
-		   early BIOS) but the record is otherwise valid. */
+		/* A few systems have a bad checksum (xSeries 325, 330, 335
+		   and 345 with early BIOS) but the record is otherwise
+		   valid. */
 		printf("Bad checksum! Please report.\n");
 	}
 	
