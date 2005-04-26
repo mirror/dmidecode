@@ -54,6 +54,7 @@ static struct opt opt;
 
 #define FLAG_VERSION            (1<<0)
 #define FLAG_HELP               (1<<1)
+#define FLAG_DUMP               (1<<2)
 
 static const char *product_name(const char *id)
 {
@@ -217,6 +218,30 @@ static void print_entry(const char *name, const u8 *p, size_t len)
 	printf("\n");
 }
 
+static void dump(const u8 *p, u8 len)
+{
+	int done, i, min;
+
+	for(done=0; done<len; done+=16)
+	{
+		printf("%02X:", done);
+		min=(len-done<16)?len-done:16;
+
+		/* As hexadecimal first */
+		for(i=0; i<min; i++)
+			printf(" %02X", p[done+i]);
+		for(; i<16; i++) /* Complete line if needed */
+			printf("   ");
+		printf("     ");
+
+		/* And now as text, with ASCII filtering */
+		for(i=0; i<min; i++)
+			printf("%c", (p[done+i]>=32 && p[done+i]<127)?
+				p[done+i]:'.');
+		printf("\n");
+	}
+}
+
 static int decode(const u8 *p)
 {
 	if(p[5]<0x30)
@@ -255,10 +280,11 @@ static int decode(const u8 *p)
 static int parse_command_line(int argc, char * const argv[])
 {
 	int option;
-	const char *optstring = "d:hV";
+	const char *optstring = "d:huV";
 	struct option longopts[]={
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
+		{ "dump", no_argument, NULL, 'u' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0, 0, 0, 0 }
 	};
@@ -271,6 +297,9 @@ static int parse_command_line(int argc, char * const argv[])
 				break;
 			case 'h':
 				opt.flags|=FLAG_HELP;
+				break;
+			case 'u':
+				opt.flags|=FLAG_DUMP;
 				break;
 			case 'V':
 				opt.flags|=FLAG_VERSION;
@@ -290,6 +319,7 @@ static void print_help(void)
 		"Options are:\n"
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
 		" -h, --help             Display this help text and exit\n"
+		" -u, --dump             Do not decode the VPD records\n"
 		" -V, --version          Display the version and exit\n";
 	
 	printf("%s", help);
@@ -336,9 +366,19 @@ int main(int argc, char * const argv[])
 		u8 *p=buf+fp;
 
 		if(memcmp((char *)p, "\252\125VPD", 5)==0
-		&& fp+p[5]-1<=0xFFFF
-		&& decode(p))
-			found++;
+		&& fp+p[5]-1<=0xFFFF)
+		{
+			if(opt.flags & FLAG_DUMP)
+			{
+				dump(p, p[5]);
+				found++;
+			}
+			else
+			{
+				if(decode(p))
+					found++;
+			}
+		}
 	}
 
 	free(buf);
