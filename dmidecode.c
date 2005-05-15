@@ -25,8 +25,8 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 2.4, Preliminary"
- * document, available from http://www.dmtf.org/standards/smbios/.
+ * Management BIOS Reference Specification, Version 2.4" document,
+ * available from http://www.dmtf.org/standards/smbios/.
  *
  * Note to contributors:
  * Please reference every value you add or modify, especially if the
