@@ -1,3 +1,14 @@
+2005-05-15  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.8, vpddecode.8: Document the new -u, --dump option.
+
+	Update to support SMBIOS specification version 2.4 (was 2.4
+	preliminary). There is actually no difference between 2.4
+	preliminary and 2.4 final.
+
+	* dmidecode.c: Update the "System Management BIOS Reference
+	  Specification" version.
+
 2005-04-26  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product ID "M1". Reported by Myke Olson.
