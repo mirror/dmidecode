@@ -9,9 +9,9 @@ include usage status for the CPU sockets, expansion slots (e.g. AGP, PCI,
 ISA) and memory module slots, and the list of I/O ports (e.g. serial,
 parallel, USB).
 
-Part of dmidecode's code can be found in the Linux kernel, where DMI data
+Part of the dmidecode code can be found in the Linux kernel, where DMI data
 is used to enable or disable specific portions of code depending on the
-specific hardware. Thus, one of dmidecode's use is for kernel developers to
+specific hardware. Thus, one use of dmidecode is for kernel developers to
 detect system "signatures" and add them to the kernel source code when
 needed.
 
@@ -22,10 +22,11 @@ to.
 
 ** INSTALLATION **
 
-Dmidecode's home page is hosted on Savannah:
+The home web page for dmidecode is hosted on Savannah:
   http://www.nongnu.org/dmidecode/
 You will find the latest version (including CVS) there, as well as fresh news
-and other interesting material, such as a list of related projects.
+and other interesting material, such as a list of related projects and
+articles.
 
 This program was first written for Linux, and has since been reported to work
 on FreeBSD, NetBSD, BeOS and Cygwin as well.
@@ -52,13 +53,13 @@ neighbour architectures (x86_64, ia64) anyway.
 
 ** DOCUMENTATION **
 
-Each tool has a manual page, found in the man/ subdirectory. Manual pages
+Each tool has a manual page, found in the "man" subdirectory. Manual pages
 are installed by "make install".
 
 For an history of the changes made to dmidecode, see the CHANGELOG file.
 
 If you need help, your best chances are to visit the web page (see the
-INSTALLATION section above) or to get in touch with the developpers
+INSTALLATION section above) or to get in touch with the developers
 directly. Have a look at the AUTHORS file and contact one of the maintainers
 (or less likely someone else, but you'd need to have a good reason for doing
 so).
