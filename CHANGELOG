@@ -411,7 +411,7 @@
 
 2003-09-19  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Explicitely say when no SMBIOS nor DMI entry point
+	* dmidecode.c: Explicitly say when no SMBIOS nor DMI entry point
 	  was found. Implicitly suggested by Sergey Leonovich.
 
 2003-09-11  Jean Delvare  <khali@linux-fr.org>
