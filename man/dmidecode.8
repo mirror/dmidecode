@@ -61,6 +61,12 @@ and serial number.
 .BR "-d" ", " "--dev-mem FILE"
 Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
 .TP
+.BR "-u" ", " "--dump"
+Do not decode the entries, dump their contents as hexadecimal instead.
+Note that this is still a text output, no binary data will be thrown upon
+you. The strings attached to each entry are displayed as both
+hexadecimal and ASCII. This option is mainly useful for debugging.
+.TP
 .BR "-h" ", " "--help"
 Display usage information and exit
 .TP
