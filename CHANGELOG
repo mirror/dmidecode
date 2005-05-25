@@ -1,3 +1,8 @@
+2005-05-25  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product IDs "KE", "NT" and "ZR". Reported by 
+	  Bernd Krumboeck.
+
 2005-05-15  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.8, vpddecode.8: Document the new -u, --dump option.
