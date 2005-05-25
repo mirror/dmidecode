@@ -104,6 +104,8 @@ static const char *product_name(const char *id)
 		"IZ", "Thinkpad X20 or X21", /* updated 2003-11-29 (IBM) */
 		"JP", "eServer xSeries 205", /* added 2004-04-30,
 		                                reported by Bernd Krumboeck */
+		"KE", "eServer xSeries 206", /* added 2005-05-25,
+		                                reported by Bernd Krumboeck */
 		"KP", "eServer xSeries 346", /* added 2005-02-01,
 		                                reported by David Rosala,
 		                                confirmed by Scott Denham */
@@ -121,6 +123,8 @@ static const char *product_name(const char *id)
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
 		"M1", "eServer xSeries 325", /* added 2005-04-26,
 		                                reported by Myke Olson */
+ 		"NT", "Netfinity 3000", /* added 2005-05-25,
+ 		                           reported by Bernd Krumboeck */
 		"NV", "PC 300PL", /* added 2004-04-02,
 		                     reported by Shawn Starr */
 		"OP", "Intellistation Z10", /* added 2005-02-17,
@@ -146,6 +150,8 @@ static const char *product_name(const char *id)
 		                                reported by Doug Brenner */
 		"TT", "eServer xSeries 330", /* added 2003-12-03,
 		                                reported by Hugues Lepesant */
+		"ZR", "eServer xSeries 200", /* added 2005-05-25,
+		                                reported by Bernd Krumboeck */
 		"10", "Thinkpad A21e or A22e", /* Celeron models */
 		"11", "Thinkpad 240Z",
 		"13", "Thinkpad A22m", /* 2628-Sxx models */
