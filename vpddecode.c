@@ -176,8 +176,8 @@ static const char *product_name(const char *id)
 		"1Q", "Thinkpad X31",
 		"1R", "Thinkpad T40, T41, T42, R50, R50p or R51", /* updated 2003-11-29 (IBM),
 		                                                     updated 2004-11-08,
-								     reported by Marco Wertejuk,
-								     updated 2005-03-08 (IBM) */
+		                                                     reported by Marco Wertejuk,
+		                                                     updated 2005-03-08 (IBM) */
 		"1S", "Thinkpad R40e", /* added 2003-11-29 (IBM) */
 		"1T", "Thinkpad G40",
 		"1V", "Thinkpad R51", /* added 2005-03-08 (IBM),
