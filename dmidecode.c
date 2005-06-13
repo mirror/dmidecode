@@ -67,6 +67,7 @@ struct opt
 {
 	const char* devmem;
 	unsigned int flags;
+	u8 *type;
 };
 static struct opt opt;
 
@@ -3799,24 +3800,29 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 	{
 		u8 *next;
 		struct dmi_header *h=(struct dmi_header *)data;
+		int display=(opt.type==NULL || opt.type[h->type]);
 		
-		printf("Handle 0x%04X\n\tDMI type %d, %d bytes.\n",
-			HANDLE(h), h->type, h->length);
+		if(display)
+			printf("Handle 0x%04X\n\tDMI type %d, %d bytes.\n",
+				HANDLE(h), h->type, h->length);
 		
 		/* look for the next handle */
 		next=data+h->length;
 		while(next-buf+1<len && (next[0]!=0 || next[1]!=0))
 			next++;
 		next+=2;
-		if(next-buf<=len)
+		if(display)
 		{
-			if (opt.flags & FLAG_DUMP)
-				dmi_dump(h, "\t\t");
+			if(next-buf<=len)
+			{
+				if(opt.flags & FLAG_DUMP)
+					dmi_dump(h, "\t\t");
+				else
+					dmi_decode(data, ver);
+			}
 			else
-				dmi_decode(data, ver);
+				printf("\t<TRUNCATED>\n");
 		}
-		else
-			printf("\t<TRUNCATED>\n");
 		
 		data=next;
 		i++;
@@ -3865,14 +3871,58 @@ static int legacy_decode(u8 *buf, const char *devmem)
 }
 #endif /* USE_EFI */
 
+static u8 *parse_opt_type(u8* p, const char *arg)
+{
+	/* Allocate memory on first call only */
+	if(p==NULL)
+	{
+		p=(u8 *)calloc(256, sizeof(u8));
+		if(p==NULL)
+		{
+			perror("calloc");
+			return NULL;
+		}
+	}
+
+	while(*arg!='\0')
+	{
+		unsigned long val;
+		char *next;
+
+		val=strtoul(arg, &next, 0);
+		if(next==arg)
+		{
+			fprintf(stderr, "Invalid type: %s\n", arg);
+			goto exit_free;
+		}
+		if(val>0xff)
+		{
+			fprintf(stderr, "Invalid type: %lu\n", val);
+			goto exit_free;
+		}
+
+		p[val]=1;
+		arg=next;
+		while(*arg==',' || *arg==' ')
+			arg++;
+	}
+
+	return p;
+
+exit_free:
+	free(p);
+	return NULL;
+}
+
 /* Return -1 on error, 0 on success */
 static int parse_command_line(int argc, char * const argv[])
 {
 	int option;
-	const char *optstring = "d:huV";
+	const char *optstring = "d:ht:uV";
 	struct option longopts[]={
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
+		{ "type", required_argument, NULL, 't' },
 		{ "dump", no_argument, NULL, 'u' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0, 0, 0, 0 }
@@ -3886,6 +3936,11 @@ static int parse_command_line(int argc, char * const argv[])
 				break;
 			case 'h':
 				opt.flags|=FLAG_HELP;
+				break;
+			case 't':
+				opt.type=parse_opt_type(opt.type, optarg);
+				if(opt.type==NULL)
+					return -1;
 				break;
 			case 'u':
 				opt.flags|=FLAG_DUMP;
@@ -3908,6 +3963,7 @@ static void print_help(void)
 		"Options are:\n"
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
 		" -h, --help             Display this help text and exit\n"
+		" -t, --type T1[,T2...]  Only display the entries of given type(s)\n"
 		" -u, --dump             Do not decode the entries\n"
 		" -V, --version          Display the version and exit\n";
 	
@@ -4013,6 +4069,8 @@ int main(int argc, char * const argv[])
 	
 	if(!found)
 		printf("# No SMBIOS nor DMI entry point found, sorry.\n");
+
+	free(opt.type);
 
 	return 0;
 }
