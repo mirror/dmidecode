@@ -3972,6 +3972,7 @@ static void print_help(void)
 
 int main(int argc, char * const argv[])
 {
+	int ret=0;                  /* Returned value */
 	int found=0;
 	size_t fp;
 #ifdef USE_EFI
@@ -3992,18 +3993,21 @@ int main(int argc, char * const argv[])
 	opt.flags=0;
 
 	if(parse_command_line(argc, argv)<0)
-		exit(2);
+	{
+		ret=2;
+		goto exit_free;
+	}
 
 	if(opt.flags & FLAG_HELP)
 	{
 		print_help();
-		return 0;
+		goto exit_free;
 	}
 
 	if(opt.flags & FLAG_VERSION)
 	{
 		printf("%s\n", VERSION);
-		return 0;
+		goto exit_free;
 	}
 	
 	printf("# dmidecode %s\n", VERSION);
@@ -4017,7 +4021,8 @@ int main(int argc, char * const argv[])
 	&& (efi_systab=fopen(filename="/sys/firmware/efi/systab", "r"))==NULL)
 	{
 		perror(filename);
-		exit(1);
+		ret=1;
+		goto exit_free;
 	}
 	fp=0;
 	while((fgets(linebuf, sizeof(linebuf)-1, efi_systab))!=NULL)
@@ -4035,11 +4040,15 @@ int main(int argc, char * const argv[])
 	if(fp==0)
 	{
 		fprintf(stderr, "%s: SMBIOS entry point missing\n", filename);
-		exit(1);
+		ret=1;
+		goto exit_free;
 	}
 
 	if((buf=mem_chunk(fp, 0x20, opt.devmem))==NULL)
-		exit(1);
+	{
+		ret=1;
+		goto exit_free;
+	}
 	
 	if(smbios_decode(buf, opt.devmem))
 		found++;
@@ -4047,7 +4056,10 @@ int main(int argc, char * const argv[])
 	free(buf);
 #else /* USE_EFI */
 	if((buf=mem_chunk(0xF0000, 0x10000, opt.devmem))==NULL)
-		exit(1);
+	{
+		ret=1;
+		goto exit_free;
+	}
 	
 	for(fp=0; fp<=0xFFF0; fp+=16)
 	{
@@ -4070,7 +4082,8 @@ int main(int argc, char * const argv[])
 	if(!found)
 		printf("# No SMBIOS nor DMI entry point found, sorry.\n");
 
+exit_free:
 	free(opt.type);
 
-	return 0;
+	return ret;
 }
