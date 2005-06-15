@@ -1,3 +1,22 @@
+2005-06-15  Jean Delvare  <khali@linux-fr.org>
+
+	* dmiopt.c, dmiopt.h: New.
+	* Makefile, dmidecode.c, dmiopt.c, dmiopt.h: Move the command line
+	  handling of dmidecode to a separate source file.
+	* dmiopt.c: Define keywords to be used with --type (instead of
+	  numeric values).
+
+2005-06-14  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Centralize the main exit point. This allows fixing
+	  a minor, recently introduced memory leak which was happening on
+	  error conditions.
+
+2005-06-13  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Add option -t, --type. It limits the output to
+	  the given type(s) of DMI entries.
+
 2005-05-25  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product IDs "KE", "NT" and "ZR". Reported by 
