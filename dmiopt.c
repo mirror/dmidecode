@@ -28,11 +28,41 @@
 #include "types.h"
 #include "dmiopt.h"
 
+struct type_keyword
+{
+	const char *keyword;
+	const u8 *type;
+};
+
 /* Options are global */
 struct opt opt;
 
+static const u8 opt_type_bios[]={ 0, 13, 255 };
+static const u8 opt_type_system[]={ 1, 12, 15, 23, 32, 255 };
+static const u8 opt_type_baseboard[]={ 2, 10, 255 };
+static const u8 opt_type_chassis[]={ 3, 255 };
+static const u8 opt_type_processor[]={ 4, 255 };
+static const u8 opt_type_memory[]={ 5, 6, 16, 17, 255 };
+static const u8 opt_type_cache[]={ 7, 255 };
+static const u8 opt_type_connector[]={ 8, 255 };
+static const u8 opt_type_slot[]={ 9, 255 };
+
+static const struct type_keyword opt_type_keyword[]={
+	{ "bios", opt_type_bios },
+	{ "system", opt_type_system },
+	{ "baseboard", opt_type_baseboard },
+	{ "chassis", opt_type_chassis },
+	{ "processor", opt_type_processor },
+	{ "memory", opt_type_memory },
+	{ "cache", opt_type_cache },
+	{ "connector", opt_type_connector },
+	{ "slot", opt_type_slot },
+};
+
 static u8 *parse_opt_type(u8 *p, const char *arg)
 {
+	unsigned int i;
+
 	/* Allocate memory on first call only */
 	if(p==NULL)
 	{
@@ -44,6 +74,19 @@ static u8 *parse_opt_type(u8 *p, const char *arg)
 		}
 	}
 
+	/* First try as a keyword */
+	for(i=0; i<sizeof(opt_type_keyword)/sizeof(struct type_keyword); i++)
+	{
+		if(!strcasecmp(arg, opt_type_keyword[i].keyword))
+		{
+			int j=0;
+			while(opt_type_keyword[i].type[j]!=255)
+				p[opt_type_keyword[i].type[j++]]=1;
+			goto found;
+		}
+	}
+
+	/* Else try as a number */
 	while(*arg!='\0')
 	{
 		unsigned long val;
@@ -67,6 +110,7 @@ static u8 *parse_opt_type(u8 *p, const char *arg)
 			arg++;
 	}
 
+found:
 	return p;
 
 exit_free:
@@ -123,7 +167,7 @@ void print_help(void)
 		"Options are:\n"
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
 		" -h, --help             Display this help text and exit\n"
-		" -t, --type T1[,T2...]  Only display the entries of given type(s)\n"
+		" -t, --type TYPE        Only display the entries of given type\n"
 		" -u, --dump             Do not decode the entries\n"
 		" -V, --version          Display the version and exit\n";
 	
