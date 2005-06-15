@@ -40,8 +40,8 @@ all : dmidecode biosdecode ownership vpddecode
 # Programs
 #
 
-dmidecode : dmidecode.o util.o
-	$(CC) $(LDFLAGS) dmidecode.o util.o -o $@
+dmidecode : dmidecode.o dmiopt.o util.o
+	$(CC) $(LDFLAGS) dmidecode.o dmiopt.o util.o -o $@
 
 biosdecode : biosdecode.o util.o
 	$(CC) $(LDFLAGS) biosdecode.o util.o -o $@
@@ -56,7 +56,10 @@ vpddecode : vpddecode.o util.o
 # Objects
 #
 
-dmidecode.o : dmidecode.c version.h types.h util.h config.h
+dmidecode.o : dmidecode.c version.h types.h util.h config.h dmiopt.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+dmiopt.o : dmiopt.c config.h types.h dmiopt.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 biosdecode.o : biosdecode.c version.h types.h util.h config.h 
