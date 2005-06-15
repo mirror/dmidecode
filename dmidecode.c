@@ -2569,7 +2569,7 @@ static const char *dmi_temperature_probe_location(u8 code)
 		"Processor",
 		"Disk",
 		"Peripheral Bay",
-		"System Management Module", /* master.mif says SMB MAster */
+		"System Management Module", /* master.mif says SMB Master */
 		"Motherboard",
 		"Memory Module",
 		"Processor Module",
@@ -2843,7 +2843,7 @@ static void dmi_decode(u8 *data, u16 ver)
 	struct dmi_header *h=(struct dmi_header *)data;
 	
 	/*
-	 * Note: DMI types 31, 37, 38 and 39 are untested
+	 * Note: DMI types 37, 38 and 39 are untested
 	 */
 	switch(h->type)
 	{
