@@ -75,7 +75,7 @@ the union of all the given types.
 Do not decode the entries, dump their contents as hexadecimal instead.
 Note that this is still a text output, no binary data will be thrown upon
 you. The strings attached to each entry are displayed as both
-hexadecimal and ASCII. This option is mainly useful for debugging.
+hexadecimal and \s-1ASCII\s0. This option is mainly useful for debugging.
 .TP
 .BR "-h" ", " "--help"
 Display usage information and exit
@@ -83,7 +83,7 @@ Display usage information and exit
 .BR "-V" ", " "--version"
 Display the version and exit
 
-.SH DMI TYPES
+.SH "DMI TYPES"
 The \s-1SMBIOS\s0 specification defines the following \s-1DMI\s0 types:
 
 .TS
@@ -134,7 +134,7 @@ Type	Information
 .TE
 
 Additionally, type 126 is used for disabled entries, type 127 is an
-end-of-table marker, and types 128 to 255 are for OEM-specific data.
+end-of-table marker, and types 128 to 255 are for \s-1OEM\s0-specific data.
 .B dmidecode
 will display these entries by default, but cannot decode them.
 
@@ -170,7 +170,7 @@ dmidecode --type BIOS
 .SH FILES
 .I /dev/mem
 .SH BUGS
-More often than not, information contained in the DMI tables is inaccurate,
+More often than not, information contained in the \s-1DMI\s0 tables is inaccurate,
 incomplete or simply wrong.
 .SH AUTHORS
 Alan Cox, Jean Delvare
