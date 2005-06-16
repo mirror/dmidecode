@@ -1,4 +1,4 @@
-.TH DMIDECODE 8 "February 2005" "dmidecode"
+.TH DMIDECODE 8 "June 2005" "dmidecode"
 .SH NAME
 dmidecode \- \s-1DMI\s0 table decoder
 .SH SYNOPSIS
@@ -61,6 +61,16 @@ and serial number.
 .BR "-d" ", " "--dev-mem FILE"
 Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
 .TP
+.BR "-t" ", " "--type TYPE"
+Only display the entries of type \fBTYPE\fR. \fBTYPE\fR can be either a
+\s-1DMI\s0 type number, or a comma-separated list of type numbers, or a
+keyword from the following list: \fBbios\fR, \fBsystem\fR,
+\fBbaseboard\fR, \fBchassis\fR, \fBprocessor\fR, \fBmemory\fR,
+\fBcache\fR, \fBconnector\fR, \fBslot\fR. Refer to the DMI TYPES section
+below for details.
+If this option is used more than once, the set of displayed entries will be
+the union of all the given types.
+.TP
 .BR "-u" ", " "--dump"
 Do not decode the entries, dump their contents as hexadecimal instead.
 Note that this is still a text output, no binary data will be thrown upon
@@ -72,6 +82,90 @@ Display usage information and exit
 .TP
 .BR "-V" ", " "--version"
 Display the version and exit
+
+.SH DMI TYPES
+The \s-1SMBIOS\s0 specification defines the following \s-1DMI\s0 types:
+
+.TS
+r l
+__
+r l.
+Type	Information
+0	BIOS
+1	System
+2	Base Board
+3	Chassis
+4	Processor
+5	Memory Controler
+6	Memory Module
+7	Cache
+8	Port Connector
+9	System Slots
+10	On Board Devices
+11	OEM Strings
+12	System Configuration Options
+13	BIOS Language
+14	Group Associations
+15	System Event Log
+16	Physical Memory Array
+17	Memory Device
+18	32-bit Memory Error
+19	Memory Array Mapped Address
+20	Memory Device Mapped Address
+21	Built-in Pointing Device
+22	Portable Battery
+23	System Reset
+24	Hardware Security
+25	System Power Controls
+26	Voltage Probe
+27	Cooling Device
+28	Temperature Probe
+29	Electrical Current Probe
+30	Out-of-band Remote Access
+31	Boot Integrity Services
+32	System Boot
+33	64-bit Memory Error
+34	Management Device
+35	Management Device Component
+36	Management Device Threshold Data
+37	Memory Channel
+38	IPMI Device
+39	Power Supply
+.TE
+
+Additionally, type 126 is used for disabled entries, type 127 is an
+end-of-table marker, and types 128 to 255 are for OEM-specific data.
+.B dmidecode
+will display these entries by default, but cannot decode them.
+
+Keywords can be used instead of type numbers with \fB--type\fR.
+Each keyword is equivalent to a list of type numbers:
+
+.TS
+l l
+__
+l l.
+Keyword	Types
+bios	0, 13
+system	1, 12, 15, 23, 32
+baseboard	2, 10
+chassis	3
+processor	4
+memory	5, 6, 16, 17
+cache	7
+connector	8
+slot	9
+.TE
+
+Keywords are matched case-insensitively. The following command lines are equivalent:
+.IP \(bu "\w'\(bu'u+1n"
+dmidecode --type 0 --type 13
+.IP \(bu
+dmidecode --type 0,13
+.IP \(bu
+dmidecode --type bios
+.IP \(bu
+dmidecode --type BIOS
 
 .SH FILES
 .I /dev/mem
