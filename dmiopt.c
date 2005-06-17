@@ -122,10 +122,11 @@ exit_free:
 int parse_command_line(int argc, char * const argv[])
 {
 	int option;
-	const char *optstring = "d:ht:uV";
+	const char *optstring = "d:hqt:uV";
 	struct option longopts[]={
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
+		{ "quiet", no_argument, NULL, 'q' },
 		{ "type", required_argument, NULL, 't' },
 		{ "dump", no_argument, NULL, 'u' },
 		{ "version", no_argument, NULL, 'V' },
@@ -140,6 +141,9 @@ int parse_command_line(int argc, char * const argv[])
 				break;
 			case 'h':
 				opt.flags|=FLAG_HELP;
+				break;
+			case 'q':
+				opt.flags|=FLAG_QUIET;
 				break;
 			case 't':
 				opt.type=parse_opt_type(opt.type, optarg);
@@ -167,6 +171,7 @@ void print_help(void)
 		"Options are:\n"
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
 		" -h, --help             Display this help text and exit\n"
+		" -q, --quiet            Less verbose output\n"
 		" -t, --type TYPE        Only display the entries of given type\n"
 		" -u, --dump             Do not decode the entries\n"
 		" -V, --version          Display the version and exit\n";

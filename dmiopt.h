@@ -30,6 +30,7 @@ extern struct opt opt;
 #define FLAG_VERSION            (1<<0)
 #define FLAG_HELP               (1<<1)
 #define FLAG_DUMP               (1<<2)
+#define FLAG_QUIET              (1<<3)
 
 int parse_command_line(int argc, char * const argv[]);
 void print_help(void);

@@ -3769,10 +3769,10 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 	u8 *data;
 	int i=0;
 	
-	printf("%u structures occupying %u bytes.\n",
-		num, len);
-	printf("Table at 0x%08X.\n",
-		base);
+	if(!(opt.flags & FLAG_QUIET))
+		printf("%u structures occupying %u bytes.\n"
+			"Table at 0x%08X.\n",
+			num, len, base);
 	
 	if((buf=mem_chunk(base, len, devmem))==NULL)
 	{
@@ -3787,9 +3787,10 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 	{
 		u8 *next;
 		struct dmi_header *h=(struct dmi_header *)data;
-		int display=(opt.type==NULL || opt.type[h->type]);
+		int display=((opt.type==NULL || opt.type[h->type])
+			&& !((opt.flags & FLAG_QUIET) && h->type>=126));
 		
-		if(display)
+		if(display && !(opt.flags & FLAG_QUIET))
 			printf("Handle 0x%04X\n\tDMI type %d, %d bytes.\n",
 				HANDLE(h), h->type, h->length);
 		
@@ -3832,8 +3833,9 @@ static int smbios_decode(u8 *buf, const char *devmem)
 	 && memcmp(buf+0x10, "_DMI_", 5)==0
 	 && checksum(buf+0x10, 0x0F))
 	{
-		printf("SMBIOS %u.%u present.\n",
-			buf[0x06], buf[0x07]);
+		if(!(opt.flags & FLAG_QUIET))
+			printf("SMBIOS %u.%u present.\n",
+				buf[0x06], buf[0x07]);
 		dmi_table(DWORD(buf+0x18), WORD(buf+0x16), WORD(buf+0x1C),
 			(buf[0x06]<<8)+buf[0x07], devmem);
 		return 1;
@@ -3847,8 +3849,9 @@ static int legacy_decode(u8 *buf, const char *devmem)
 {
 	if(checksum(buf, 0x0F))
 	{
-		printf("Legacy DMI %u.%u present.\n",
-			buf[0x0E]>>4, buf[0x0E]&0x0F);
+		if(!(opt.flags & FLAG_QUIET))
+			printf("Legacy DMI %u.%u present.\n",
+				buf[0x0E]>>4, buf[0x0E]&0x0F);
 		dmi_table(DWORD(buf+0x08), WORD(buf+0x06), WORD(buf+0x0C),
 			((buf[0x0E]&0xF0)<<4)+(buf[0x0E]&0x0F), devmem);
 		return 1;
@@ -3898,7 +3901,8 @@ int main(int argc, char * const argv[])
 		goto exit_free;
 	}
 	
-	printf("# dmidecode %s\n", VERSION);
+	if(!(opt.flags & FLAG_QUIET))
+		printf("# dmidecode %s\n", VERSION);
 	
 #ifdef USE_EFI
 	/*
@@ -3920,7 +3924,8 @@ int main(int argc, char * const argv[])
 		if(strcmp(linebuf, "SMBIOS")==0)
 		{
 			fp=strtoul(addr, NULL, 0);
-			printf("# SMBIOS entry point at 0x%08lx\n", fp);
+			if(!(opt.flags & FLAG_QUIET))
+				printf("# SMBIOS entry point at 0x%08lx\n", fp);
 		}
 	}
 	if(fclose(efi_systab)!=0)
@@ -3967,7 +3972,7 @@ int main(int argc, char * const argv[])
 	free(buf);
 #endif /* USE_EFI */
 	
-	if(!found)
+	if(!found && !(opt.flags & FLAG_QUIET))
 		printf("# No SMBIOS nor DMI entry point found, sorry.\n");
 
 exit_free:
