@@ -61,6 +61,10 @@ and serial number.
 .BR "-d" ", " "--dev-mem FILE"
 Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
 .TP
+.BR "-q" ", " "--quiet"
+Be less verbose. Unknown, inactive and \s-1OEM\s0-specific entries are not
+displayed. Meta-data and handle references are hidden.
+.TP
 .BR "-t" ", " "--type TYPE"
 Only display the entries of type \fBTYPE\fR. \fBTYPE\fR can be either a
 \s-1DMI\s0 type number, or a comma-separated list of type numbers, or a
