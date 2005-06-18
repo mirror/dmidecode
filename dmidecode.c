@@ -414,11 +414,11 @@ static const char *dmi_base_board_type(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_base_board_handlers(u8 count, u8 *p, const char *prefix)
+static void dmi_base_board_handles(u8 count, u8 *p, const char *prefix)
 {
 	int i;
 	
-	printf("%sContained Object Handlers: %u\n",
+	printf("%sContained Object Handles: %u\n",
 		prefix, count);
 	for(i=0; i<count; i++)
 		printf("%s\t0x%04X\n",
@@ -2719,8 +2719,9 @@ static void dmi_memory_channel_devices(u8 count, u8 *p, const char *prefix)
 	{
 		printf("%sDevice %u Load: %u\n",
 			prefix, i, p[3*i]);
-		printf("%sDevice %u Handle: 0x%04X\n",
-			prefix, i, WORD(p+3*i+1));
+		if(!(opt.flags & FLAG_QUIET))
+			printf("%sDevice %u Handle: 0x%04X\n",
+				prefix, i, WORD(p+3*i+1));
 	}
 }
 
@@ -2907,12 +2908,14 @@ static void dmi_decode(u8 *data, u16 ver)
 			dmi_base_board_features(data[0x09], "\t\t");
 			printf("\tLocation In Chassis: %s\n",
 				dmi_string(h, data[0x0A]));
-			printf("\tChassis Handle: 0x%04X\n",
-				WORD(data+0x0B));
+			if(!(opt.flags & FLAG_QUIET))
+				printf("\tChassis Handle: 0x%04X\n",
+					WORD(data+0x0B));
 			printf("\tType: %s\n",
 				dmi_base_board_type(data[0x0D]));
 			if(h->length<0x0F+data[0x0E]*sizeof(u16)) break;
-			dmi_base_board_handlers(data[0x0E], data+0x0F, "\t");
+			if(!(opt.flags & FLAG_QUIET))
+				dmi_base_board_handles(data[0x0E], data+0x0F, "\t");
 			break;
 		
 		case 3: /* 3.3.4 Chassis Information */
@@ -2987,15 +2990,18 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\tUpgrade: %s\n",
 				dmi_processor_upgrade(data[0x19]));
 			if(h->length<0x20) break;
-			printf("\tL1 Cache Handle:");
-			dmi_processor_cache(WORD(data+0x1A), "L1", ver);
-			printf("\n");
-			printf("\tL2 Cache Handle:");
-			dmi_processor_cache(WORD(data+0x1C), "L2", ver);
-			printf("\n");
-			printf("\tL3 Cache Handle:");
-			dmi_processor_cache(WORD(data+0x1E), "L3", ver);
-			printf("\n");
+			if(!(opt.flags & FLAG_QUIET))
+			{
+				printf("\tL1 Cache Handle:");
+				dmi_processor_cache(WORD(data+0x1A), "L1", ver);
+				printf("\n");
+				printf("\tL2 Cache Handle:");
+				dmi_processor_cache(WORD(data+0x1C), "L2", ver);
+				printf("\n");
+				printf("\tL3 Cache Handle:");
+				dmi_processor_cache(WORD(data+0x1E), "L3", ver);
+				printf("\n");
+			}
 			if(h->length<0x23) break;
 			printf("\tSerial Number: %s\n",
 				dmi_string(h, data[0x20]));
@@ -3210,9 +3216,12 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\tMaximum Capacity:");
 			dmi_memory_array_capacity(DWORD(data+0x07));
 			printf("\n");
-			printf("\tError Information Handle:");
-			dmi_memory_array_error_handle(WORD(data+0x0B));
-			printf("\n");
+			if(!(opt.flags & FLAG_QUIET))
+			{
+				printf("\tError Information Handle:");
+				dmi_memory_array_error_handle(WORD(data+0x0B));
+				printf("\n");
+			}
 			printf("\tNumber Of Devices: %u\n",
 				WORD(data+0x0D));
 			break;
@@ -3220,11 +3229,14 @@ static void dmi_decode(u8 *data, u16 ver)
 		case 17: /* 3.3.18 Memory Device */
 			printf("Memory Device\n");
 			if(h->length<0x15) break;
-			printf("\tArray Handle: 0x%04X\n",
-				WORD(data+0x04));
-			printf("\tError Information Handle:");
-			dmi_memory_array_error_handle(WORD(data+0x06));
-			printf("\n");
+			if(!(opt.flags & FLAG_QUIET))
+			{
+				printf("\tArray Handle: 0x%04X\n",
+					WORD(data+0x04));
+				printf("\tError Information Handle:");
+				dmi_memory_array_error_handle(WORD(data+0x06));
+				printf("\n");
+			}
 			printf("\tTotal Width:");
 			dmi_memory_device_width(WORD(data+0x08));
 			printf("\n");
@@ -3296,8 +3308,9 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\tRange Size:");
 			dmi_mapped_address_size(DWORD(data+0x08)-DWORD(data+0x04)+1);
 			printf("\n");
-			printf("\tPhysical Array Handle: 0x%04X\n",
-				WORD(data+0x0C));
+			if(!(opt.flags & FLAG_QUIET))
+				printf("\tPhysical Array Handle: 0x%04X\n",
+					WORD(data+0x0C));
 			printf("\tPartition Width: %u\n",
 				data[0x0F]);
 			break;
@@ -3312,10 +3325,13 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\tRange Size:");
 			dmi_mapped_address_size(DWORD(data+0x08)-DWORD(data+0x04)+1);
 			printf("\n");
-			printf("\tPhysical Device Handle: 0x%04X\n",
-				WORD(data+0x0C));
-			printf("\tMemory Array Mapped Address Handle: 0x%04X\n",
-				WORD(data+0x0E));
+			if(!(opt.flags & FLAG_QUIET))
+			{
+				printf("\tPhysical Device Handle: 0x%04X\n",
+					WORD(data+0x0C));
+				printf("\tMemory Array Mapped Address Handle: 0x%04X\n",
+					WORD(data+0x0E));
+			}
 			printf("\tPartition Row Position:");
 			dmi_mapped_address_row_position(data[0x10]);
 			printf("\n");
@@ -3464,7 +3480,7 @@ static void dmi_decode(u8 *data, u16 ver)
 		case 27: /* 3.3.28 Cooling Device */
 			printf("Cooling Device\n");
 			if(h->length<0x0C) break;
-			if(WORD(data+0x04)!=0xFFFF)
+			if(!(opt.flags & FLAG_QUIET) && WORD(data+0x04)!=0xFFFF)
 				printf("\tTemperature Probe Handle: 0x%04X\n",
 					WORD(data+0x04));
 			printf("\tType: %s\n",
@@ -3609,13 +3625,16 @@ static void dmi_decode(u8 *data, u16 ver)
 			if(h->length<0x0B) break;
 			printf("\tDescription: %s\n",
 				dmi_string(h, data[0x04]));
-			printf("\tManagement Device Handle: 0x%04X\n",
-			    WORD(data+0x05));
-			printf("\tComponent Handle: 0x%04X\n",
-			    WORD(data+0x07));
-			if(WORD(data+0x09)!=0xFFFF)
-				printf("\tThreshold Handle: 0x%04X\n",
-			    	WORD(data+0x09));
+			if(!(opt.flags & FLAG_QUIET))
+			{
+				printf("\tManagement Device Handle: 0x%04X\n",
+				    WORD(data+0x05));
+				printf("\tComponent Handle: 0x%04X\n",
+				    WORD(data+0x07));
+				if(WORD(data+0x09)!=0xFFFF)
+					printf("\tThreshold Handle: 0x%04X\n",
+			    		WORD(data+0x09));
+			}
 			break;
 		
 		case 36: /* 3.3.37 Management Device Threshold Data */
@@ -3738,15 +3757,18 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\tHot Replaceable: %s\n",
 				WORD(data+0x0E)&(1<<0)?"Yes":"No");
 			if(h->length<0x16) break;
-			if(WORD(data+0x10)!=0xFFFF)
-				printf("\tInput Voltage Probe Handle: 0x%04X\n",
-					WORD(data+0x10));
-			if(WORD(data+0x12)!=0xFFFF)
-				printf("\tCooling Device Handle: 0x%04X\n",
-					WORD(data+0x12));
-			if(WORD(data+0x14)!=0xFFFF)
-				printf("\tInput Current Probe Handle: 0x%04X\n",
-					WORD(data+0x14));
+			if(!(opt.flags & FLAG_QUIET))
+			{
+				if(WORD(data+0x10)!=0xFFFF)
+					printf("\tInput Voltage Probe Handle: 0x%04X\n",
+						WORD(data+0x10));
+				if(WORD(data+0x12)!=0xFFFF)
+					printf("\tCooling Device Handle: 0x%04X\n",
+						WORD(data+0x12));
+				if(WORD(data+0x14)!=0xFFFF)
+					printf("\tInput Current Probe Handle: 0x%04X\n",
+						WORD(data+0x14));
+			}
 			break;
 		
 		case 126: /* 3.3.41 Inactive */
@@ -3793,7 +3815,7 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 		u8 *next;
 		struct dmi_header *h=(struct dmi_header *)data;
 		int display=((opt.type==NULL || opt.type[h->type])
-			&& !((opt.flags & FLAG_QUIET) && h->type>=126));
+			&& !((opt.flags & FLAG_QUIET) && h->type>39));
 		
 		if(display && !(opt.flags & FLAG_QUIET))
 			printf("Handle 0x%04X, DMI type %d, %d bytes.\n",
