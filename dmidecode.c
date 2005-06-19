@@ -3816,6 +3816,10 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 		struct dmi_header *h=(struct dmi_header *)data;
 		int display=((opt.type==NULL || opt.type[h->type])
 			&& !((opt.flags & FLAG_QUIET) && h->type>39));
+
+		/* In quiet mode, stop decoding at end of table marker */
+		if((opt.flags & FLAG_QUIET) && h->type==127)
+			break;
 		
 		if(display && !(opt.flags & FLAG_QUIET))
 			printf("Handle 0x%04X, DMI type %d, %d bytes.\n",
@@ -3844,12 +3848,16 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 		i++;
 	}
 	
-	if(i!=num)
-		printf("Wrong DMI structures count: %d announced, only %d decoded.\n",
-			num, i);
-	if(data-buf!=len)
-		printf("Wrong DMI structures length: %d bytes announced, structures occupy %d bytes.\n",
-			len, (unsigned int)(data-buf));
+	if(!(opt.flags & FLAG_QUIET))
+	{
+		if(i!=num)
+			printf("Wrong DMI structures count: %d announced, "
+				"only %d decoded.\n", num, i);
+		if(data-buf!=len)
+			printf("Wrong DMI structures length: %d bytes "
+				"announced, structures occupy %d bytes.\n",
+				len, (unsigned int)(data-buf));
+	}
 	
 	free(buf);
 }
