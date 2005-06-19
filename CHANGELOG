@@ -1,3 +1,25 @@
+2005-06-18  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Hide handle references and entries of unknown
+	  type when --quiet is used.
+	* dmidecode.8: Document the new -q, --quiet option.
+	* dmidecode.c: Stop decoding at end of table entry when --quiet
+	  is used. Also don't warn about incorrect table length or entries
+	  count when --quiet is used.
+
+2005-06-17  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c, dmiopt.c, dmiopt.h: Add option -q, --quiet. It
+	  makes the output less verbose.
+	* dmidecode.c: Suppress one level of indentation in the output,
+	  insert blank lines between records. This will hopefully make
+	  the output easier to read.
+	* dmidecode.c: Hide table address and size when --type is used.
+
+2005-06-16  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.8: Document the new -t, --type option.
+
 2005-06-15  Jean Delvare  <khali@linux-fr.org>
 
 	* dmiopt.c, dmiopt.h: New.
