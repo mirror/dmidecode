@@ -126,6 +126,65 @@ exit_free:
 
 
 /*
+ * Handling of option --string
+ */
+
+struct string_keyword
+{
+	const char *keyword;
+	u8 type;
+	u8 offset;
+};
+
+/* This lookup table could admittedly be reworked for improved performance.
+   Due to the low count of items in there at the moment, it did not seem
+   worth the additional code complexity though. */
+static const struct string_keyword opt_string_keyword[]={
+	{ "bios-vendor", 0, 0x04 },
+	{ "bios-version", 0, 0x05 },
+	{ "system-manufacturer", 1, 0x04 },
+	{ "system-product-name", 1, 0x05 },
+	{ "system-version", 1, 0x06 },
+	{ "system-serial-number", 1, 0x07 },
+	{ "baseboard-manufacturer", 2, 0x04 },
+	{ "baseboard-product-name", 2, 0x05 },
+	{ "baseboard-version", 2, 0x06 },
+	{ "baseboard-serial-number", 2, 0x07 },
+	{ "baseboard-asset-tag", 2, 0x08 },
+	{ "chassis-manufacturer", 3, 0x04 },
+	{ "chassis-version", 3, 0x06 },
+	{ "chassis-serial-number", 3, 0x07 },
+	{ "chassis-asset-tag", 3, 0x08 },
+	{ "processor-manufacturer", 4, 0x07 },
+	{ "processor-version", 4, 0x10 },
+};
+
+static int parse_opt_string(const char *arg)
+{
+	unsigned int i;
+
+	if(opt.string_offset)
+	{
+		fprintf(stderr, "Only one string can be specified\n");
+		return -1;
+	}
+
+	for(i=0; i<sizeof(opt_string_keyword)/sizeof(struct string_keyword); i++)
+	{
+		if(!strcasecmp(arg, opt_string_keyword[i].keyword))
+		{
+			opt.string_type=opt_string_keyword[i].type;
+			opt.string_offset=opt_string_keyword[i].offset;
+			return 0;
+		}
+	}
+
+	fprintf(stderr, "Invalid string keyword: %s\n", arg);
+	return -1;
+}
+
+
+/*
  * Command line options handling
  */
 
@@ -133,11 +192,12 @@ exit_free:
 int parse_command_line(int argc, char * const argv[])
 {
 	int option;
-	const char *optstring = "d:hqt:uV";
+	const char *optstring = "d:hqs:t:uV";
 	struct option longopts[]={
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
 		{ "quiet", no_argument, NULL, 'q' },
+		{ "string", required_argument, NULL, 's' },
 		{ "type", required_argument, NULL, 't' },
 		{ "dump", no_argument, NULL, 'u' },
 		{ "version", no_argument, NULL, 'V' },
@@ -156,6 +216,11 @@ int parse_command_line(int argc, char * const argv[])
 			case 'q':
 				opt.flags|=FLAG_QUIET;
 				break;
+			case 's':
+				if(parse_opt_string(optarg)<0)
+					return -1;
+				opt.flags|=FLAG_QUIET;
+				break;
 			case 't':
 				opt.type=parse_opt_type(opt.type, optarg);
 				if(opt.type==NULL)
@@ -172,6 +237,12 @@ int parse_command_line(int argc, char * const argv[])
 				return -1;
 		}
 
+	if(opt.type!=NULL && opt.string_offset)
+	{
+		fprintf(stderr, "String and type modes are mutually exclusive\n");
+		return -1;
+	}
+
 	return 0;
 }
 
@@ -183,6 +254,7 @@ void print_help(void)
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
 		" -h, --help             Display this help text and exit\n"
 		" -q, --quiet            Less verbose output\n"
+		" -s, --string KEYWORD   Only display the value of the given DMI string\n"
 		" -t, --type TYPE        Only display the entries of given type\n"
 		" -u, --dump             Do not decode the entries\n"
 		" -V, --version          Display the version and exit\n";

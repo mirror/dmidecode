@@ -24,6 +24,8 @@ struct opt
 	const char* devmem;
 	unsigned int flags;
 	u8 *type;
+	u8 string_type;
+	u8 string_offset;
 };
 extern struct opt opt;
 
