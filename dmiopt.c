@@ -28,14 +28,20 @@
 #include "types.h"
 #include "dmiopt.h"
 
+
+/* Options are global */
+struct opt opt;
+
+
+/*
+ * Handling of option --type
+ */
+
 struct type_keyword
 {
 	const char *keyword;
 	const u8 *type;
 };
-
-/* Options are global */
-struct opt opt;
 
 static const u8 opt_type_bios[]={ 0, 13, 255 };
 static const u8 opt_type_system[]={ 1, 12, 15, 23, 32, 255 };
@@ -117,6 +123,11 @@ exit_free:
 	free(p);
 	return NULL;
 }
+
+
+/*
+ * Command line options handling
+ */
 
 /* Return -1 on error, 0 on success */
 int parse_command_line(int argc, char * const argv[])
