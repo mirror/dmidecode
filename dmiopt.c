@@ -65,6 +65,17 @@ static const struct type_keyword opt_type_keyword[]={
 	{ "slot", opt_type_slot },
 };
 
+static void print_opt_type_list(void)
+{
+	unsigned int i;
+
+	fprintf(stderr, "Valid type keywords are:\n");
+	for(i=0; i<sizeof(opt_type_keyword)/sizeof(struct type_keyword); i++)
+	{
+		fprintf(stderr, "  %s\n", opt_type_keyword[i].keyword);
+	}
+}
+
 static u8 *parse_opt_type(u8 *p, const char *arg)
 {
 	unsigned int i;
@@ -101,12 +112,13 @@ static u8 *parse_opt_type(u8 *p, const char *arg)
 		val=strtoul(arg, &next, 0);
 		if(next==arg)
 		{
-			fprintf(stderr, "Invalid type: %s\n", arg);
+			fprintf(stderr, "Invalid type keyword: %s\n", arg);
+			print_opt_type_list();
 			goto exit_free;
 		}
 		if(val>0xff)
 		{
-			fprintf(stderr, "Invalid type: %lu\n", val);
+			fprintf(stderr, "Invalid type number: %lu\n", val);
 			goto exit_free;
 		}
 
@@ -159,6 +171,17 @@ static const struct string_keyword opt_string_keyword[]={
 	{ "processor-version", 4, 0x10 },
 };
 
+static void print_opt_string_list(void)
+{
+	unsigned int i;
+
+	fprintf(stderr, "Valid string keywords are:\n");
+	for(i=0; i<sizeof(opt_string_keyword)/sizeof(struct string_keyword); i++)
+	{
+		fprintf(stderr, "  %s\n", opt_string_keyword[i].keyword);
+	}
+}
+
 static int parse_opt_string(const char *arg)
 {
 	unsigned int i;
@@ -180,6 +203,7 @@ static int parse_opt_string(const char *arg)
 	}
 
 	fprintf(stderr, "Invalid string keyword: %s\n", arg);
+	print_opt_string_list();
 	return -1;
 }
 
@@ -192,7 +216,7 @@ static int parse_opt_string(const char *arg)
 int parse_command_line(int argc, char * const argv[])
 {
 	int option;
-	const char *optstring = "d:hqs:t:uV";
+	const char *optstring = ":d:hqs:t:uV";
 	struct option longopts[]={
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
@@ -233,6 +257,18 @@ int parse_command_line(int argc, char * const argv[])
 				opt.flags|=FLAG_VERSION;
 				break;
 			case ':':
+				switch(optopt)
+				{
+					case 's':
+						fprintf(stderr, "String keyword expected\n");
+						print_opt_string_list();
+						break;
+					case 't':
+						fprintf(stderr, "Type number or keyword expected\n");
+						print_opt_type_list();
+						break;
+				}
+				/* fall through */
 			case '?':
 				return -1;
 		}
