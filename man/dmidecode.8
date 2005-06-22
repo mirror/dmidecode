@@ -65,6 +65,29 @@ Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
 Be less verbose. Unknown, inactive and \s-1OEM\s0-specific entries are not
 displayed. Meta-data and handle references are hidden.
 .TP
+.BR "-s" ", " "--string KEYWORD"
+Only display the value of the \s-1DMI\s0 string identified by \fBKEYWORD\fR.
+\fBKEYWORD\fR must be a keyword from the following list: \fBbios-vendor\fR,
+\fBbios-version\fR, \fBsystem-manufacturer\fR, \fBsystem-product-name\fR,
+\fBsystem-version\fR, \fBsystem-serial-number\fR,
+\fBbaseboard-manufacturer\fR, \fBbaseboard-product-name\fR,
+\fBbaseboard-version\fR, \fBbaseboard-serial-number\fR,
+\fBbaseboard-asset-tag\fR, \fBchassis-manufacturer\fR,
+\fBchassis-version\fR, \fBchassis-serial-number\fR,
+\fBchassis-asset-tag\fR, \fBprocessor-manufacturer\fR,
+\fBprocessor-version\fR.
+Each keyword corresponds to a given \s-1DMI\s0 type and a given offset
+within this entry type.
+Not all strings may be meaningful or even defined on all systems. Some
+keywords may return more than one result on some systems (e.g.
+\fBprocessor-version\fR on a multi-processor system).
+If \fBKEYWORD\fR is not provided or not valid, a list of all valid
+keywords is printed and
+.B dmidecode
+exits with an error.
+This option cannot be used more than once, and implies \fB--quiet\fR.
+Mutually exclusive with \fB--type\fR.
+.TP
 .BR "-t" ", " "--type TYPE"
 Only display the entries of type \fBTYPE\fR. \fBTYPE\fR can be either a
 \s-1DMI\s0 type number, or a comma-separated list of type numbers, or a
@@ -74,6 +97,11 @@ keyword from the following list: \fBbios\fR, \fBsystem\fR,
 below for details.
 If this option is used more than once, the set of displayed entries will be
 the union of all the given types.
+If \fBTYPE\fR is not provided or not valid, a list of all valid keywords
+is printed and
+.B dmidecode
+exits with an error.
+Mutually exclusive with \fB--string\fR.
 .TP
 .BR "-u" ", " "--dump"
 Do not decode the entries, dump their contents as hexadecimal instead.
