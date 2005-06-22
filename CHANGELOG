@@ -1,3 +1,16 @@
+2005-06-22  Jean Delvare  <khali@linux-fr.org>
+
+	* dmiopt.c: Display the list of all valid type or string keywords
+	  when --type or --string, respectievely, is used without an
+	  argument or with an invalid one.
+	* dmidecode.8: Document the new -s, --string option. Update the
+	  -t, --type option documentation.
+
+2005-06-21  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c, dmiopt.c, dmiopt.h: Add option -s, --string. It
+	  prints one selected DMI string instead of the regular output.
+
 2005-06-18  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Hide handle references and entries of unknown
