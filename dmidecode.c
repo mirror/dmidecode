@@ -119,7 +119,7 @@ static const char *dmi_smbios_structure_type(u8 code)
 		"Base Board",
 		"Chassis",
 		"Processor",
-		"Memory Controler",
+		"Memory Controller",
 		"Memory Module",
 		"Cache",
 		"Port Connector",
