@@ -1,3 +1,8 @@
+2005-06-23  Jean Delvare  <khali@linux-fr.org>
+
+	* dmiopt.c, dmidecode.8: Options --dump and --string are mutually
+	  exclusive.
+
 2005-06-22  Jean Delvare  <khali@linux-fr.org>
 
 	* dmiopt.c: Display the list of all valid type or string keywords
@@ -5,6 +10,10 @@
 	  argument or with an invalid one.
 	* dmidecode.8: Document the new -s, --string option. Update the
 	  -t, --type option documentation.
+	* dmiopt.c, dmidecode.8: Add string keyword "bios-release-date",
+	  the Linux kernel uses it.
+	* dmidecode.c, dmidecode.8: Fix typo ("Controler" becomes
+	  "Controller").
 
 2005-06-21  Jean Delvare  <khali@linux-fr.org>
 
