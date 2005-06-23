@@ -276,7 +276,13 @@ int parse_command_line(int argc, char * const argv[])
 
 	if(opt.type!=NULL && opt.string_offset)
 	{
-		fprintf(stderr, "String and type modes are mutually exclusive\n");
+		fprintf(stderr, "Options --string and --type are mutually exclusive\n");
+		return -1;
+	}
+
+	if((opt.flags & FLAG_DUMP) && opt.string_offset)
+	{
+		fprintf(stderr, "Options --string and --dump are mutually exclusive\n");
 		return -1;
 	}
 

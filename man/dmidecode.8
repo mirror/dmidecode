@@ -87,7 +87,7 @@ keywords is printed and
 .B dmidecode
 exits with an error.
 This option cannot be used more than once, and implies \fB--quiet\fR.
-Mutually exclusive with \fB--type\fR.
+Mutually exclusive with \fB--type\fR and \fB--dump\fR.
 .TP
 .BR "-t" ", " "--type TYPE"
 Only display the entries of type \fBTYPE\fR. \fBTYPE\fR can be either a
@@ -109,6 +109,7 @@ Do not decode the entries, dump their contents as hexadecimal instead.
 Note that this is still a text output, no binary data will be thrown upon
 you. The strings attached to each entry are displayed as both
 hexadecimal and \s-1ASCII\s0. This option is mainly useful for debugging.
+Mutually exclusive with \fB--string\fR.
 .TP
 .BR "-h" ", " "--help"
 Display usage information and exit
