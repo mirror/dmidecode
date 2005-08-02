@@ -1,3 +1,8 @@
+2005-08-02  Jean Delvare  <khali@linux-fr.org>
+
+	* dmiopt.c, dmidecode.8: Options --dump and --quiet are mutually
+	  exclusive.
+
 2005-06-23  Jean Delvare  <khali@linux-fr.org>
 
 	* dmiopt.c, dmidecode.8: Options --dump and --string are mutually
