@@ -286,6 +286,12 @@ int parse_command_line(int argc, char * const argv[])
 		return -1;
 	}
 
+	if((opt.flags & FLAG_DUMP) && (opt.flags & FLAG_QUIET))
+	{
+		fprintf(stderr, "Options --quiet and --dump are mutually exclusive\n");
+		return -1;
+	}
+
 	return 0;
 }
 

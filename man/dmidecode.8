@@ -63,7 +63,8 @@ Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
 .TP
 .BR "-q" ", " "--quiet"
 Be less verbose. Unknown, inactive and \s-1OEM\s0-specific entries are not
-displayed. Meta-data and handle references are hidden.
+displayed. Meta-data and handle references are hidden. Mutually exclusive
+with \fB--dump\fR.
 .TP
 .BR "-s" ", " "--string KEYWORD"
 Only display the value of the \s-1DMI\s0 string identified by \fBKEYWORD\fR.
@@ -109,7 +110,7 @@ Do not decode the entries, dump their contents as hexadecimal instead.
 Note that this is still a text output, no binary data will be thrown upon
 you. The strings attached to each entry are displayed as both
 hexadecimal and \s-1ASCII\s0. This option is mainly useful for debugging.
-Mutually exclusive with \fB--string\fR.
+Mutually exclusive with \fB--quiet\fR and \fB--string\fR.
 .TP
 .BR "-h" ", " "--help"
 Display usage information and exit
