@@ -54,15 +54,18 @@ neighbour architectures (x86_64, ia64) anyway.
 ** DOCUMENTATION **
 
 Each tool has a manual page, found in the "man" subdirectory. Manual pages
-are installed by "make install".
+are installed by "make install". See these manual pages for command line
+interface details and tool specific information.
 
 For an history of the changes made to dmidecode, see the CHANGELOG file.
 
 If you need help, your best chances are to visit the web page (see the
-INSTALLATION section above) or to get in touch with the developers
-directly. Have a look at the AUTHORS file and contact one of the maintainers
-(or less likely someone else, but you'd need to have a good reason for doing
-so).
+INSTALLATION section above) or to get in touch with the developers directly.
+Have a look at the AUTHORS file and contact one of the maintainers.
+
+If you want to help with the development of dmidecode, please consider
+joining the dmidecode-devel discussion list:
+http://lists.nongnu.org/mailman/listinfo/dmidecode-devel
 
 The most common problems are detailed in the COMMON PROBLEMS section right
 below.
@@ -105,11 +108,11 @@ successes have been reported by other users too.
 
 MMAP
 
-Note that mmap() is now used by default on Linux, since this seems to
-solve a number of problems. This default behavior can be changed in config.h.
-Just to make sure this is clear, mmap() is not used for performance reasons
-but to increase the number of systems on which dmidecode can be successfully
-run. See the IA-64 subsection above for details.
+Note that mmap() is now used by default wherever possible, since this seems
+to solve a number of problems. This default behavior can be changed in
+config.h. Just to make sure this is clear, mmap() is not used for performance
+reasons but to increase the number of systems on which dmidecode can be
+successfully run. See the IA-64 subsection above for details.
 
 CYGWIN
 
