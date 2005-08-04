@@ -1,3 +1,10 @@
+2005-08-04  Jean Delvare  <khali@linux-fr.org>
+
+	* README: Manual pages document the command line interface.
+	  A discussion list exists for developers. Mmap is used on
+	  most systems, not just Linux.
+	* version.h: Set version to 2.7.
+
 2005-08-02  Jean Delvare  <khali@linux-fr.org>
 
 	* dmiopt.c, dmidecode.8: Options --dump and --quiet are mutually
