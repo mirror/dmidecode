@@ -18,7 +18,7 @@
 2005-06-22  Jean Delvare  <khali@linux-fr.org>
 
 	* dmiopt.c: Display the list of all valid type or string keywords
-	  when --type or --string, respectievely, is used without an
+	  when --type or --string, respectively, is used without an
 	  argument or with an invalid one.
 	* dmidecode.8: Document the new -s, --string option. Update the
 	  -t, --type option documentation.
