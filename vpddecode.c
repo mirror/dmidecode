@@ -24,8 +24,8 @@
  *   are deemed to be part of the source code.
  *
  * References:
- *  - IBM "Using the BIOS Build ID to identify IBM Thinkpad systems"
- *    Revision 2005-03-02
+ *  - IBM "Using the BIOS Build ID to identify Thinkpad systems"
+ *    Revision 2005-06-24
  *    http://www-307.ibm.com/pc/support/site.wss/MIGR-45120.html
  *
  * Notes:
@@ -150,6 +150,8 @@ static const char *product_name(const char *id)
 		                                reported by Doug Brenner */
 		"TT", "eServer xSeries 330", /* added 2003-12-03,
 		                                reported by Hugues Lepesant */
+		"VI", "eServer xSeries 440", /* added 2005-08-25,
+		                                reported by Torsten Seemann */
 		"ZR", "eServer xSeries 200", /* added 2005-05-25,
 		                                reported by Bernd Krumboeck */
 		"10", "Thinkpad A21e or A22e", /* Celeron models */
@@ -180,10 +182,15 @@ static const char *product_name(const char *id)
 		                                                     updated 2005-03-08 (IBM) */
 		"1S", "Thinkpad R40e", /* added 2003-11-29 (IBM) */
 		"1T", "Thinkpad G40",
+		"1U", "Thinkpad X40", /* added 2005-06-24 (IBM) */
 		"1V", "Thinkpad R51", /* added 2005-03-08 (IBM),
 		                         confirmed by Ingo van Lil */
 		"1W", "Thinkpad R50e", /* added 2005-02-17 (IBM) */
-		"1Y", "Thinkpad T43/p", /* added 2005-02-17 (IBM) */
+		"1X", "Thinkpad G41", /* added 2005-06-24 (IBM),
+		                         types 2881, 2882 and 2886 */
+		"1Y", "Thinkpad T43/p", /* added 2005-02-17 (IBM),
+		                           updated 2005-06-24 (IBM),
+		                           types 2668, 2669, 2678, 2679, 2686 and 2687 */
 		"20", "Netvista A22p or M41", /* added 2003-10-09,
 		                                 updated 2004-02-23,
 		                                 updated 2004-03-24 */
@@ -193,6 +200,13 @@ static const char *product_name(const char *id)
 		                            reported by Rafael Avila de Espindola */
 		"2C", "Thinkcentre A50", /* added 2005-02-24,
 		                            reported by Tomek Mateja */
+		"70", "Thinkpad T43/p or R52", /* added 2005-06-24,
+		                                  T43/p types 1871, 1872, 1873, 1874,1875 and 1876,
+		                                  R52 types 1858, 1859, 1860, 1861, 1862 and 1863 */
+		"74", "Thinkpad X41", /* added 2005-06-24 (IBM) */
+		"75", "Thinkpad X41 Tablet", /* added 2005-06-24 (IBM) */
+		"76", "Thinkpad R52", /* added 2005-06-24,
+		                         types 1846, 1847, 1848, 1849, 1850 and 1870 */
 		NULL, "Unknown, please report!"
 	};
 	
