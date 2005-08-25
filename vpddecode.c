@@ -324,7 +324,6 @@ static int parse_command_line(int argc, char * const argv[])
 			case 'V':
 				opt.flags|=FLAG_VERSION;
 				break;
-			case ':':
 			case '?':
 				return -1;
 		}
