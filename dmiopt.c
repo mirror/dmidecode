@@ -217,7 +217,7 @@ static int parse_opt_string(const char *arg)
 int parse_command_line(int argc, char * const argv[])
 {
 	int option;
-	const char *optstring = ":d:hqs:t:uV";
+	const char *optstring = "d:hqs:t:uV";
 	struct option longopts[]={
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
@@ -257,7 +257,7 @@ int parse_command_line(int argc, char * const argv[])
 			case 'V':
 				opt.flags|=FLAG_VERSION;
 				break;
-			case ':':
+			case '?':
 				switch(optopt)
 				{
 					case 's':
@@ -269,8 +269,6 @@ int parse_command_line(int argc, char * const argv[])
 						print_opt_type_list();
 						break;
 				}
-				/* fall through */
-			case '?':
 				return -1;
 		}
 
