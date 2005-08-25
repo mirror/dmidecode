@@ -1,3 +1,13 @@
+2005-08-25  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "VI". Reported by Torsten Seemann.
+	* vpddecode.c: Update lookup table from revision 2005-06-24 of IBM
+	  reference document (add product IDs "1U", "1X", "70", "74", "75"
+	  and "76", update product ID "1Y").
+	* dmiopt.c: Complain about unknown options again.
+	* biosdecode.c, ownership.c, vpddecode.c: getopt_long() will never
+	  return ':'.
+
 2005-08-04  Jean Delvare  <khali@linux-fr.org>
 
 	* README: Manual pages document the command line interface.
