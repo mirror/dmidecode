@@ -33,7 +33,7 @@
  * information does not come from the above mentioned specification.
  *
  * Additional references:
- *  - Intel AP-485 revision 27
+ *  - Intel AP-485 revision 28
  *    "Intel Processor Identification and the CPUID Instruction"
  *    http://developer.intel.com/design/xeon/applnots/241618.htm
  *  - DMTF Master MIF version 040707
@@ -838,7 +838,7 @@ static const char *dmi_processor_family(u8 code)
 
 static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *prefix)
 {
-	/* Intel AP-485 revision 27, table 5 */
+	/* Intel AP-485 revision 28, table 5 */
 	static const char *flags[32]={
 		"FPU (Floating-point unit on-chip)", /* 0 */
 		"VME (Virtual mode extension)",
@@ -875,7 +875,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 	};
 	/*
 	 * Extra flags are now returned in the ECX register when one calls
-	 * the CPUID instruction. Their means are explained in table 6, but
+	 * the CPUID instruction. Their meaning is explained in table 6, but
 	 * DMI doesn't support this yet.
 	 */
 	u32 eax, edx;
