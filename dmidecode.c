@@ -3823,7 +3823,7 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 			break;
 		
 		if(display && !(opt.flags & FLAG_QUIET))
-			printf("Handle 0x%04X, DMI type %d, %d bytes.\n",
+			printf("Handle 0x%04X, DMI type %d, %d bytes\n",
 				HANDLE(h), h->type, h->length);
 		
 		/* look for the next handle */
