@@ -1,3 +1,13 @@
+2005-08-31  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Drop trailing dot from handle description line.
+
+2005-08-29  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Reword a comment about CPUID.
+	* dmidecode.c: Claim to support revision 28 of Intel AP-485
+	  (CPUID). No relevant change since revision 27.
+
 2005-08-25  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Add product ID "VI". Reported by Torsten Seemann.
