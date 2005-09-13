@@ -267,8 +267,8 @@ static int decode(const u8 *p)
 	if(p[5]<0x30)
 		return 0;
 	
-	/* XSeries have longer records. */
-	if(!(p[5]>=0x46 && checksum(p, 0x46))
+	/* XSeries have longer records, exact length seems to vary. */
+	if(!(p[5]>=0x45 && checksum(p, p[5]))
 	/* Some Netvista seem to work with this. */
 	&& !(checksum(p, 0x30))
 	/* The Thinkpad/Thinkcentre checksum does *not* include the first
@@ -291,7 +291,10 @@ static int decode(const u8 *p)
 		return 1;
 	
 	print_entry("BIOS Release Date", p+0x30, 8);
-	print_entry("Default Flash Image File Name", p+0x38, 13);
+	/* This one seems to be a variable length field, it is usually 13
+	   byte long but was seen 12 byte long on an xSeries 440. */
+	print_entry("Default Flash Image File Name", p+0x38,
+		0x38+13<p[5]-1?13:p[5]-1-0x38);
 	
 	return 1;
 }
