@@ -3851,7 +3851,14 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 		     && opt.string_offset
 		     && opt.string_offset<h->length)
 		{
-			printf("%s\n", dmi_string(h, data[opt.string_offset]));
+			if (opt.string_lookup != NULL)
+				printf("%s\n", opt.string_lookup(data[opt.string_offset]));
+			else if (opt.string_print != NULL) {
+				opt.string_print(data+opt.string_offset);
+				printf("\n");
+			}
+			else
+				printf("%s\n", dmi_string(h, data[opt.string_offset]));
 		}
 		
 		data=next;

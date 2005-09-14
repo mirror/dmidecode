@@ -26,6 +26,8 @@ struct opt
 	u8 *type;
 	u8 string_type;
 	u8 string_offset;
+	const char *(*string_lookup)(u8);
+	void (*string_print)(u8 *);
 };
 extern struct opt opt;
 

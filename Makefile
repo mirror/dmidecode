@@ -60,7 +60,7 @@ dmidecode.o : dmidecode.c version.h types.h util.h config.h dmidecode.h \
 	      dmiopt.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-dmiopt.o : dmiopt.c config.h types.h dmiopt.h
+dmiopt.o : dmiopt.c config.h types.h dmidecode.h dmiopt.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 biosdecode.o : biosdecode.c version.h types.h util.h config.h 
