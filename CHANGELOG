@@ -1,3 +1,25 @@
+2005-09-14  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.h: New.
+	* dmidecode.c, dmidecode.h, Makefile: Export four specific
+	  decoding functions, make them suitable for external call.
+	* dmidecode.c, dmiopt.c, dmiopt.h, Makefile: Make it possible
+	  for --string to print decoded binary data rather than only
+	  DMI strings. Add four such string keywords.
+	* dmidecode.c, dmiopt.c, dmiopt.h: Modify the opt structure
+	  to handle the string option more efficiently.
+
+2005-09-13  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Slightly change the xSeries checksumming method to
+	  accomodate a strange xSeries 440 VPD record. Also tweak the
+	  decoding of the "Default Flash Image File Name" entry. Thanks
+	  to Torsten Seemann for providing a test VPD record.
+
+2005-09-05  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Use -Wundef.
+
 2005-08-31  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Drop trailing dot from handle description line.
