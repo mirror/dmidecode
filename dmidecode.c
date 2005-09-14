@@ -3819,7 +3819,7 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 		struct dmi_header *h=(struct dmi_header *)data;
 		int display=((opt.type==NULL || opt.type[h->type])
 			&& !((opt.flags & FLAG_QUIET) && h->type>39)
-			&& !opt.string_offset);
+			&& !opt.string);
 
 		/* In quiet mode, stop decoding at end of table marker */
 		if((opt.flags & FLAG_QUIET) && h->type==127)
@@ -3847,18 +3847,18 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 				printf("\t<TRUNCATED>\n");
 			printf("\n");
 		}
-		else if(opt.string_type==h->type
-		     && opt.string_offset
-		     && opt.string_offset<h->length)
+		else if(opt.string!=NULL
+		     && opt.string->type==h->type
+		     && opt.string->offset<h->length)
 		{
-			if (opt.string_lookup != NULL)
-				printf("%s\n", opt.string_lookup(data[opt.string_offset]));
-			else if (opt.string_print != NULL) {
-				opt.string_print(data+opt.string_offset);
+			if (opt.string->lookup!=NULL)
+				printf("%s\n", opt.string->lookup(data[opt.string->offset]));
+			else if (opt.string->print!=NULL) {
+				opt.string->print(data+opt.string->offset);
 				printf("\n");
 			}
 			else
-				printf("%s\n", dmi_string(h, data[opt.string_offset]));
+				printf("%s\n", dmi_string(h, data[opt.string->offset]));
 		}
 		
 		data=next;

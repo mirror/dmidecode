@@ -142,15 +142,6 @@ exit_free:
  * Handling of option --string
  */
 
-struct string_keyword
-{
-	const char *keyword;
-	u8 type;
-	u8 offset;
-	const char *(*lookup)(u8);
-	void (*print)(u8 *);
-};
-
 /* This lookup table could admittedly be reworked for improved performance.
    Due to the low count of items in there at the moment, it did not seem
    worth the additional code complexity though. */
@@ -194,7 +185,7 @@ static int parse_opt_string(const char *arg)
 {
 	unsigned int i;
 
-	if(opt.string_offset)
+	if(opt.string)
 	{
 		fprintf(stderr, "Only one string can be specified\n");
 		return -1;
@@ -204,10 +195,7 @@ static int parse_opt_string(const char *arg)
 	{
 		if(!strcasecmp(arg, opt_string_keyword[i].keyword))
 		{
-			opt.string_type=opt_string_keyword[i].type;
-			opt.string_offset=opt_string_keyword[i].offset;
-			opt.string_lookup=opt_string_keyword[i].lookup;
-			opt.string_print=opt_string_keyword[i].print;
+			opt.string=&opt_string_keyword[i];
 			return 0;
 		}
 	}
@@ -281,13 +269,13 @@ int parse_command_line(int argc, char * const argv[])
 				return -1;
 		}
 
-	if(opt.type!=NULL && opt.string_offset)
+	if(opt.type!=NULL && opt.string!=NULL)
 	{
 		fprintf(stderr, "Options --string and --type are mutually exclusive\n");
 		return -1;
 	}
 
-	if((opt.flags & FLAG_DUMP) && opt.string_offset)
+	if((opt.flags & FLAG_DUMP) && opt.string!=NULL)
 	{
 		fprintf(stderr, "Options --string and --dump are mutually exclusive\n");
 		return -1;

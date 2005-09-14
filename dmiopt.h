@@ -19,15 +19,21 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
+struct string_keyword
+{
+	const char *keyword;
+	u8 type;
+	u8 offset;
+	const char *(*lookup)(u8);
+	void (*print)(u8 *);
+};
+
 struct opt
 {
 	const char* devmem;
 	unsigned int flags;
 	u8 *type;
-	u8 string_type;
-	u8 string_offset;
-	const char *(*string_lookup)(u8);
-	void (*string_print)(u8 *);
+	const struct string_keyword *string;
 };
 extern struct opt opt;
 
