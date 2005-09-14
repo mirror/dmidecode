@@ -56,7 +56,8 @@ vpddecode : vpddecode.o util.o
 # Objects
 #
 
-dmidecode.o : dmidecode.c version.h types.h util.h config.h dmiopt.h
+dmidecode.o : dmidecode.c version.h types.h util.h config.h dmidecode.h \
+	      dmiopt.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 dmiopt.o : dmiopt.c config.h types.h dmiopt.h

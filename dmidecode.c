@@ -60,6 +60,7 @@
 #include "config.h"
 #include "types.h"
 #include "util.h"
+#include "dmidecode.h"
 #include "dmiopt.h"
 
 static const char *out_of_spec = "<OUT OF SPEC>";
@@ -314,7 +315,7 @@ static void dmi_bios_characteristics_x2(u8 code, const char *prefix)
  * 3.3.2 System Information (Type 1)
  */
 
-static void dmi_system_uuid(u8 *p)
+void dmi_system_uuid(u8 *p)
 {
 	int only0xFF=1, only0x00=1;
 	int i;
@@ -327,16 +328,16 @@ static void dmi_system_uuid(u8 *p)
 	
 	if(only0xFF)
 	{
-		printf(" Not Present");
+		printf("Not Present");
 		return;
 	}
 	if(only0x00)
 	{
-		printf(" Not Settable");
+		printf("Not Settable");
 		return;
 	}
 	
-	printf(" %02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+	printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
 		p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
 		p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
 }
@@ -429,7 +430,7 @@ static void dmi_base_board_handles(u8 count, u8 *p, const char *prefix)
  * 3.3.4 Chassis Information (Type 3)
  */
 
-static const char *dmi_chassis_type(u8 code)
+const char *dmi_chassis_type(u8 code)
 {
 	/* 3.3.4.1 */
 	static const char *type[]={
@@ -568,7 +569,7 @@ static const char *dmi_processor_type(u8 code)
 	return out_of_spec;
 }
 
-static const char *dmi_processor_family(u8 code)
+const char *dmi_processor_family(u8 code)
 {
 	/* 3.3.5.2 */
 	static const char *family[256]={
@@ -1002,12 +1003,14 @@ static void dmi_processor_voltage(u8 code)
 	}
 }
 
-static void dmi_processor_frequency(u16 code)
+void dmi_processor_frequency(u8 *p)
 {
+	u16 code = WORD(p);
+
 	if(code)
-		printf(" %u MHz", code);
+		printf("%u MHz", code);
 	else
-		printf(" Unknown");
+		printf("Unknown");
 }
 
 static const char *dmi_processor_status(u8 code)
@@ -2878,7 +2881,7 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\tSerial Number: %s\n",
 				dmi_string(h, data[0x07]));
 			if(h->length<0x19) break;
-			printf("\tUUID:");
+			printf("\tUUID: ");
 			dmi_system_uuid(data+0x08);
 			printf("\n");
 			printf("\tWake-up Type: %s\n",
@@ -2973,14 +2976,14 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\tVoltage:");
 			dmi_processor_voltage(data[0x11]);
 			printf("\n");
-			printf("\tExternal Clock:");
-			dmi_processor_frequency(WORD(data+0x12));
+			printf("\tExternal Clock: ");
+			dmi_processor_frequency(data+0x12);
 			printf("\n");
-			printf("\tMax Speed:");
-			dmi_processor_frequency(WORD(data+0x14));
+			printf("\tMax Speed: ");
+			dmi_processor_frequency(data+0x14);
 			printf("\n");
-			printf("\tCurrent Speed:");
-			dmi_processor_frequency(WORD(data+0x16));
+			printf("\tCurrent Speed: ");
+			dmi_processor_frequency(data+0x16);
 			printf("\n");
 			if(data[0x18]&(1<<6))
 				printf("\tStatus: Populated, %s\n",
