@@ -25,7 +25,7 @@
  *
  * References:
  *  - IBM "Using the BIOS Build ID to identify Thinkpad systems"
- *    Revision 2005-06-24
+ *    Revision 2005-09-19
  *    http://www-307.ibm.com/pc/support/site.wss/MIGR-45120.html
  *
  * Notes:

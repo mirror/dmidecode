@@ -46,9 +46,9 @@
  *  - Compaq "Technical Reference Guide for Compaq Deskpro 4000 and 6000"
  *    First Edition
  *    http://h18000.www1.hp.com/support/techpubs/technical_reference_guides/113a1097.html
- *  - IBM "Using the BIOS Build ID to identify IBM Thinkpad systems"
- *    Revision "November 17, 2003"
- *    http://www.pc.ibm.com/qtechinfo/MIGR-45120.html
+ *  - IBM "Using the BIOS Build ID to identify Thinkpad systems"
+ *    Revision 2005-09-19
+ *    http://www-307.ibm.com/pc/support/site.wss/MIGR-45120.html
  */
 
 #include <stdio.h>
