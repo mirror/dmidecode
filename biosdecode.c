@@ -459,12 +459,15 @@ static size_t vpd_length(const u8 *p)
 
 static int vpd_decode(const u8 *p, size_t len)
 {
+	if(len<0x30)
+		return 0;
+
 	/* XSeries have longer records. */
 	if(!(len>=0x46 && checksum(p, 0x46))
 	/* Some Netvista seem to work with this. */
-	&& !(checksum(p, 0x30))
+	&& !checksum(p, 0x30)
 	/* The Thinkpad checksum does *not* include the first 13 bytes. */
-	&& !(len>=0x30 && checksum(p+0x0D, 0x30-0x0D)))
+	&& !checksum(p+0x0D, 0x30-0x0D))
 		return 0;
 	
 	printf("VPD present.\n");
