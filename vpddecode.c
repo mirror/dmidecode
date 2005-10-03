@@ -37,24 +37,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <getopt.h>
 
 #include "version.h"
 #include "config.h"
 #include "types.h"
 #include "util.h"
-
-/* Options are global */
-struct opt
-{
-	const char* devmem;
-	unsigned int flags;
-};
-static struct opt opt;
-
-#define FLAG_VERSION            (1<<0)
-#define FLAG_HELP               (1<<1)
-#define FLAG_DUMP               (1<<2)
+#include "vpdopt.h"
 
 static const char *product_name(const char *id)
 {
@@ -297,54 +285,6 @@ static int decode(const u8 *p)
 		0x38+13<p[5]-1?13:p[5]-1-0x38);
 	
 	return 1;
-}
-
-/* Return -1 on error, 0 on success */
-static int parse_command_line(int argc, char * const argv[])
-{
-	int option;
-	const char *optstring = "d:huV";
-	struct option longopts[]={
-		{ "dev-mem", required_argument, NULL, 'd' },
-		{ "help", no_argument, NULL, 'h' },
-		{ "dump", no_argument, NULL, 'u' },
-		{ "version", no_argument, NULL, 'V' },
-		{ 0, 0, 0, 0 }
-	};
-
-	while((option=getopt_long(argc, argv, optstring, longopts, NULL))!=-1)
-		switch(option)
-		{
-			case 'd':
-				opt.devmem=optarg;
-				break;
-			case 'h':
-				opt.flags|=FLAG_HELP;
-				break;
-			case 'u':
-				opt.flags|=FLAG_DUMP;
-				break;
-			case 'V':
-				opt.flags|=FLAG_VERSION;
-				break;
-			case '?':
-				return -1;
-		}
-
-	return 0;
-}
-
-static void print_help(void)
-{
-	static const char *help=
-		"Usage: vpddecode [OPTIONS]\n"
-		"Options are:\n"
-		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
-		" -h, --help             Display this help text and exit\n"
-		" -u, --dump             Do not decode the VPD records\n"
-		" -V, --version          Display the version and exit\n";
-	
-	printf("%s", help);
 }
 
 int main(int argc, char * const argv[])

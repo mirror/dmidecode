@@ -49,8 +49,8 @@ biosdecode : biosdecode.o util.o
 ownership : ownership.o util.o
 	$(CC) $(LDFLAGS) ownership.o util.o -o $@
 
-vpddecode : vpddecode.o util.o
-	$(CC) $(LDFLAGS) vpddecode.o util.o -o $@
+vpddecode : vpddecode.o vpdopt.o util.o
+	$(CC) $(LDFLAGS) vpddecode.o vpdopt.o util.o -o $@
 
 #
 # Objects
@@ -69,7 +69,10 @@ biosdecode.o : biosdecode.c version.h types.h util.h config.h
 ownership.o : ownership.c version.h types.h util.h config.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-vpddecode.o : vpddecode.c version.h types.h util.h config.h 
+vpddecode.o : vpddecode.c version.h types.h util.h config.h vpdopt.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+vpdopt.o : vpdopt.c config.h vpdopt.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 util.o : util.c types.h util.h config.h
