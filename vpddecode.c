@@ -214,7 +214,8 @@ static void print_entry(const char *name, const u8 *p, size_t len)
 {
 	size_t i;
 	
-	printf("%s: ", name);
+	if(name!=NULL)
+		printf("%s: ", name);
 	for(i=0; i<len; i++)
 	{
 		/* ASCII filtering */
@@ -266,9 +267,18 @@ static int decode(const u8 *p)
 		/* A few systems have a bad checksum (xSeries 325, 330, 335
 		   and 345 with early BIOS) but the record is otherwise
 		   valid. */
-		printf("Bad checksum! Please report.\n");
+		if(!(opt.flags & FLAG_QUIET))
+			printf("Bad checksum! Please report.\n");
 	}
 	
+	if(opt.string!=NULL)
+	{
+		if(opt.string->offset+opt.string->len<p[5])
+			print_entry(NULL, p+opt.string->offset,
+			            opt.string->len);
+		return 1;
+	}
+
 	print_entry("BIOS Build ID", p+0x0D, 9);
 	printf("Product Name: %s\n", product_name((const char *)(p+0x0D)));
 	print_entry("Box Serial Number", p+0x16, 7);
@@ -318,7 +328,8 @@ int main(int argc, char * const argv[])
 		return 0;
 	}
 
-	printf("# vpddecode %s\n", VERSION);
+	if(!(opt.flags & FLAG_QUIET))
+		printf("# vpddecode %s\n", VERSION);
 
 	if((buf=mem_chunk(0xF0000, 0x10000, opt.devmem))==NULL)
 		exit(1);
