@@ -463,7 +463,7 @@ static int vpd_decode(const u8 *p, size_t len)
 		return 0;
 
 	/* XSeries have longer records. */
-	if(!(len>=0x46 && checksum(p, 0x46))
+	if(!(len>=0x45 && checksum(p, len))
 	/* Some Netvista seem to work with this. */
 	&& !checksum(p, 0x30)
 	/* The Thinkpad checksum does *not* include the first 13 bytes. */
@@ -481,7 +481,6 @@ static int vpd_decode(const u8 *p, size_t len)
 		return 1;
 
 	vpd_print_entry("BIOS Release Date", p+0x30, 8);
-	vpd_print_entry("Default Flash Image File Name", p+0x38, 13);
 	
 	return 1;
 }
