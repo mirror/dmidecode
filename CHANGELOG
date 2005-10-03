@@ -1,3 +1,24 @@
+2005-10-03  Jean Delvare  <khali@linux-fr.org>
+
+	* biosdecode.c: Fix a potential (but highly improbable) buffer
+	  overrun in the VPD record decoding.
+	* biosdecode.c: Change the xSeries checksumming method to
+	  accomodate a strange xSeries 440 VPD record, as was done in
+	  vpddecode.c some weeks ago. Do not display the default flash
+	  image file name anymore, it's not so useful and the field length
+	  is now uncertain.
+	* vpdopt.c, vpdopt.h: New.
+	* Makefile, vpddecode.c, vpdopt.c, vpdopt.h: Move the command line
+	  handling of vpddecode to a separate source file.
+	* vpddecode.c, vpdopt.c, vpdopt.h: Add option -s, --string. It
+	  prints one selected VPD string instead of the regular output.
+
+2005-09-24  Jean Delvare  <khali@linux-fr.org>
+
+	* dmiopt.c: Fix incorrect header include. The strcasecmp function
+	  is defined in <strings.h>, not <string.h>. Reported by Petter
+	  Reinholdtsen.
+
 2005-09-14  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.h: New.
