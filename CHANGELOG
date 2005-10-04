@@ -1,3 +1,12 @@
+2005-10-04  Jean Delvare  <khali@linux-fr.org>
+
+	* vpdopt.c: Display the list of all valid string keywords when
+	  --string is used without an argument.
+	* vpddecode.8: Document the new -s, --string option.
+	* dmidecode.8: List the four new string keywords.
+	* vpddecode.c: Keep quiet when --string is used, even when no VPD
+	  record is found.
+
 2005-10-03  Jean Delvare  <khali@linux-fr.org>
 
 	* biosdecode.c: Fix a potential (but highly improbable) buffer
