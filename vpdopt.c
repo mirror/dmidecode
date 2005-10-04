@@ -122,6 +122,13 @@ int parse_command_line(int argc, char * const argv[])
 				opt.flags|=FLAG_VERSION;
 				break;
 			case '?':
+				switch(optopt)
+				{
+					case 's':
+						fprintf(stderr, "String keyword expected\n");
+						print_opt_string_list();
+						break;
+				}
 				return -1;
 		}
 
