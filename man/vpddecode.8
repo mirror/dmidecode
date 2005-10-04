@@ -37,11 +37,27 @@ the accuracy of these labels is welcome.
 .BR "-d" ", " "--dev-mem FILE"
 Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
 .TP
+.BR "-s" ", " "--string KEYWORD"
+Only display the value of the \s-1VPD\s0 string identified by \fBKEYWORD\fR.
+\fBKEYWORD\fR must be a keyword from the following list: \fBbios-build-id\fR,
+\fBbox-serial-number\fR, \fBmotherboard-serial-number\fR,
+\fBmachine-type-model\fR, \fBbios-release-date\fR.
+Each keyword corresponds to an offset and a length within the \s-1VPD\s0
+record.
+Not all strings may be defined on all \s-1VPD\s0-enabled systems.
+If \fBKEYWORD\fR is not provided or not valid, a list of all valid
+keywords is printed and
+.B vpddecode
+exits with an error.
+This option cannot be used more than once.
+Mutually exclusive with \fB--dump\fR.
+.TP
 .BR "-u" ", " "--dump"
 Do not decode the VPD records, dump their contents as hexadecimal instead.
 Note that this is still a text output, no binary data will be thrown upon
 you. ASCII equivalent is displayed when possible. This option is mainly
 useful for debugging.
+Mutually exclusive with \fB--string\fR.
 .TP
 .BR "-h" ", " "--help"
 Display usage information and exit
