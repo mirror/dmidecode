@@ -39,7 +39,7 @@
  *  - DMTF Master MIF version 040707
  *    "DMTF approved standard groups"
  *    http://www.dmtf.org/standards/dmi
- *  - IPMI 1.5 revision 1.1
+ *  - IPMI 2.0 revision 1.0
  *    "Intelligent Platform Management Interface Specification"
  *    http://developer.intel.com/design/servers/ipmi/spec.htm
  *  - AMD publication #20734 revision 3.04
@@ -2734,22 +2734,37 @@ static void dmi_memory_channel_devices(u8 count, u8 *p, const char *prefix)
 
 static const char *dmi_ipmi_interface_type(u8 code)
 {
-	/* 3.3.39.1 */
+	/* 3.3.39.1 and IPMI 2.0, appendix C1, table C1-2 */
 	static const char *type[]={
 		"Unknown", /* 0x00 */
 		"KCS (Keyboard Control Style)",
 		"SMIC (Server Management Interface Chip)",
-		"BT (Block Transfer)" /* 0x03 */
+		"BT (Block Transfer)",
+		"SSIF (SMBus System Interface)" /* 0x04 */
 	};
 	
-	if(code<=0x03)
+	if(code<=0x04)
 		return type[code];
 	return out_of_spec;
 }
 
+static void dmi_ipmi_base_address(u8 type, u8 *p, u8 lsb)
+{
+	if(type==0x04) /* SSIF */
+	{
+		printf("0x%02X (SMBus)", (*p)>>1);
+	}
+	else
+	{
+		u64 address=QWORD(p);
+		printf("0x%08X%08X (%s)", address.h, (address.l&~1)|lsb,
+			address.l&1?"I/O":"Memory-mapped");		
+	}
+}
+
 static const char *dmi_ipmi_register_spacing(u8 code)
 {
-	/* IPMI 1.5 */
+	/* IPMI 2.0, appendix C1, table C1-1 */
 	static const char *spacing[]={
 		"Successive Byte Boundaries", /* 0x00 */
 		"32-bit Boundaries",
@@ -3679,7 +3694,7 @@ static void dmi_decode(u8 *data, u16 ver)
 		case 38: /* 3.3.39 IPMI Device Information */
 			/*
 			 * We use the word "Version" instead of "Revision", conforming to
-			 * the IPMI 1.5 specification.
+			 * the IPMI specification.
 			 */
 			printf("IPMI Device Information\n");
 			if(h->length<0x10) break;
@@ -3694,25 +3709,22 @@ static void dmi_decode(u8 *data, u16 ver)
 					data[0x07]);
 			else
 				printf("\tNV Storage Device: Not Present\n");
-			if(h->length<0x12)
+			printf("\tBase Address: ");
+			dmi_ipmi_base_address(data[0x04], data+0x08,
+				h->length<0x12?0:(data[0x10]>>5)&1);
+			printf("\n");
+			if(h->length<0x12) break;
+			if(data[0x04]!=0x04)
 			{
-				printf("\tBase Address: 0x%08X%08X (%s)\n",
-					QWORD(data+0x08).h, QWORD(data+0x08).l,
-					QWORD(data+0x08).l&1?"I/O":"Memory-mapped");
-				break;
-			}
-			printf("\tBase Address: 0x%08X%08X (%s)\n",
-				QWORD(data+0x08).h,
-				(QWORD(data+0x08).l&~1)|((data[0x10]>>5)&1),
-				QWORD(data+0x08).l&1?"I/O":"Memory-mapped");
-			printf("\tRegister Spacing: %s\n",
-				dmi_ipmi_register_spacing(data[0x10]>>6));
-			if(data[0x10]&(1<<3))
-			{
-				printf("\tInterrupt Polarity: %s\n",
-					data[0x10]&(1<<1)?"Active High":"Active Low");
-				printf("\tInterrupt Trigger Mode: %s\n",
-					data[0x10]&(1<<0)?"Level":"Edge");
+				printf("\tRegister Spacing: %s\n",
+					dmi_ipmi_register_spacing(data[0x10]>>6));
+				if(data[0x10]&(1<<3))
+				{
+					printf("\tInterrupt Polarity: %s\n",
+						data[0x10]&(1<<1)?"Active High":"Active Low");
+					printf("\tInterrupt Trigger Mode: %s\n",
+						data[0x10]&(1<<0)?"Level":"Edge");
+				}
 			}
 			if(data[0x11]!=0x00)
 			{
