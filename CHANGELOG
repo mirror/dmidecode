@@ -1,3 +1,10 @@
+2005-10-05  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support IPMI specification version 2.0 (was 1.5).
+
+	* dmidecode.c: Support IPMI interface type SSIF. Original patch
+	  by Garry Belka.
+
 2005-10-04  Jean Delvare  <khali@linux-fr.org>
 
 	* vpdopt.c: Display the list of all valid string keywords when
