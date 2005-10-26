@@ -111,6 +111,8 @@ static const char *product_name(const char *id)
 		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
 		"M1", "eServer xSeries 325", /* added 2005-04-26,
 		                                reported by Myke Olson */
+		"NR", "eServer xSeries 236", /* added 2005-10-26,
+		                                reported by Klaus Muth */
  		"NT", "Netfinity 3000", /* added 2005-05-25,
  		                           reported by Bernd Krumboeck */
 		"NV", "PC 300PL", /* added 2004-04-02,
