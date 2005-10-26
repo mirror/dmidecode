@@ -25,7 +25,7 @@
  *
  * References:
  *  - IBM "Using the BIOS Build ID to identify Thinkpad systems"
- *    Revision 2005-09-19
+ *    Revision 2005-10-06
  *    http://www-307.ibm.com/pc/support/site.wss/MIGR-45120.html
  *
  * Notes:
@@ -197,6 +197,8 @@ static const char *product_name(const char *id)
 		"75", "Thinkpad X41 Tablet", /* added 2005-06-24 (IBM) */
 		"76", "Thinkpad R52", /* added 2005-06-24,
 		                         types 1846, 1847, 1848, 1849, 1850 and 1870 */
+		"77", "ThinkPad Z60m/t", /* added 2005-10-06 */
+		"78", "ThinkPad R51e", /* added 2005-10-06 */
 		NULL, "Unknown, please report!"
 	};
 	
