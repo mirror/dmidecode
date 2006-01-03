@@ -338,13 +338,16 @@ int main(int argc, char * const argv[])
 	if((buf=mem_chunk(0xF0000, 0x10000, opt.devmem))==NULL)
 		exit(1);
 
-	for(fp=0; fp<=0xFFF0; fp+=16)
+	for(fp=0; fp<=0xFFF0; fp+=4)
 	{
 		u8 *p=buf+fp;
 
 		if(memcmp((char *)p, "\252\125VPD", 5)==0
 		&& fp+p[5]-1<=0xFFFF)
 		{
+			if(fp%16 && !(opt.flags & FLAG_QUIET))
+				printf("Unaligned address (%#lx)! Please report.\n",
+				       0xf0000+fp);
 			if(opt.flags & FLAG_DUMP)
 			{
 				dump(p, p[5]);
