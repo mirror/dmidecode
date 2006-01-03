@@ -1,3 +1,16 @@
+2005-12-24  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Scan for VPD records on 4-byte boundaries instead
+	  of 16-byte boundaries. This is needed for some eServer xSeries
+	  206. Still emit a warning if a VPD record is found not on a
+	  16-byte boundary.
+
+2005-10-26  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Add product ID "NR". Reported by Klaus Muth.
+	* vpddecode.c: Update lookup table from revision 2005-10-06 of IBM
+	  reference document (add product IDs "77" and "78").
+
 2005-10-05  Jean Delvare  <khali@linux-fr.org>
 
 	Update to support IPMI specification version 2.0 (was 1.5).
