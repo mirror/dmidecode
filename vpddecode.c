@@ -289,14 +289,11 @@ static int decode(const u8 *p)
 	print_entry("Motherboard Serial Number", p+0x1D, 11);
 	print_entry("Machine Type/Model", p+0x28, 7);
 	
-	if(p[5]<0x45)
+	if(p[5]<0x44)
 		return 1;
 	
 	print_entry("BIOS Release Date", p+0x30, 8);
-	/* This one seems to be a variable length field, it is usually 13
-	   byte long but was seen 12 byte long on an xSeries 440. */
-	print_entry("Default Flash Image File Name", p+0x38,
-		0x38+13<p[5]-1?13:p[5]-1-0x38);
+	print_entry("Default Flash Image File Name", p+0x38, 12);
 	
 	return 1;
 }
