@@ -4,6 +4,11 @@
 	  may be a BIOS revision. Display it as such when present and
 	  non zero, and ask users to report.
 	* vpddecode.c: Adjust an error message.
+	* dmidecode.8: Update the sample entry to match the new output
+	  format.
+	* README: Improve the IA-64 specific section and the vpddecode
+	  tool description.
+	* vpdopt.h: Add missing system header file include.
 
 2006-01-20  Jean Delvare  <khali@linux-fr.org>
 
