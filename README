@@ -104,7 +104,7 @@ system, you need two things:
  - an ia64 patched 2.4 kernel, using linux-2.4.21-ia64-030702.diff or any
    later version, or a 2.6 kernel.
 Chad Smith tested dmidecode successfully on two different IA-64 systems, and
-successes have been reported by other users too. Non-Linux system are not
+successes have been reported by other users too. Non-Linux systems are not
 supported.
 
 MMAP
