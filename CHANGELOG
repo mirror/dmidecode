@@ -1,3 +1,17 @@
+2006-01-21  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: The mysterious last character of xSeries records
+	  may be a BIOS revision. Display it as such when present and
+	  non zero, and ask users to report.
+	* vpddecode.c: Adjust an error message.
+
+2006-01-20  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Assume a constant length of 12 characters for the
+	  "Default Flash Image File Name" entry. The 13th character never
+	  contained anything useful, so it probably has a different
+	  meaning (unknown for now).
+
 2005-12-24  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Scan for VPD records on 4-byte boundaries instead
