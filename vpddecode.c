@@ -294,6 +294,12 @@ static int decode(const u8 *p)
 	
 	print_entry("BIOS Release Date", p+0x30, 8);
 	print_entry("Default Flash Image File Name", p+0x38, 12);
+
+	if(p[5]>=0x46 && p[0x44]!=0x00)
+	{
+		printf("%s: %u (Please report!)\n", "BIOS Revision",
+		       p[0x44]);
+	}
 	
 	return 1;
 }
@@ -343,7 +349,7 @@ int main(int argc, char * const argv[])
 		&& fp+p[5]-1<=0xFFFF)
 		{
 			if(fp%16 && !(opt.flags & FLAG_QUIET))
-				printf("Unaligned address (%#lx)! Please report.\n",
+				printf("Unaligned address (%#lx), please report!\n",
 				       0xf0000+fp);
 			if(opt.flags & FLAG_DUMP)
 			{
