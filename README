@@ -101,10 +101,11 @@ since integrated into the main ia64 patch. Finally, I added the required
 code to make it all work. So, in order to have dmidecode work on your IA-64
 system, you need two things:
  - dmidecode version 2.2 or later;
- - an ia64 patched kernel, using linux-2.4.21-ia64-030702.diff or any later
-   version.
+ - an ia64 patched 2.4 kernel, using linux-2.4.21-ia64-030702.diff or any
+   later version, or a 2.6 kernel.
 Chad Smith tested dmidecode successfully on two different IA-64 systems, and
-successes have been reported by other users too.
+successes have been reported by other users too. Non-Linux system are not
+supported.
 
 MMAP
 
@@ -143,6 +144,5 @@ decided to make it part of the project.
 VPDDECODE
 
 This tool prints the contents of the "vital product data" structure as
-found in most IBM computers. It roughly shows the same information as
-biosdecode does with regard to this structure, but has an additional
-lookup table for the machine name.
+found in most IBM computers. It has a lookup table for the machine name
+and a command line interface.
