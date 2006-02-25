@@ -2964,7 +2964,7 @@ static void dmi_decode(u8 *data, u16 ver)
 			printf("\tOEM Information: 0x%08X\n",
 				DWORD(data+0x0D));
 			if(h->length<0x15) break;
-			printf("\tHeigth:");
+			printf("\tHeight:");
 			dmi_chassis_height(data[0x11]);
 			printf("\n");
 			printf("\tNumber Of Power Cords:");
