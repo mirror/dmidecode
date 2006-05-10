@@ -32,7 +32,7 @@ typedef struct {
 #endif
 
 #ifdef ALIGNMENT_WORKAROUND
-static u64 U64(u32 low, u32 high)
+static inline u64 U64(u32 low, u32 high)
 {
 	u64 self;
 	
