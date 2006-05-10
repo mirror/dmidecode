@@ -52,10 +52,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#ifdef __ia64__
-#define USE_EFI
-#endif /* __ia64__ */
-
 #include "version.h"
 #include "config.h"
 #include "types.h"
@@ -3913,7 +3909,6 @@ static int smbios_decode(u8 *buf, const char *devmem)
 	return 0;
 }
 
-#ifndef USE_EFI
 static int legacy_decode(u8 *buf, const char *devmem)
 {
 	if(checksum(buf, 0x0F))
@@ -3928,18 +3923,60 @@ static int legacy_decode(u8 *buf, const char *devmem)
 	
 	return 0;
 }
-#endif /* USE_EFI */
+
+/*
+ * Probe for EFI interface
+ */
+#define EFI_NOT_FOUND   (-1)
+#define EFI_NO_SMBIOS   (-2)
+static int address_from_efi(size_t *address)
+{
+	FILE *efi_systab;
+	const char *filename;
+	char linebuf[64];
+	int ret;
+
+	*address=0; /* Prevent compiler warning */
+
+	/*
+	 * Linux up to 2.6.6: /proc/efi/systab
+	 * Linux 2.6.7 and up: /sys/firmware/efi/systab
+	 */
+	if((efi_systab=fopen(filename="/sys/firmware/efi/systab", "r"))==NULL
+	&& (efi_systab=fopen(filename="/proc/efi/systab", "r"))==NULL)
+	{
+		/* No EFI interface, fallback to memory scan */
+		return EFI_NOT_FOUND;
+	}
+	ret=EFI_NO_SMBIOS;
+	while((fgets(linebuf, sizeof(linebuf)-1, efi_systab))!=NULL)
+	{
+		char *addrp=strchr(linebuf, '=');
+		*(addrp++)='\0';
+		if(strcmp(linebuf, "SMBIOS")==0)
+		{
+			*address=strtoul(addrp, NULL, 0);
+			if(!(opt.flags & FLAG_QUIET))
+				printf("# SMBIOS entry point at 0x%08lx\n",
+				       (unsigned long)*address);
+			ret=0;
+			break;
+		}
+	}
+	if(fclose(efi_systab)!=0)
+		perror(filename);
+
+	if(ret==EFI_NO_SMBIOS)
+		fprintf(stderr, "%s: SMBIOS entry point missing\n", filename);
+	return ret;
+}
 
 int main(int argc, char * const argv[])
 {
 	int ret=0;                  /* Returned value */
 	int found=0;
 	size_t fp;
-#ifdef USE_EFI
-	FILE *efi_systab;
-	const char *filename;
-	char linebuf[64];
-#endif /* USE_EFI */
+	int efi;
 	u8 *buf;
 	
 	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4 || '\0'!=0)
@@ -3973,37 +4010,15 @@ int main(int argc, char * const argv[])
 	if(!(opt.flags & FLAG_QUIET))
 		printf("# dmidecode %s\n", VERSION);
 	
-#ifdef USE_EFI
-	/*
-	 * Linux up to 2.6.6-rc2: /proc/efi/systab
-	 * Linux 2.6.6-rc3 and up: /sys/firmware/efi/systab
-	 */
-	if((efi_systab=fopen(filename="/proc/efi/systab", "r"))==NULL
-	&& (efi_systab=fopen(filename="/sys/firmware/efi/systab", "r"))==NULL)
+	/* First try EFI (ia64, Intel-based Mac) */
+	efi=address_from_efi(&fp);
+	switch(efi)
 	{
-		perror(filename);
-		ret=1;
-		goto exit_free;
-	}
-	fp=0;
-	while((fgets(linebuf, sizeof(linebuf)-1, efi_systab))!=NULL)
-	{
-		char* addr=memchr(linebuf, '=', strlen(linebuf));
-		*(addr++)='\0';
-		if(strcmp(linebuf, "SMBIOS")==0)
-		{
-			fp=strtoul(addr, NULL, 0);
-			if(!(opt.flags & FLAG_QUIET))
-				printf("# SMBIOS entry point at 0x%08lx\n", fp);
-		}
-	}
-	if(fclose(efi_systab)!=0)
-		perror(filename);
-	if(fp==0)
-	{
-		fprintf(stderr, "%s: SMBIOS entry point missing\n", filename);
-		ret=1;
-		goto exit_free;
+		case EFI_NOT_FOUND:
+			goto memory_scan;
+		case EFI_NO_SMBIOS:
+			ret=1;
+			goto exit_free;
 	}
 
 	if((buf=mem_chunk(fp, 0x20, opt.devmem))==NULL)
@@ -4014,9 +4029,10 @@ int main(int argc, char * const argv[])
 	
 	if(smbios_decode(buf, opt.devmem))
 		found++;
-	
-	free(buf);
-#else /* USE_EFI */
+	goto done;
+
+memory_scan:
+	/* Fallback to memory scan (x86, x86_64) */
 	if((buf=mem_chunk(0xF0000, 0x10000, opt.devmem))==NULL)
 	{
 		ret=1;
@@ -4038,8 +4054,8 @@ int main(int argc, char * const argv[])
 		}
 	}
 	
+done:
 	free(buf);
-#endif /* USE_EFI */
 	
 	if(!found && !(opt.flags & FLAG_QUIET))
 		printf("# No SMBIOS nor DMI entry point found, sorry.\n");
