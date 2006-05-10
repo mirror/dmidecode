@@ -71,13 +71,8 @@ struct dmi_header
 	u8 type;
 	u8 length;
 	u16 handle;
+	u8 *data;
 };
-
-#ifdef ALIGNMENT_WORKAROUND
-#define HANDLE(x) WORD((u8 *)&(x->handle))
-#else
-#define HANDLE(x) x->handle
-#endif
 
 
 /*
@@ -86,7 +81,7 @@ struct dmi_header
 
 static const char *dmi_string(struct dmi_header *dm, u8 s)
 {
-	char *bp=(char *)dm;
+	char *bp=(char *)dm->data;
 	size_t i, len;
 
 	if(s==0)
@@ -181,11 +176,11 @@ static void dmi_dump(struct dmi_header *h, const char *prefix)
 	{
 		printf("%s\t", prefix);
 		for(i=0; i<16 && i<h->length-(row<<4); i++)
-			printf("%s%02X", i?" ":"", ((u8 *)h)[(row<<4)+i]);
+			printf("%s%02X", i?" ":"", (h->data)[(row<<4)+i]);
 		printf("\n");
 	}
 
-	if(((u8 *)h)[h->length] || ((u8 *)h)[h->length+1])
+	if((h->data)[h->length] || (h->data)[h->length+1])
 	{
 		printf("%sStrings:\n", prefix);
 		i=1;
@@ -1677,7 +1672,7 @@ static const char *dmi_on_board_devices_type(u8 code)
 
 static void dmi_on_board_devices(struct dmi_header *h, const char *prefix)
 {
-	u8 *p=(u8 *)h+4;
+	u8 *p=h->data+4;
 	u8 count=(h->length-0x04)/2;
 	int i;
 
@@ -1704,7 +1699,7 @@ static void dmi_on_board_devices(struct dmi_header *h, const char *prefix)
 
 static void dmi_oem_strings(struct dmi_header *h, const char *prefix)
 {
-	u8 *p=(u8 *)h+4;
+	u8 *p=h->data+4;
 	u8 count=p[0x00];
 	int i;
 	
@@ -1719,7 +1714,7 @@ static void dmi_oem_strings(struct dmi_header *h, const char *prefix)
 
 static void dmi_system_configuration_options(struct dmi_header *h, const char *prefix)
 {
-	u8 *p=(u8 *)h+4;
+	u8 *p=h->data+4;
 	u8 count=p[0x00];
 	int i;
 	
@@ -1734,7 +1729,7 @@ static void dmi_system_configuration_options(struct dmi_header *h, const char *p
 
 static void dmi_bios_languages(struct dmi_header *h, const char *prefix)
 {
-	u8 *p=(u8 *)h+4;
+	u8 *p=h->data+4;
 	u8 count=p[0x00];
 	int i;
 	
@@ -2844,9 +2839,9 @@ static const char *dmi_power_supply_range_switching(u8 code)
  * Main
  */
 
-static void dmi_decode(u8 *data, u16 ver)
+static void dmi_decode(struct dmi_header *h, u16 ver)
 {
-	struct dmi_header *h=(struct dmi_header *)data;
+	u8 *data=h->data;
 	
 	/*
 	 * Note: DMI types 37, 38 and 39 are untested
@@ -3801,6 +3796,14 @@ static void dmi_decode(u8 *data, u16 ver)
 	}
 }
 		
+static void to_dmi_header(struct dmi_header *h, u8 *data)
+{
+	h->type=data[0];
+	h->length=data[1];
+	h->handle=WORD(data+2);
+	h->data=data;
+}
+
 static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 {
 	u8 *buf;
@@ -3825,24 +3828,25 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 	}
 	
 	data=buf;
-	while(i<num && data+sizeof(struct dmi_header)<=buf+len)
+	while(i<num && data+4<=buf+len) /* 4 is the length of an SMBIOS structure header */
 	{
 		u8 *next;
-		struct dmi_header *h=(struct dmi_header *)data;
-		int display=((opt.type==NULL || opt.type[h->type])
-			&& !((opt.flags & FLAG_QUIET) && h->type>39)
+		struct dmi_header h;
+		to_dmi_header(&h, data);
+		int display=((opt.type==NULL || opt.type[h.type])
+			&& !((opt.flags & FLAG_QUIET) && h.type>39)
 			&& !opt.string);
 
 		/* In quiet mode, stop decoding at end of table marker */
-		if((opt.flags & FLAG_QUIET) && h->type==127)
+		if((opt.flags & FLAG_QUIET) && h.type==127)
 			break;
 		
 		if(display && !(opt.flags & FLAG_QUIET))
 			printf("Handle 0x%04X, DMI type %d, %d bytes\n",
-				HANDLE(h), h->type, h->length);
+				h.handle, h.type, h.length);
 		
 		/* look for the next handle */
-		next=data+h->length;
+		next=data+h.length;
 		while(next-buf+1<len && (next[0]!=0 || next[1]!=0))
 			next++;
 		next+=2;
@@ -3851,17 +3855,17 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 			if(next-buf<=len)
 			{
 				if(opt.flags & FLAG_DUMP)
-					dmi_dump(h, "\t");
+					dmi_dump(&h, "\t");
 				else
-					dmi_decode(data, ver);
+					dmi_decode(&h, ver);
 			}
 			else
 				printf("\t<TRUNCATED>\n");
 			printf("\n");
 		}
 		else if(opt.string!=NULL
-		     && opt.string->type==h->type
-		     && opt.string->offset<h->length)
+		     && opt.string->type==h.type
+		     && opt.string->offset<h.length)
 		{
 			if (opt.string->lookup!=NULL)
 				printf("%s\n", opt.string->lookup(data[opt.string->offset]));
@@ -3870,7 +3874,7 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 				printf("\n");
 			}
 			else
-				printf("%s\n", dmi_string(h, data[opt.string->offset]));
+				printf("%s\n", dmi_string(&h, data[opt.string->offset]));
 		}
 		
 		data=next;
