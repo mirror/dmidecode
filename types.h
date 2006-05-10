@@ -1,22 +1,22 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include "config.h"
+
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef signed short i16;
 typedef unsigned int u32;
 
 /*
- * These macros help us solve problems on systems that don't support
- * non-aligned memory access. This isn't a big issue IMHO, since the tools
- * in this package are intended mainly for Intel and compatible systems,
- * which are little-endian and support non-aligned memory access. Anyway,
- * you may use the following defines to control the way it works:
- * - Define BIGENDIAN on big-endian systems.
+ * You may use the following defines to adjust the type definitions
+ * depending on the architecture:
+ * - Define BIGENDIAN on big-endian systems. Untested, as all target
+ *   systems to date are little-endian.
  * - Define ALIGNMENT_WORKAROUND if your system doesn't support
  *   non-aligned memory access. In this case, we use a slower, but safer,
- *   memory access method.
- * You most probably will have to define none or the two of them.
+ *   memory access method. This should be done automatically in config.h
+ *   for architectures which need it.
  */
 
 #ifdef BIGENDIAN

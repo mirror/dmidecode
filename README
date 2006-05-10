@@ -46,9 +46,8 @@ Two parameters can be set in the Makefile file to make dmidecode work on
 non-i386 systems. They should be used if your system uses the big endian
 byte ordering (Motorola) or doesn't support unaligned memory accesses,
 respectively. For example, compiling for a SPARC processor would require
-both. Note that this hasn't been much tested though, because the data
-manipulated by dmidecode and the other tools is only found on i386 and
-neighbour architectures (x86_64, ia64) anyway.
+both. Compiling for an IA64 processor requires the memory alignment
+workaround, and it is enabled automatically.
 
 
 ** DOCUMENTATION **
