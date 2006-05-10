@@ -1,3 +1,27 @@
+2006-05-10  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Don't cast from u8* to dmi_header*, else
+	  architectures which do not support unaligned memory accesses
+	  may break. Instead, copy the members individually. That's a
+	  bit slower, but that's also safer and we only need to do it
+	  once per DMI entry, so it's not time critical. So far, we
+	  were using a trick to later work around the unaligned memory
+	  access, but the compiler would still warn about the risk,
+	  which is always confusing.
+	* config.h, types.h, README: Automatically enable the unaligned
+	  memory access workaround on ia64.
+	* types.h: Inline U64. It makes sense per se and also lets us
+	  get rid of a warning about U64 being unused.
+	* dmidecode.c: Detect EFI at run-time rather than compilation-
+	  time. Based on an original patch from Matthew Garrett. This
+	  will make x86 binaries work for both PC systems with BIOS and
+	  Macintosh systems with EFI. Also prevent a possible, though
+	  unlikely, NULL-pointer dereference in the EFI code.
+
+2006-02-25  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix typo reported by David Wilson (DMI case 3).
+
 2006-02-04  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Update lookup table from revision 2006-01-31 of IBM
