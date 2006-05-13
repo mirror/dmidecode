@@ -30,7 +30,7 @@
  *
  * Notes:
  *  - Main part of the code is taken directly from biosdecode, with an
- *    additional lookup table for the product name.
+ *    additional command line interface and a few experimental features.
  */
 
 #include <stdio.h>
@@ -43,179 +43,6 @@
 #include "types.h"
 #include "util.h"
 #include "vpdopt.h"
-
-static const char *product_name(const char *id)
-{
-	/* Please keep IDs in alphabetical order */
-	static const char *name[]={
-		"AP", "eServer xSeries 336", /* added 2005-02-01,
-		                                reported by David Rosala,
-		                                confirmed by Scott Denham */
-		"GE", "eServer xSeries 345", /* added 2004-06-11,
-		                                reported by Doug Brenner */
-		"HR", "Thinkpad 560E",
-		"HV", "Thinkpad 760C/CD/L/LD",
-		"HX", "Thinkpad 760E/ED/X/XD/XL or 765/L/D (9385XGA)",
-		"HY", "Thinkpad 760E/EL/ELD (9320SVGA)",
-		"HZ", "Thinkpad 760ED/EL (9385SVGA)",
-		"I0", "Thinkpad 560",
-		"I1", "Thinkpad 380/D/E/ED or 385D/ED",
-		"I4", "Thinkpad 535/E",
-		"I5", "Thinkpad 365X/XD",
-		"I7", "Thinkpad 770",
-		"I8", "Thinkpad 560X",
-		"I9", "Thinkpad 310/E or 315D/ED (Please report!)",
-		"IA", "Thinkpad 535X",
-		"IB", "Thinkpad 600",
-		"IC", "Thinkpad 380X/XD or 385XD",
-		"ID", "Thinkpad 770/E/ED",
-		"IE", "Thinkpad 560Z",
-		"IF", "Thinkpad 380X/XD or 385XD",
-		"IG", "Thinkpad 380Z",
-		"IH", "Thinkpad 600E",
-		"II", "Thinkpad 770X/XD",
-		"IJ", "Thinkpad 390 or i17xx",
-		"IK", "Thinkpad i14xx",
-		"IL", "Thinkpad 390",
-		"IM", "Thinkpad 570",
-		"IN", "Thinkpad 600E",
-		"IO", "Thinkpad 770X",
-		"IQ", "Thinkpad 390E",
-		"IR", "Thinkpad 240",
-		"IS", "Thinkpad 390X",
-		"IT", "Thinkpad 600X",
-		"IU", "Thinkpad 570E",
-		"IV", "Thinkpad A20p",
-		"IW", "Thinkpad A20m",
-		"IX", "Thinkpad i1400 or i1500",
-		"IY", "Thinkpad T20",
-		"IZ", "Thinkpad X20 or X21", /* updated 2003-11-29 (IBM) */
-		"JP", "eServer xSeries 205", /* added 2004-04-30,
-		                                reported by Bernd Krumboeck */
-		"KE", "eServer xSeries 206", /* added 2005-05-25,
-		                                reported by Bernd Krumboeck */
-		"KP", "eServer xSeries 346", /* added 2005-02-01,
-		                                reported by David Rosala,
-		                                confirmed by Scott Denham */
-		"KQ", "Thinkpad i1200 or i1300",
-		"KR", "Thinkpad i1400 or i1500",
-		"KS", "Thinkpad 240X",
-		"KT", "Thinkpad i1400 or i1500",
-		"KU", "Thinkpad A21e", /* type 2628 only */
-		"KV", "Transnote",
-		"KW", "Thinkpad i1200 or i1300",
-		"KX", "Thinkpad A21m or A22m", /* added 2003-11-11,
-		                                  reported by Klaus Ade Johnstad,
-		                                  confirmed by Pamela Huntley */
-		"KY", "Thinkpad A21p or A22p", /* fixed 2003-11-29 (IBM) */
-		"KZ", "Thinkpad T21", /* fixed 2003-11-29 (IBM) */
-		"M1", "eServer xSeries 325", /* added 2005-04-26,
-		                                reported by Myke Olson */
-		"NR", "eServer xSeries 236", /* added 2005-10-26,
-		                                reported by Klaus Muth */
- 		"NT", "Netfinity 3000", /* added 2005-05-25,
- 		                           reported by Bernd Krumboeck */
-		"NV", "PC 300PL", /* added 2004-04-02,
-		                     reported by Shawn Starr */
-		"OP", "Intellistation Z10", /* added 2005-02-17,
-		                               reported by Scott Denham */
-		"PD", "PC 300GL", /* added 2004-04-14,
-		                     reported by Roger Koot */
-		"PI", "Netvista A40/p", /* added 2004-02-23,
-		                           updated 2004-03-24,
-		                           reported by Zing Zing Shishak */
-		"PJ", "PC 300GL", /* added 2004-03-23,
-		                     reported by Roger Koot */
-		"PL", "Intellistation M-Pro", /* added 2004-04-15,
-		                                 reported by Mark Syms */
-		"PN", "Intellistation A10", /* added 2005-02-17,
-		                               reported by Scott Denham */
-		"PT", "Netvista A20", /* added 2003-12-28,
-		                         reported by Ramiro Barreiro */
-		"RE", "eServer xSeries 445", /* added 2003-12-17,
-		                                reported by Josef Moellers */
-		"RD", "eServer xSeries 365", /* added 2005-02-01,
-		                                reported by David Rosala */
-		"T2", "eServer xSeries 335", /* added 2004-06-11,
-		                                reported by Doug Brenner */
-		"TT", "eServer xSeries 330", /* added 2003-12-03,
-		                                reported by Hugues Lepesant */
-		"VI", "eServer xSeries 440", /* added 2005-08-25,
-		                                reported by Torsten Seemann */
-		"ZR", "eServer xSeries 200", /* added 2005-05-25,
-		                                reported by Bernd Krumboeck */
-		"10", "Thinkpad A21e or A22e", /* Celeron models */
-		"11", "Thinkpad 240Z",
-		"13", "Thinkpad A22m", /* 2628-Sxx models */
-		"15", "Thinkpad i1200",
-		"16", "Thinkpad T22",
-		"17", "Thinkpad i1200",
-		"18", "Thinkpad S30",
-		"1A", "Thinkpad T23",
-		"1B", "Thinkpad A22e", /* Pentium models */
-		"1C", "Thinkpad R30",
-		"1D", "Thinkpad X22, X23 or X24",
-		"1E", "Thinkpad A30/p",
-		"1F", "Thinkpad R31",
-		"1G", "Thinkpad A31/p",
-		"1I", "Thinkpad T30",
-		"1K", "Thinkpad X30",
-		"1M", "Thinkpad R32",
-		"1N", "Thinkpad A31/p",
-		"1O", "Thinkpad R40", /* types 2681, 2682 and 2683 */
-		"1P", "Thinkpad R40", /* added 2003-11-29 (IBM),
-		                         types 2722, 2723 and 2724 */
-		"1Q", "Thinkpad X31",
-		"1R", "Thinkpad T40, T41, T42, R50, R50p or R51", /* updated 2003-11-29 (IBM),
-		                                                     updated 2004-11-08,
-		                                                     reported by Marco Wertejuk,
-		                                                     updated 2005-03-08 (IBM) */
-		"1S", "Thinkpad R40e", /* added 2003-11-29 (IBM) */
-		"1T", "Thinkpad G40",
-		"1U", "Thinkpad X40", /* added 2005-06-24 (IBM) */
-		"1V", "Thinkpad R51", /* added 2005-03-08 (IBM),
-		                         confirmed by Ingo van Lil */
-		"1W", "Thinkpad R50e", /* added 2005-02-17 (IBM) */
-		"1X", "Thinkpad G41", /* added 2005-06-24 (IBM),
-		                         types 2881, 2882 and 2886 */
-		"1Y", "Thinkpad T43/p", /* added 2005-02-17 (IBM),
-		                           updated 2005-06-24 (IBM),
-		                           types 2668, 2669, 2678, 2679, 2686 and 2687 */
-		"20", "Netvista A22p or M41", /* added 2003-10-09,
-		                                 updated 2004-02-23,
-		                                 updated 2004-03-24 */
-		"24", "Netvista M42", /* added 2004-03-27,
-		                         reported by Paul Sturm */
-		"2A", "Thinkcentre M50", /* added 2004-03-19,
-		                            reported by Rafael Avila de Espindola */
-		"2C", "Thinkcentre A50", /* added 2005-02-24,
-		                            reported by Tomek Mateja */
-		"70", "Thinkpad T43/p or R52", /* added 2005-06-24,
-		                                  T43/p types 1871, 1872, 1873, 1874,1875 and 1876,
-		                                  R52 types 1858, 1859, 1860, 1861, 1862 and 1863 */
-		"74", "Thinkpad X41", /* added 2005-06-24 (IBM) */
-		"75", "Thinkpad X41 Tablet", /* added 2005-06-24 (IBM) */
-		"76", "Thinkpad R52", /* added 2005-06-24,
-		                         types 1846, 1847, 1848, 1849, 1850 and 1870 */
-		"77", "Thinkpad Z60m/t", /* added 2005-10-06 */
-		"78", "Thinkpad R51e", /* added 2005-10-06 */
-		"7B", "Thinkpad X60/s", /* added 2006-01-31,
-		                           X60 types 1706, 1707, 1708, 1709, 2509 and 2510,
-		                           X60s types 1702, 1703, 1704, 1705, 2507, 2508 and 2533 */
-		NULL, "Unknown, please report!"
-	};
-	
-	int i=0;
-	
-	/*
-	 * This lookup algorithm admittedly performs poorly, but
-	 * improving it is just not worth it.
-	 */
-	while(name[i*2]!=NULL && memcmp(id, name[i*2], 2)!=0)
-		i++;
-	
-	return name[i*2+1];
-}
 
 static void print_entry(const char *name, const u8 *p, size_t len)
 {
@@ -287,7 +114,6 @@ static int decode(const u8 *p)
 	}
 
 	print_entry("BIOS Build ID", p+0x0D, 9);
-	printf("Product Name: %s\n", product_name((const char *)(p+0x0D)));
 	print_entry("Box Serial Number", p+0x16, 7);
 	print_entry("Motherboard Serial Number", p+0x1D, 11);
 	print_entry("Machine Type/Model", p+0x28, 7);

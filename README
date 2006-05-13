@@ -143,5 +143,6 @@ decided to make it part of the project.
 VPDDECODE
 
 This tool prints the contents of the "vital product data" structure as
-found in most IBM computers. It has a lookup table for the machine name
-and a command line interface.
+found in most IBM and Lenovo computers. It used to have a lookup table
+for the machine name, but that was unreliable and hard to maintain so it
+was ultimately dropped. It has a command line interface.
