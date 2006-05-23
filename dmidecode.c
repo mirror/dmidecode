@@ -3828,10 +3828,26 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 	{
 		u8 *next;
 		struct dmi_header h;
+		int display;
+
 		to_dmi_header(&h, data);
-		int display=((opt.type==NULL || opt.type[h.type])
+		display=((opt.type==NULL || opt.type[h.type])
 			&& !((opt.flags & FLAG_QUIET) && h.type>39)
 			&& !opt.string);
+
+		/*
+		 * If a short entry is found (less than 4 bytes), not only it
+		 * is invalid, but we cannot reliably locate the next entry.
+		 * Better stop at this point, and let the user know his/her
+		 * table is broken.
+		 */
+		if(h.length<4)
+		{
+			printf("Invalid entry length (%u). DMI table is "
+			       "broken! Stop.\n\n", (unsigned int)h.length);
+			opt.flags |= FLAG_QUIET;
+			break;
+		}
 
 		/* In quiet mode, stop decoding at end of table marker */
 		if((opt.flags & FLAG_QUIET) && h.type==127)
