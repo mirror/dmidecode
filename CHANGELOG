@@ -1,3 +1,16 @@
+2006-05-23  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix a recently introduced compilation error with
+	  non-C99 compilers.
+	* dmidecode.c: Check for short entries (less than 4 bytes), stop
+	  with an error when one is encountered.
+
+2006-05-13  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c, README: Drop the product name lookup table. It
+	  was reported to be unreliable too many times, and was also
+	  difficult to maintain.
+
 2006-05-10  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Don't cast from u8* to dmi_header*, else
