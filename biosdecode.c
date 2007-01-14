@@ -2,7 +2,7 @@
  * BIOS Decode
  *
  *   (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   (C) 2002-2005 Jean Delvare <khali@linux-fr.org>
+ *   (C) 2002-2007 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -49,6 +49,9 @@
  *  - IBM "Using the BIOS Build ID to identify Thinkpad systems"
  *    Revision 2005-09-19
  *    http://www-307.ibm.com/pc/support/site.wss/MIGR-45120.html
+ *  - Fujitsu application panel technical details
+ *    As of July 23rd, 2004
+ *    http://apanel.sourceforge.net/tech.php
  */
 
 #include <stdio.h>
@@ -486,6 +489,41 @@ static int vpd_decode(const u8 *p, size_t len)
 }
 
 /*
+ * Fujitsu application panel
+ */
+
+static size_t fjkeyinf_length(const u8 *p)
+{
+	(void) p;
+	/*
+	 * We don't know at this point, it's somewhere between 12 and 32.
+	 * So we return the max, it shouldn't hurt.
+	 */
+	return 32;
+}
+
+static int fjkeyinf_decode(const u8 *p, size_t len)
+{
+	(void) len;
+	int i;
+
+	printf("Fujitsu application panel present.\n");
+
+	for (i = 0; i < 6; i++)
+	{
+		if (*(p+8+i*4)==0)
+			return 1;
+		printf("\tDevice %d: type %u, chip %u", i+1,
+		       *(p+8+i*4), *(p+8+i*4+2));
+		if (*(p+8+i*4+1)) /* Access method */
+			printf(", SMBus address 0x%x", *(p+8+i*4+3) >> 1);
+		printf("\n");
+	}
+
+	return 1;
+}
+
+/*
  * Main
  */
 
@@ -500,6 +538,7 @@ static struct bios_entry bios_entries[]={
 	{ "$PIR", 0, 0xF0000, 0xFFFFF, pir_length, pir_decode },
 	{ "32OS", 0, 0xE0000, 0xFFFFF, compaq_length, compaq_decode },
 	{ "\252\125VPD", 0, 0xF0000, 0xFFFFF, vpd_length, vpd_decode },
+	{ "FJKEYINF", 0, 0xF0000, 0xFFFFF, fjkeyinf_length, fjkeyinf_decode },
 	{ NULL, 0, 0, 0, NULL, NULL }
 };
 
