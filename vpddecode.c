@@ -137,7 +137,7 @@ int main(int argc, char * const argv[])
 {
 	u8 *buf;
 	int found=0;
-	off_t fp;
+	unsigned int fp;
 	
 	if(sizeof(u8)!=1)
 	{
@@ -178,7 +178,7 @@ int main(int argc, char * const argv[])
 		&& fp+p[5]-1<=0xFFFF)
 		{
 			if(fp%16 && !(opt.flags & FLAG_QUIET))
-				printf("Unaligned address (%#lx), please report!\n",
+				printf("Unaligned address (%#x), please report!\n",
 				       0xf0000+fp);
 			if(opt.flags & FLAG_DUMP)
 			{
