@@ -2832,7 +2832,7 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 	u8 *data=h->data;
 	
 	/*
-	 * Note: DMI types 37, 38 and 39 are untested
+	 * Note: DMI types 37 and 39 are untested
 	 */
 	switch(h->type)
 	{
