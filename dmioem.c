@@ -90,7 +90,7 @@ static int dmi_decode_hp(struct dmi_header *h)
 					printf("\tNIC %d [NOT_INSTALLED]\n", nic);
 				else
 				{
-					printf("\tNIC %d [%02x:%02x.%02x]",
+					printf("\tNIC %d [%02x:%02x.%x]",
 						nic, data[ptr+1], data[ptr]>>3, data[ptr]&7);
 					printf(" %02X:%02X:%02X:%02X:%02X:%02X\n",
 						data[ptr+2], data[ptr+3],
@@ -119,7 +119,7 @@ static int dmi_decode_hp(struct dmi_header *h)
 					printf("\tNIC %d [NOT_INSTALLED]\n", nic);
 				else
 				{
-					printf("\tNIC %d [%02x:%02x.%02x]",
+					printf("\tNIC %d [%02x:%02x.%x]",
 						nic, data[ptr+1], data[ptr]>>3, data[ptr]&7);
 					printf(" %02X:%02X:%02X:%02X:%02X:%02X\n",
 						data[ptr+2], data[ptr+3],
