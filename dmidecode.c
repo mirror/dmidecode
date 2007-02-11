@@ -2,7 +2,7 @@
  * DMI Decode
  *
  *   (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   (C) 2002-2005 Jean Delvare <khali@linux-fr.org>
+ *   (C) 2002-2007 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -58,31 +58,16 @@
 #include "util.h"
 #include "dmidecode.h"
 #include "dmiopt.h"
+#include "dmioem.h"
 
 static const char *out_of_spec = "<OUT OF SPEC>";
 static const char *bad_index = "<BAD INDEX>";
-
-struct dmi_header
-{
-	u8 type;
-	u8 length;
-	u16 handle;
-	u8 *data;
-};
-
-/*
- * Globals for vendor-specific decodes
- */
-
-enum DMI_VENDORS { VENDOR_UNKNOWN, VENDOR_HP };
-
-enum DMI_VENDORS dmi_vendor = VENDOR_UNKNOWN;
 
 /*
  * Type-independant Stuff
  */
 
-static const char *dmi_string(struct dmi_header *dm, u8 s)
+const char *dmi_string(struct dmi_header *dm, u8 s)
 {
 	char *bp=(char *)dm->data;
 	size_t i, len;
@@ -2839,109 +2824,6 @@ static const char *dmi_power_supply_range_switching(u8 code)
 }
 
 /*
- * HP-specific data structures are decoded here.
- *
- * Code contributed by John Cagle.
- */
-
-static int dmi_decode_hp(struct dmi_header *h)
-{
-	u8 *data=h->data;
-	int nic, ptr;
-
-	switch(h->type)
-	{
-		case 204:
-			/*
-			 * Vendor Specific: HP ProLiant System/Rack Locator
-			 */
-			printf("HP ProLiant System/Rack Locator\n");
-			printf("\tRack Name: %s\n", dmi_string(h, 1));
-			printf("\tEnclosure Name: %s\n", dmi_string(h, 2));
-			printf("\tEnclosure Model: %s\n", dmi_string(h, 3));
-			printf("\tEnclosure Serial: %s\n", dmi_string(h, 5));
-			printf("\tEnclosure Bays: %d\n", data[8]);
-			printf("\tServer Bay: %s\n", dmi_string(h, 4));
-			printf("\tBays Filled: %d\n", data[9]);
-			break;
-
-		case 209:
-			/*
-			 * Vendor Specific: HP ProLiant NIC MAC Information
-			 *
-			 * This prints the BIOS NIC number,
-			 * PCI bus/device/function, and MAC address
-			 */
-			printf("HP BIOS NIC PCI and MAC Information\n");
-			nic=1;
-			ptr=4;
-			while(h->length>=(ptr+8))
-			{
-				if(data[ptr]==0x00 && data[ptr+1]==0x00)
-					printf("\tNIC %d [DISABLED]\n", nic);
-				else if(data[ptr]==0xFF && data[ptr+1]==0xFF)
-					printf("\tNIC %d [NOT_INSTALLED]\n", nic);
-				else
-				{
-					printf("\tNIC %d [%02x:%02x.%02x]",
-						nic, data[ptr+1], data[ptr]>>3, data[ptr]&7);
-					printf(" %02X:%02X:%02X:%02X:%02X:%02X\n",
-						data[ptr+2], data[ptr+3],
-						data[ptr+4], data[ptr+5],
-						data[ptr+6], data[ptr+7]);
-				}
-				nic++;
-				ptr+=8;
-			}
-			break;
-
-		case 221:
-			/* Vendor Specific: HP ProLiant NIC iSCSI MAC Information
-			 *
-			 * This prints the BIOS NIC iSCSI number,
-			 * PCI bus/device/function, and MAC address
-			 */
-			printf("HP BIOS iSCSI NIC PCI and MAC Information\n");
-			nic=1;
-			ptr=4;
-			while(h->length>=(ptr+8))
-			{
-				if(data[ptr]==0x00 && data[ptr+1]==0x00)
-					printf("\tNIC %d [DISABLED]\n", nic);
-				else if(data[ptr]==0xFF && data[ptr+1]==0xFF)
-					printf("\tNIC %d [NOT_INSTALLED]\n", nic);
-				else
-				{
-					printf("\tNIC %d [%02x:%02x.%02x]",
-						nic, data[ptr+1], data[ptr]>>3, data[ptr]&7);
-					printf(" %02X:%02X:%02X:%02X:%02X:%02X\n",
-						data[ptr+2], data[ptr+3],
-						data[ptr+4], data[ptr+5],
-						data[ptr+6], data[ptr+7]);
-				}
-				nic++;
-				ptr+=8;
-			}
-			break;
-
-		default:
-			return 0;
-	}
-	return 1;
-}
-
-static int dmi_decode_oem(struct dmi_header *h)
-{
-	switch(dmi_vendor)
-	{
-		case VENDOR_HP:
-			return dmi_decode_hp(h);
-		default:
-			return 0;
-	}
-}
-
-/*
  * Main
  */
 
@@ -2963,8 +2845,7 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 			/*
 			 * Assign vendor for vendor-specific decodes later
 			 */
-			if(strcmp(dmi_string(h, data[0x04]), "HP")==0)
-				dmi_vendor=VENDOR_HP;
+			dmi_set_vendor(dmi_string(h, data[0x04]));
 
 			printf("\tVersion: %s\n",
 				dmi_string(h, data[0x05]));

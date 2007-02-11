@@ -3,7 +3,7 @@
 #	BIOS Decode
 #
 #	(C) 2000-2002 Alan Cox <alan@redhat.com>
-#	(C) 2002-2005 Jean Delvare <khali@linux-fr.org>
+#	(C) 2002-2007 Jean Delvare <khali@linux-fr.org>
 #
 #	Licensed under the GNU Public License.
 #
@@ -40,8 +40,8 @@ all : dmidecode biosdecode ownership vpddecode
 # Programs
 #
 
-dmidecode : dmidecode.o dmiopt.o util.o
-	$(CC) $(LDFLAGS) dmidecode.o dmiopt.o util.o -o $@
+dmidecode : dmidecode.o dmiopt.o dmioem.o util.o
+	$(CC) $(LDFLAGS) dmidecode.o dmiopt.o dmioem.o util.o -o $@
 
 biosdecode : biosdecode.o util.o
 	$(CC) $(LDFLAGS) biosdecode.o util.o -o $@
@@ -57,10 +57,13 @@ vpddecode : vpddecode.o vpdopt.o util.o
 #
 
 dmidecode.o : dmidecode.c version.h types.h util.h config.h dmidecode.h \
-	      dmiopt.h
+	      dmiopt.h dmioem.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 dmiopt.o : dmiopt.c config.h types.h dmidecode.h dmiopt.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+dmioem.o : dmioem.c types.h dmidecode.h dmioem.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 biosdecode.o : biosdecode.c version.h types.h util.h config.h 
