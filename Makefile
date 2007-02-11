@@ -60,7 +60,7 @@ dmidecode.o : dmidecode.c version.h types.h util.h config.h dmidecode.h \
 	      dmiopt.h dmioem.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-dmiopt.o : dmiopt.c config.h types.h dmidecode.h dmiopt.h
+dmiopt.o : dmiopt.c config.h types.h util.h dmidecode.h dmiopt.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 dmioem.o : dmioem.c types.h dmidecode.h dmioem.h
@@ -75,7 +75,7 @@ ownership.o : ownership.c version.h types.h util.h config.h
 vpddecode.o : vpddecode.c version.h types.h util.h config.h vpdopt.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-vpdopt.o : vpdopt.c config.h vpdopt.h
+vpdopt.o : vpdopt.c config.h util.h vpdopt.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 util.o : util.c types.h util.h config.h

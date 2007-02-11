@@ -25,6 +25,7 @@
 #include <getopt.h>
 
 #include "config.h"
+#include "util.h"
 #include "vpdopt.h"
 
 
@@ -52,7 +53,7 @@ static void print_opt_string_list(void)
 	unsigned int i;
 
 	fprintf(stderr, "Valid string keywords are:\n");
-	for(i=0; i<sizeof(opt_string_keyword)/sizeof(struct string_keyword); i++)
+	for(i=0; i<ARRAY_SIZE(opt_string_keyword); i++)
 	{
 		fprintf(stderr, "  %s\n", opt_string_keyword[i].keyword);
 	}
@@ -68,7 +69,7 @@ static int parse_opt_string(const char *arg)
 		return -1;
 	}
 
-	for(i=0; i<sizeof(opt_string_keyword)/sizeof(struct string_keyword); i++)
+	for(i=0; i<ARRAY_SIZE(opt_string_keyword); i++)
 	{
 		if(!strcasecmp(arg, opt_string_keyword[i].keyword))
 		{

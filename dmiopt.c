@@ -26,6 +26,7 @@
 
 #include "config.h"
 #include "types.h"
+#include "util.h"
 #include "dmidecode.h"
 #include "dmiopt.h"
 
@@ -71,7 +72,7 @@ static void print_opt_type_list(void)
 	unsigned int i;
 
 	fprintf(stderr, "Valid type keywords are:\n");
-	for(i=0; i<sizeof(opt_type_keyword)/sizeof(struct type_keyword); i++)
+	for(i=0; i<ARRAY_SIZE(opt_type_keyword); i++)
 	{
 		fprintf(stderr, "  %s\n", opt_type_keyword[i].keyword);
 	}
@@ -93,7 +94,7 @@ static u8 *parse_opt_type(u8 *p, const char *arg)
 	}
 
 	/* First try as a keyword */
-	for(i=0; i<sizeof(opt_type_keyword)/sizeof(struct type_keyword); i++)
+	for(i=0; i<ARRAY_SIZE(opt_type_keyword); i++)
 	{
 		if(!strcasecmp(arg, opt_type_keyword[i].keyword))
 		{
@@ -175,7 +176,7 @@ static void print_opt_string_list(void)
 	unsigned int i;
 
 	fprintf(stderr, "Valid string keywords are:\n");
-	for(i=0; i<sizeof(opt_string_keyword)/sizeof(struct string_keyword); i++)
+	for(i=0; i<ARRAY_SIZE(opt_string_keyword); i++)
 	{
 		fprintf(stderr, "  %s\n", opt_string_keyword[i].keyword);
 	}
@@ -191,7 +192,7 @@ static int parse_opt_string(const char *arg)
 		return -1;
 	}
 
-	for(i=0; i<sizeof(opt_string_keyword)/sizeof(struct string_keyword); i++)
+	for(i=0; i<ARRAY_SIZE(opt_string_keyword); i++)
 	{
 		if(!strcasecmp(arg, opt_string_keyword[i].keyword))
 		{
