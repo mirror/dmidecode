@@ -147,6 +147,7 @@ int dmi_decode_oem(struct dmi_header *h)
 	{
 		case VENDOR_HP:
 			return dmi_decode_hp(h);
+		default:
+			return 0;
 	}
-	return 0;
 }
