@@ -1,3 +1,28 @@
+2007-02-11  Jean Delvare  <khali@linux-fr.org>
+
+	* dmioem.c, dmioem.h: New.
+	* Makefile, dmidecode.c, dmidecode.h, dmioem.c, dmioem.h: Move the
+	  decoding of OEM-specific entries to a separate source file.
+	* dmidecode.c: DMI type 38 is tested by now.
+	* dmioem.c: The PCI function is typically represented as a single
+	  digit.
+	* Makefile, dmiopt.c, vpdopt.c, util.h: Define an ARRAY_SIZE macro
+	  which computes the size of a static array, and use it where
+	  relevant.
+
+2007-02-11  John Cagle  <jcagle@kernel.org>
+
+	* dmidecode.c: Add support for 3 HP-specific entries: system/rack
+	  locator (type 204), NIC MAC information (type 209) and NIC iSCSI
+	  MAC information (type 221).
+
+2007-01-14  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Fix a rare warning.
+	* biosdecode.c: Add support for the FJKEYINF entry point, which
+	  contains data related to the "application panel" on Fujitsu
+	  laptops.
+
 2006-05-23  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fix a recently introduced compilation error with
