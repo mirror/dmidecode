@@ -3875,7 +3875,7 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 				else
 					dmi_decode(&h, ver);
 			}
-			else
+			else if(!(opt.flags & FLAG_QUIET))
 				printf("\t<TRUNCATED>\n\n");
 		}
 		else if(opt.string!=NULL
