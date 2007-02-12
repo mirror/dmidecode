@@ -3780,10 +3780,13 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 		default:
 			if(dmi_decode_oem(h))
 				break;
+			if(opt.flags & FLAG_QUIET)
+				return;
 			printf("%s Type\n",
 				h->type>=128?"OEM-specific":"Unknown");
 			dmi_dump(h, "\t");
 	}
+	printf("\n");
 }
 		
 static void to_dmi_header(struct dmi_header *h, u8 *data)
@@ -3826,7 +3829,7 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 
 		to_dmi_header(&h, data);
 		display=((opt.type==NULL || opt.type[h.type])
-			&& !((opt.flags & FLAG_QUIET) && h.type>39)
+			&& !((opt.flags & FLAG_QUIET) && (h.type>39 && h.type<=127))
 			&& !opt.string);
 
 		/*
@@ -3865,13 +3868,15 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 			if(next-buf<=len)
 			{
 				if(opt.flags & FLAG_DUMP)
+				{
 					dmi_dump(&h, "\t");
+					printf("\n");
+				}
 				else
 					dmi_decode(&h, ver);
 			}
 			else
-				printf("\t<TRUNCATED>\n");
-			printf("\n");
+				printf("\t<TRUNCATED>\n\n");
 		}
 		else if(opt.string!=NULL
 		     && opt.string->type==h.type
