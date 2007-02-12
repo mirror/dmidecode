@@ -63,13 +63,14 @@ static int dmi_decode_hp(struct dmi_header *h)
 			 * Vendor Specific: HP ProLiant System/Rack Locator
 			 */
 			printf("HP ProLiant System/Rack Locator\n");
-			printf("\tRack Name: %s\n", dmi_string(h, 1));
-			printf("\tEnclosure Name: %s\n", dmi_string(h, 2));
-			printf("\tEnclosure Model: %s\n", dmi_string(h, 3));
-			printf("\tEnclosure Serial: %s\n", dmi_string(h, 5));
-			printf("\tEnclosure Bays: %d\n", data[8]);
-			printf("\tServer Bay: %s\n", dmi_string(h, 4));
-			printf("\tBays Filled: %d\n", data[9]);
+			if(h->length<0x0B) break;
+			printf("\tRack Name: %s\n", dmi_string(h, data[0x04]));
+			printf("\tEnclosure Name: %s\n", dmi_string(h, data[0x05]));
+			printf("\tEnclosure Model: %s\n", dmi_string(h, data[0x06]));
+			printf("\tEnclosure Serial: %s\n", dmi_string(h, data[0x0A]));
+			printf("\tEnclosure Bays: %d\n", data[0x08]);
+			printf("\tServer Bay: %s\n", dmi_string(h, data[0x07]));
+			printf("\tBays Filled: %d\n", data[0x09]);
 			break;
 
 		case 209:
