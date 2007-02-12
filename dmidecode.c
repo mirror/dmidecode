@@ -2841,12 +2841,6 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 			if(h->length<0x12) break;
 			printf("\tVendor: %s\n",
 				dmi_string(h, data[0x04]));
-
-			/*
-			 * Assign vendor for vendor-specific decodes later
-			 */
-			dmi_set_vendor(dmi_string(h, data[0x04]));
-
 			printf("\tVersion: %s\n",
 				dmi_string(h, data[0x05]));
 			printf("\tRelease Date: %s\n",
@@ -3857,6 +3851,10 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 			printf("Handle 0x%04X, DMI type %d, %d bytes\n",
 				h.handle, h.type, h.length);
 		
+		/* assign vendor for vendor-specific decodes later */
+		if(h.type==0 && h.length>=5)
+			dmi_set_vendor(dmi_string(&h, data[0x04]));
+
 		/* look for the next handle */
 		next=data+h.length;
 		while(next-buf+1<len && (next[0]!=0 || next[1]!=0))
