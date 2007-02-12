@@ -73,42 +73,16 @@ static int dmi_decode_hp(struct dmi_header *h)
 			break;
 
 		case 209:
+		case 221:
 			/*
 			 * Vendor Specific: HP ProLiant NIC MAC Information
 			 *
 			 * This prints the BIOS NIC number,
 			 * PCI bus/device/function, and MAC address
 			 */
-			printf("HP BIOS NIC PCI and MAC Information\n");
-			nic=1;
-			ptr=4;
-			while(h->length>=ptr+8)
-			{
-				if(data[ptr]==0x00 && data[ptr+1]==0x00)
-					printf("\tNIC %d [DISABLED]\n", nic);
-				else if(data[ptr]==0xFF && data[ptr+1]==0xFF)
-					printf("\tNIC %d [NOT_INSTALLED]\n", nic);
-				else
-				{
-					printf("\tNIC %d [%02x:%02x.%x]",
-						nic, data[ptr+1], data[ptr]>>3, data[ptr]&7);
-					printf(" %02X:%02X:%02X:%02X:%02X:%02X\n",
-						data[ptr+2], data[ptr+3],
-						data[ptr+4], data[ptr+5],
-						data[ptr+6], data[ptr+7]);
-				}
-				nic++;
-				ptr+=8;
-			}
-			break;
-
-		case 221:
-			/* Vendor Specific: HP ProLiant NIC iSCSI MAC Information
-			 *
-			 * This prints the BIOS NIC iSCSI number,
-			 * PCI bus/device/function, and MAC address
-			 */
-			printf("HP BIOS iSCSI NIC PCI and MAC Information\n");
+			printf(h->type==221?
+				"HP BIOS iSCSI NIC PCI and MAC Information\n":
+				"HP BIOS NIC PCI and MAC Information\n");
 			nic=1;
 			ptr=4;
 			while(h->length>=ptr+8)
