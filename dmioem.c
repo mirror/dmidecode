@@ -88,14 +88,14 @@ static int dmi_decode_hp(struct dmi_header *h)
 			while(h->length>=ptr+8)
 			{
 				if(data[ptr]==0x00 && data[ptr+1]==0x00)
-					printf("\tNIC %d [DISABLED]\n", nic);
+					printf("\tNIC %d: Disabled\n", nic);
 				else if(data[ptr]==0xFF && data[ptr+1]==0xFF)
-					printf("\tNIC %d [NOT_INSTALLED]\n", nic);
+					printf("\tNIC %d: Not Installed\n", nic);
 				else
 				{
-					printf("\tNIC %d [%02x:%02x.%x]",
-						nic, data[ptr+1], data[ptr]>>3, data[ptr]&7);
-					printf(" %02X:%02X:%02X:%02X:%02X:%02X\n",
+					printf("\tNIC %d: PCI device %02x:%02x.%x, "
+						"MAC address %02X:%02X:%02X:%02X:%02X:%02X\n",
+						nic, data[ptr+1], data[ptr]>>3, data[ptr]&7,
 						data[ptr+2], data[ptr+3],
 						data[ptr+4], data[ptr+5],
 						data[ptr+6], data[ptr+7]);
