@@ -33,7 +33,7 @@
  * information does not come from the above mentioned specification.
  *
  * Additional references:
- *  - Intel AP-485 revision 28
+ *  - Intel AP-485 revision 31
  *    "Intel Processor Identification and the CPUID Instruction"
  *    http://developer.intel.com/design/xeon/applnots/241618.htm
  *  - DMTF Master MIF version 040707
@@ -822,7 +822,7 @@ const char *dmi_processor_family(u8 code)
 
 static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *prefix)
 {
-	/* Intel AP-485 revision 28, table 5 */
+	/* Intel AP-485 revision 31, table 3-4 */
 	static const char *flags[32]={
 		"FPU (Floating-point unit on-chip)", /* 0 */
 		"VME (Virtual mode extension)",
@@ -854,12 +854,12 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 		"SS (Self-snoop)",
 		"HTT (Hyper-threading technology)",
 		"TM (Thermal monitor supported)",
-		NULL, /* 30 */
+		"IA64 (IA64 capabilities)",
 		"PBE (Pending break enabled)" /* 31 */
 	};
 	/*
 	 * Extra flags are now returned in the ECX register when one calls
-	 * the CPUID instruction. Their meaning is explained in table 6, but
+	 * the CPUID instruction. Their meaning is explained in table 3-5, but
 	 * DMI doesn't support this yet.
 	 */
 	u32 eax, edx;
@@ -935,7 +935,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 	{
 		case 1: /* Intel */
 			printf("%sSignature: Type %u, Family %u, Model %u, Stepping %u\n",
-				prefix, (eax>>12)&0x3, ((eax>>16)&0xFF0)+((eax>>8)&0x00F),
+				prefix, (eax>>12)&0x3, ((eax>>20)&0xFF)+((eax>>8)&0x0F),
 				((eax>>12)&0xF0)+((eax>>4)&0x0F), eax&0xF);
 			break;
 		case 2: /* AMD */
@@ -951,7 +951,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 
 	edx=DWORD(p+4);
 	printf("%sFlags:", prefix);
-	if((edx&0x3FF7FDFF)==0)
+	if((edx&0xFFF7FDFF)==0)
 		printf(" None\n");
 	else
 	{
