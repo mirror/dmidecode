@@ -441,10 +441,12 @@ const char *dmi_chassis_type(u8 code)
 		"RAID Chassis",
 		"Rack Mount Chassis",
 		"Sealed-case PC",
-		"Multi-system" /* 0x19 */
+		"Multi-system",
+	   	"CompactPCI",
+		"AdvancedTCA" /* 0x1B */
 	};
 	
-	if(code>=0x01 && code<=0x19)
+	if(code>=0x01 && code<=0x1B)
 		return type[code-0x01];
 	return out_of_spec;
 }
@@ -690,10 +692,10 @@ const char *dmi_processor_family(u8 code)
 		"Athlon 64",
 		"Opteron",
 		"Sempron",
-		NULL, /* 0x86 */
-		NULL,
-		NULL,
-		NULL,
+		"Turion 64", 
+		"Dual-Core Opteron",
+		"Athlon 64 X2",
+		NULL, /* 0x89 */
 		NULL,
 		NULL,
 		NULL,
@@ -742,10 +744,10 @@ const char *dmi_processor_family(u8 code)
 		"Athlon MP",
 		"Itanium 2",
 		"Pentium M",
-		NULL, /* 0xBA */
-		NULL,
-		NULL,
-		NULL,
+		"Celeron D",
+		"Pentium D",
+		"Pentium EE",
+		NULL, /* 0xBD */
 		NULL,
 		NULL,
 		NULL,
@@ -904,12 +906,12 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 	else if((type>=0x0B && type<=0x13) /* Intel, Cyrix */
 	|| (type>=0xB0 && type<=0xB3) /* Intel */
 	|| type==0xB5 /* Intel */
-	|| type==0xB9) /* Intel */
+	|| (type>=0xB9 && type<=0xBC)) /* Intel */
 		sig=1;
 	else if((type>=0x18 && type<=0x1D) /* AMD */
 	|| type==0x1F /* AMD */
 	|| (type>=0xB6 && type<=0xB7) /* AMD */
-	|| (type>=0x83 && type<=0x85)) /* AMD */
+	|| (type>=0x83 && type<=0x88)) /* AMD */
 		sig=2;
 	else if(type==0x01 || type==0x02)
 	{
@@ -1035,10 +1037,13 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket 478",
 		"Socket 754",
 		"Socket 940",
-		"Socket 939" /* 0x12 */
+		"Socket 939",
+	   	"Socket mPGA604",
+		"Socket LGA771",
+		"Socket LGA775" /* 0x15 */
 	};
 	
-	if(code>=0x01 && code<=0x11)
+	if(code>=0x01 && code<=0x15)
 		return upgrade[code-0x01];
 	return out_of_spec;
 }
@@ -1405,7 +1410,8 @@ static const char *dmi_port_connector_type(u8 code)
 		"Mini Centronics Type-26",
 		"Mini Jack (headphones)",
 		"BNC",
-		"IEEE 1394" /* 0x21 */
+		"IEEE 1394",
+	   	"SAS/SATA Plug Receptacle" /* 0x22 */
 	};
 	static const char *type_0xA0[]={
 		"PC-98", /* 0xA0 */
@@ -1415,7 +1421,7 @@ static const char *dmi_port_connector_type(u8 code)
 		"PC-98 Full" /* 0xA4 */
 	};
 	
-	if(code<=0x21)
+	if(code<=0x22)
 		return type[code];
 	if(code>=0xA0 && code<=0xA4)
 		return type_0xA0[code-0xA0];
@@ -1459,14 +1465,16 @@ static const char *dmi_port_type(u8 code)
 		"Video Port",
 		"Audio Port",
 		"Modem Port",
-		"Network Port" /* 0x1F */
+		"Network Port",
+	   	"SATA",
+		"SAS" /* 0x21 */
 	};
 	static const char *type_0xA0[]={
 		"8251 Compatible", /* 0xA0 */
 		"8251 FIFO Compatible" /* 0xA1 */
 	};
 	
-	if(code<=0x1F)
+	if(code<=0x21)
 		return type[code];
 	if(code>=0xA0 && code<=0xA1)
 		return type_0xA0[code-0xA0];
@@ -1650,10 +1658,13 @@ static const char *dmi_on_board_devices_type(u8 code)
 		"SCSI Controller",
 		"Ethernet",
 		"Token Ring",
-		"Sound" /* 0x07 */
+		"Sound",
+		"PATA Controller",
+		"SATA Controller",
+		"SAS Controller" /* 0x0A */
 	};
 	
-	if(code>=0x01 && code <=0x07)
+	if(code>=0x01 && code<=0x0A)
 		return type[code-0x01];
 	return out_of_spec;
 }
@@ -2031,10 +2042,11 @@ static const char *dmi_memory_device_form_factor(u8 code)
 		"Row Of Chips",
 		"RIMM",
 		"SODIMM",
-		"SRIMM" /* 0x0E */
+		"SRIMM",
+	   	"FB-DIMM" /* 0x0F */
 	};
 	
-	if(code>=0x01 && code<=0x0E)
+	if(code>=0x01 && code<=0x0F)
 		return form_factor[code-0x01];
 	return out_of_spec;
 }
@@ -2071,10 +2083,11 @@ static const char *dmi_memory_device_type(u8 code)
 		"SGRAM",
 		"RDRAM",
 		"DDR",
-		"DDR2" /* 0x13 */
+		"DDR2",
+	   	"DDR2 FB-DIMM" /* 0x14 */
 	};
 	
-	if(code>=0x01 && code<=0x13)
+	if(code>=0x01 && code<=0x14)
 		return type[code-0x01];
 	return out_of_spec;
 }
@@ -2688,8 +2701,8 @@ static const char *dmi_memory_channel_type(u8 code)
 	static const char *type[]={
 		"Other", /* 0x01 */
 		"Unknown",
-		"RAMBus",
-		"Synclink" /* 0x04 */
+		"RamBus",
+		"SyncLink" /* 0x04 */
 	};
 	
 	if(code>=0x01 && code<=0x04)
