@@ -25,7 +25,7 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 2.4" document,
+ * Management BIOS Reference Specification, Version 2.5" document,
  * available from http://www.dmtf.org/standards/smbios/.
  *
  * Note to contributors:
@@ -1061,6 +1061,26 @@ static void dmi_processor_cache(u16 code, const char *level, u16 ver)
 		printf(" 0x%04X", code);
 }
 
+static void dmi_processor_characteristics(u16 code, const char *prefix)
+{
+	/* 3.3.5.9 */
+	static const char *characteristics[]={
+		"64-bit capable" /* 2 */
+	};
+
+	if((code&0x0004)==0)
+		printf(" None\n");
+	else
+	{
+		int i;
+
+		printf("\n");
+		for(i=2; i<=2; i++)
+			if(code&(1<<i))
+				printf("%s%s\n", prefix, characteristics[i-2]);
+	}
+}
+
 /*
  * 3.3.6 Memory Controller Information (Type 5)
  */
@@ -1294,7 +1314,7 @@ static void dmi_cache_size(u16 code)
 
 static void dmi_cache_types(u16 code, const char *sep)
 {
-	/* 3.3.8.1 */
+	/* 3.3.8.2 */
 	static const char *types[]={
 		"Other", /* 0 */
 		"Unknown",
@@ -1319,7 +1339,7 @@ static void dmi_cache_types(u16 code, const char *sep)
 
 static const char *dmi_cache_ec_type(u8 code)
 {
-	/* 3.3.8.2 */
+	/* 3.3.8.3 */
 	static const char *type[]={
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1336,7 +1356,7 @@ static const char *dmi_cache_ec_type(u8 code)
 
 static const char *dmi_cache_type(u8 code)
 {
-	/* 3.3.8.3 */
+	/* 3.3.8.4 */
 	static const char *type[]={
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1352,7 +1372,7 @@ static const char *dmi_cache_type(u8 code)
 
 static const char *dmi_cache_associativity(u8 code)
 {
-	/* 3.3.8.4 */
+	/* 3.3.8.5 */
 	static const char *type[]={
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1598,7 +1618,9 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
 		case 0x0F: /* AGP */
 		case 0x10: /* AGP */
 		case 0x11: /* AGP */
-		case 0x12: /* PCI */
+		case 0x12: /* PCI-X */
+		case 0x13: /* AGP */
+		case 0xA5: /* PCI Express */
 			printf("%sID: %u\n", prefix, code1);
 			break;
 		case 0x07: /* PCMCIA */
@@ -3023,6 +3045,15 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 				dmi_string(h, data[0x21]));
 			printf("\tPart Number: %s\n",
 				dmi_string(h, data[0x22]));
+			if(h->length<0x28) break;
+			if(data[0x23]!=0)
+				printf("\tCore Count: %u\n", data[0x23]);
+			if(data[0x24]!=0)
+				printf("\tCore Enabled: %u\n", data[0x24]);
+			if(data[0x25]!=0)
+				printf("\tThread Count: %u\n", data[0x25]);
+			printf("\tCharacteristics:");
+			dmi_processor_characteristics(WORD(data+0x26), "\t\t");
 			break;
 		
 		case 5: /* 3.3.6 Memory Controller Information */
