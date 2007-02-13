@@ -33,14 +33,14 @@ on FreeBSD, NetBSD, BeOS and Cygwin as well.
 
 There's no configure script, so simply run "make" to build dmidecode, and
 "make install" to install it. You also can use "make uninstall" to remove
-all files you installed. By default, files are installed in /usr/local but
-you can change this behavior by editing the Makefile file and setting prefix
-to wherever you want. You may change the C compiler and the compilation
-flags as well.
+all the files you installed. By default, files are installed in /usr/local
+but you can change this behavior by editing the Makefile file and setting
+prefix to wherever you want. You may change the C compiler and the
+compilation flags as well.
 
 Optionally, you can run "make strip" prior to "make install" if you want
-smaller binaries. However, know that this will prevent any further
-attempt to debug programs.
+smaller binaries. However, be aware that this will prevent any further
+attempt to debug the programs.
 
 Two parameters can be set in the Makefile file to make dmidecode work on
 non-i386 systems. They should be used if your system uses the big endian
@@ -64,10 +64,7 @@ Have a look at the AUTHORS file and contact one of the maintainers.
 
 If you want to help with the development of dmidecode, please consider
 joining the dmidecode-devel discussion list:
-http://lists.nongnu.org/mailman/listinfo/dmidecode-devel
-
-The most common problems are detailed in the COMMON PROBLEMS section right
-below.
+  http://lists.nongnu.org/mailman/listinfo/dmidecode-devel
 
 
 ** COMMON PROBLEMS **
@@ -80,7 +77,7 @@ is at a memory location we couldn't seem to reach through /dev/mem. Although
 I believe this reveals a problem in the Linux kernel, which should be fixed,
 a workaround was found by Chad Smith, and we are using it for now. See the
 IA-64 subsection below for more details. I posted about this problem on the
-LKML but did not have any answer. Since then, the list of affected systems
+LKML but never received any answer. Since then, the list of affected systems
 was extended to IBM X-series laptops and xSeries x445 servers.
 
 IA-64
@@ -103,7 +100,7 @@ system, you need two things:
  - an ia64 patched 2.4 kernel, using linux-2.4.21-ia64-030702.diff or any
    later version, or a 2.6 kernel.
 Chad Smith tested dmidecode successfully on two different IA-64 systems, and
-successes have been reported by other users too. Non-Linux systems are not
+success has been reported by other users too. Non-Linux systems are not
 supported.
 
 MMAP
@@ -144,5 +141,5 @@ VPDDECODE
 
 This tool prints the contents of the "vital product data" structure as
 found in most IBM and Lenovo computers. It used to have a lookup table
-for the machine name, but that was unreliable and hard to maintain so it
+for the machine name, but it was unreliable and hard to maintain so it
 was ultimately dropped. It has a command line interface.
