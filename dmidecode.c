@@ -42,9 +42,9 @@
  *  - IPMI 2.0 revision 1.0
  *    "Intelligent Platform Management Interface Specification"
  *    http://developer.intel.com/design/servers/ipmi/spec.htm
- *  - AMD publication #20734 revision 3.04
- *    "AMD Processor Recognition Application Note"
- *    http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/20734.pdf
+ *  - AMD publication #25481 revision 2.18
+ *    "CPUID Specification"
+ *    http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/25481.pdf
  */
 
 #include <stdio.h>
@@ -941,12 +941,10 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 				((eax>>12)&0xF0)+((eax>>4)&0x0F), eax&0xF);
 			break;
 		case 2: /* AMD */
-			printf("%sSignature: %s %X, %s %X, Stepping %X\n",
+			printf("%sSignature: Family %u, Model %u, Stepping %u\n",
 				prefix,
-				((eax>>8)&0xF)==0xF?"Extended Family":"Family",
-				((eax>>8)&0xF)==0xF?(eax>>20)&0xFF:(eax>>8)&0xF,
-				((eax>>4)&0xF)==0xF?"Extended Model":"Model",
-				((eax>>4)&0xF)==0xF?(eax>>16)&0xF:(eax>>4)&0xF,
+				((eax>>8)&0xF)+(((eax>>8)&0xF)==0xF?(eax>>20)&0xFF:0),
+				((eax>>4)&0xF)|(((eax>>8)&0xF)==0xF?(eax>>12)&0xF0:0),
 				eax&0xF);
 			break;
 	}
