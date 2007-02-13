@@ -953,7 +953,7 @@ static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *pr
 
 	edx=DWORD(p+4);
 	printf("%sFlags:", prefix);
-	if((edx&0xFFF7FDFF)==0)
+	if((edx&0xFFEFFBFF)==0)
 		printf(" None\n");
 	else
 	{
@@ -1203,7 +1203,7 @@ static void dmi_memory_module_types(u16 code, const char *sep)
 		"SDRAM" /* 10 */
 	};
 	
-	if((code&0x03FF)==0)
+	if((code&0x07FF)==0)
 		printf(" None");
 	else
 	{
@@ -1650,7 +1650,7 @@ static void dmi_slot_characteristics(u8 code1, u8 code2, const char *prefix)
 	
 	if(code1&(1<<0))
 		printf(" Unknown\n");
-	else if((code1&0x7F)==0 && (code2&0x07)==0)
+	else if((code1&0xFE)==0 && (code2&0x07)==0)
 		printf(" None\n");
 	else
 	{
