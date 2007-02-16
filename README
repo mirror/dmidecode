@@ -121,7 +121,8 @@ this version.
 ** MISCELLANEOUS TOOLS **
 
 Three other tools come along with dmidecode: biosdecode, ownership and
-vpddecode.
+vpddecode. These tools are only useful on systems with a BIOS, so they
+are not built on IA-64 by default.
 
 BIOSDECODE
 

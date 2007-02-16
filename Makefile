@@ -34,7 +34,14 @@ INSTALL_DIR     := $(INSTALL) -m 755 -d
 INSTALL_PROGRAM := $(INSTALL) -m 755
 RM              := rm -f
 
-all : dmidecode biosdecode ownership vpddecode
+PROGRAMS := dmidecode
+PROGRAMS += $(shell test `uname -m 2>/dev/null` != ia64 && echo biosdecode ownership vpddecode)
+# BSD make doesn't understand the $(shell) syntax above, it wants the !=
+# syntax below. GNU make ignores the line below so in the end both BSD
+# make and GNU make are happy.
+PROGRAMS != echo dmidecode ; test `uname -m 2>/dev/null` != ia64 && echo biosdecode ownership vpddecode
+
+all : $(PROGRAMS)
 
 #
 # Programs
@@ -85,38 +92,30 @@ util.o : util.c types.h util.h config.h
 # Commands
 #
 
-strip : all
-	strip dmidecode biosdecode ownership vpddecode
+strip : $(PROGRAMS)
+	strip $(PROGRAMS)
 
 install : install-bin install-man install-doc
 
 uninstall : uninstall-bin uninstall-man uninstall-doc
 
-install-bin : all
+install-bin : $(PROGRAMS)
 	$(INSTALL_DIR) $(DESTDIR)$(sbindir)
-	$(INSTALL_PROGRAM) dmidecode $(DESTDIR)$(sbindir)
-	$(INSTALL_PROGRAM) biosdecode $(DESTDIR)$(sbindir)
-	$(INSTALL_PROGRAM) ownership $(DESTDIR)$(sbindir)
-	$(INSTALL_PROGRAM) vpddecode $(DESTDIR)$(sbindir)
+	for program in $(PROGRAMS) ; do \
+	$(INSTALL_PROGRAM) $$program $(DESTDIR)$(sbindir) ; done
 
 uninstall-bin :
-	$(RM) $(DESTDIR)$(sbindir)/dmidecode
-	$(RM) $(DESTDIR)$(sbindir)/biosdecode
-	$(RM) $(DESTDIR)$(sbindir)/ownership
-	$(RM) $(DESTDIR)$(sbindir)/vpddecode
+	for program in $(PROGRAMS) ; do \
+	$(RM) $(DESTDIR)$(sbindir)/$$program ; done
 
 install-man :
 	$(INSTALL_DIR) $(DESTDIR)$(man8dir)
-	$(INSTALL_DATA) man/dmidecode.8 $(DESTDIR)$(man8dir)
-	$(INSTALL_DATA) man/biosdecode.8 $(DESTDIR)$(man8dir)
-	$(INSTALL_DATA) man/ownership.8 $(DESTDIR)$(man8dir)
-	$(INSTALL_DATA) man/vpddecode.8 $(DESTDIR)$(man8dir)
+	for program in $(PROGRAMS) ; do \
+	$(INSTALL_DATA) man/$$program.8 $(DESTDIR)$(man8dir) ; done
 
 uninstall-man :
-	$(RM) $(DESTDIR)$(man8dir)/dmidecode.8
-	$(RM) $(DESTDIR)$(man8dir)/biosdecode.8
-	$(RM) $(DESTDIR)$(man8dir)/ownership.8
-	$(RM) $(DESTDIR)$(man8dir)/vpddecode.8
+	for program in $(PROGRAMS) ; do \
+	$(RM) $(DESTDIR)$(man8dir)/$$program.8
 
 install-doc :
 	$(INSTALL_DIR) $(DESTDIR)$(docdir)
@@ -128,4 +127,4 @@ uninstall-doc :
 	$(RM) -r $(DESTDIR)$(docdir)
 
 clean :
-	$(RM) *.o dmidecode biosdecode ownership vpddecode core
+	$(RM) *.o $(PROGRAMS) core
