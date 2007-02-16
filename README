@@ -29,7 +29,7 @@ and other interesting material, such as a list of related projects and
 articles.
 
 This program was first written for Linux, and has since been reported to work
-on FreeBSD, NetBSD, BeOS and Cygwin as well.
+on FreeBSD, NetBSD, OpenBSD, BeOS and Cygwin as well.
 
 There's no configure script, so simply run "make" to build dmidecode, and
 "make install" to install it. You also can use "make uninstall" to remove
