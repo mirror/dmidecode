@@ -2878,11 +2878,19 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 				dmi_string(h, data[0x05]));
 			printf("\tRelease Date: %s\n",
 				dmi_string(h, data[0x08]));
-			printf("\tAddress: 0x%04X0\n",
-				WORD(data+0x06));
-			printf("\tRuntime Size:");
-			dmi_bios_runtime_size((0x10000-WORD(data+0x06))<<4);
-			printf("\n");
+			/*
+			 * On IA-64, the BIOS base address will read 0 because
+			 * there is no BIOS. Skip the base address and the
+			 * runtime size in this case.
+			 */
+			if(WORD(data+0x06)!=0)
+			{
+				printf("\tAddress: 0x%04X0\n",
+					WORD(data+0x06));
+				printf("\tRuntime Size:");
+				dmi_bios_runtime_size((0x10000-WORD(data+0x06))<<4);
+				printf("\n");
+			}
 			printf("\tROM Size: %u kB\n",
 				(data[0x09]+1)<<6);
 			printf("\tCharacteristics:\n");
