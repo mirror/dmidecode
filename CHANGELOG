@@ -1,3 +1,66 @@
+2007-02-16  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Do not print the BIOS base address and runtime size
+	  if the base address is 0. This happens on IA-64 because there's
+	  no BIOS.
+	* Makefile, README: Do not build biosdecode, ownership and
+	  vpddecode on IA-64, as IA-64 systems have no BIOS. This was
+	  quite tricky to keep both GNU make and BSD make happy, but it
+	  seems that I finally succeeded.
+
+2007-02-13  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support SMBIOS specification version 2.5, second round.
+
+	* dmidecode.c: Decode new processor characteristics (multi-core,
+	  multi-thread, 64-bit) (DMI type 4).
+	* dmidecode.c: Decode slot ID of AGP 8x and PCI Express slots (DMI
+	  type 9).
+
+	* dmidecode.c: Fix the mask of 3 bitfield tests. This will let
+	  the memory type of some systems be properly reported as SDRAM.
+	* dmidecode.c: Fix the AMD processors signature decoding.
+	* README: Minor edits.
+
+2007-02-12  Jens Elkner  <elkner@linofee.org>
+
+	Update to support SMBIOS specification version 2.5, first round.
+
+	* dmidecode.c: Add chassis types "CompactPCI" and "AdvancedTCA"
+	  (DMI type 3).
+	* dmidecode.c: Add processor types "Turion 64",
+	  "Dual-Core Opteron", "Athlon 64 X2", "Celeron D", "Pentium D"
+	  and "Pentium EE" (DMI type 4).
+	* dmidecode.c: Add processor upgrade types "Socket mPGA604",
+	  "Socket LGA771" and "Socket LGA775" (DMI type 4).
+	* dmidecode.c: Add connector type "SAS/SATA Plug Receptacle" and
+	  port types "SATA" and "SAS" (DMI type 8).
+	* dmidecode.c: Add on-board device types "PATA Controller",
+	  "SATA Controller" and "SAS Controller" (DMI type 10).
+	* dmidecode.c: Add memory device form factor "FB-DIMM" and memory
+	  device type "DDR2 FB-DIMM" (DMI type 17).
+
+2007-02-12  Jean Delvare  <khali@linux-fr.org>
+
+	* dmioem.c: Share the code between HP-specific types 209 and 221.
+	  Both types are really the same, only the title is different.
+	* dmioem.c: Make the HP-specific types 209 and 221 output a bit
+	  more verbose.
+	* dmidecode.c: Let --type decode OEM-specific entries when
+	  possible.
+	* dmidecode.c: Include decoded OEM-specific entries in quiet mode
+	  output (--quiet).
+	* dmidecode.c: Do not complain about truncated entries in quiet
+	  mode.
+	* dmioem.c: Decode HP-specific type 204 entries in a safer way:
+	  check the length before decoding, and don't assume that all
+	  strings are provided in the same order as they are used.
+
+	Update to support Intel AP-485 (CPUID) revision 31 (was 28).
+
+	* dmidecode.c: New CPUID flag IA64.
+	* dmidecode.c: Fix the decoding of Intel extended family.
+
 2007-02-11  Jean Delvare  <khali@linux-fr.org>
 
 	* dmioem.c, dmioem.h: New.
