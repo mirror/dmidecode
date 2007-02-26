@@ -1806,7 +1806,7 @@ static void dmi_event_log_status(u8 code)
 	};
 	
 	printf(" %s, %s",
-		valid[code&(1<<0)], full[code&(1<<1)]);
+		valid[(code>>0)&1], full[(code>>1)&1]);
 }
 
 static void dmi_event_log_address(u8 method, u8 *p)
