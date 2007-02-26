@@ -244,9 +244,8 @@ static int acpi_decode(const u8 *p, size_t len)
 	
 	printf("ACPI%s present.\n",
 		acpi_revision(p[15]));
-	printf("\tOEM Identifier: ");
-	fwrite(p+9, 6, 1, stdout);
-	printf("\n");
+	printf("\tOEM Identifier: %c%c%c%c%c%c\n",
+		p[9], p[10], p[11], p[12], p[13], p[14]);
 	printf("\tRSD Table 32-bit Address: 0x%08X\n",
 		DWORD(p+16));
 	
