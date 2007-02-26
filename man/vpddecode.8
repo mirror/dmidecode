@@ -1,4 +1,4 @@
-.TH VPDDECODE 8 "October 2005" "dmidecode"
+.TH VPDDECODE 8 "February 2007" "dmidecode"
 .SH NAME
 vpddecode \- \s-1VPD\s0 structure decoder
 .SH SYNOPSIS
@@ -8,11 +8,9 @@ vpddecode \- \s-1VPD\s0 structure decoder
 .SH DESCRIPTION
 .B vpddecode
 prints the "vital product data" information that can be found in almost
-all IBM computers, and only IBM computers. Available items are:
+all IBM and Lenovo computers. Available items are:
 .IP \(bu "\w'\(bu'u+1n"
 \s-1BIOS\s0 Build \s-1ID\s0
-.IP \(bu
-Product Name
 .IP \(bu
 Box Serial Number
 .IP \(bu
@@ -67,15 +65,6 @@ Display the version and exit
 
 .SH FILES
 .I /dev/mem
-.SH BUGS
-The lookup table for product names is incomplete. If your system is missing
-from the table,
-.B vpddecode
-will ask you to report. See the
-.I AUTHORS
-file for maintainer contact information. Your report should include the
-product name of the machine, and the \s-1BIOS\s0 build \s-1ID\s0 as given by
-.BR vpddecode .
 .SH AUTHOR
 Jean Delvare
 .SH "SEE ALSO"
