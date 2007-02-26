@@ -170,10 +170,11 @@ Type	Information
 39	Power Supply
 .TE
 
-Additionally, type 126 is used for disabled entries, type 127 is an
-end-of-table marker, and types 128 to 255 are for \s-1OEM\s0-specific data.
+Additionally, type 126 is used for disabled entries and type 127 is an
+end-of-table marker. Types 128 to 255 are for \s-1OEM\s0-specific data.
 .B dmidecode
-will display these entries by default, but cannot decode them.
+will display these entries by default, but it can only decode them
+when the vendors have contributed documentation or code for them.
 
 Keywords can be used instead of type numbers with \fB--type\fR.
 Each keyword is equivalent to a list of type numbers:
