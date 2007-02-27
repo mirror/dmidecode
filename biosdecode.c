@@ -503,8 +503,8 @@ static size_t fjkeyinf_length(const u8 *p)
 
 static int fjkeyinf_decode(const u8 *p, size_t len)
 {
-	(void) len;
 	int i;
+	(void) len;
 
 	printf("Fujitsu application panel present.\n");
 
