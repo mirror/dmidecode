@@ -1,3 +1,8 @@
+2007-02-27  Jean Delvare  <khali@linux-fr.org>
+
+	* biosdecode.c: Fix a compilation error with non-C99 compilers.
+	  Patch from Francois Revol.
+
 2007-02-26  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fix an array overrun while decoding the system
@@ -192,7 +197,7 @@
 	* biosdecode.c: Fix a potential (but highly improbable) buffer
 	  overrun in the VPD record decoding.
 	* biosdecode.c: Change the xSeries checksumming method to
-	  accomodate a strange xSeries 440 VPD record, as was done in
+	  accommodate a strange xSeries 440 VPD record, as was done in
 	  vpddecode.c some weeks ago. Do not display the default flash
 	  image file name anymore, it's not so useful and the field length
 	  is now uncertain.
@@ -222,7 +227,7 @@
 2005-09-13  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Slightly change the xSeries checksumming method to
-	  accomodate a strange xSeries 440 VPD record. Also tweak the
+	  accommodate a strange xSeries 440 VPD record. Also tweak the
 	  decoding of the "Default Flash Image File Name" entry. Thanks
 	  to Torsten Seemann for providing a test VPD record.
 
@@ -351,7 +356,7 @@
 2005-04-03  Jean Delvare  <khali@linux-fr.org>
 
 	* Makefile: Use variables for install and rm commands, so that these
-	  can be overriden by the caller.
+	  can be overridden by the caller.
 
 2005-03-25  Jean Delvare  <khali@linux-fr.org>
 
@@ -420,9 +425,9 @@
 	  by Don Howard.
 
 	Fix a bug causing dmidecode to crash on some systems with more than
-	2 GB of memory. This is a signedness issue, which existed up to
-	version 2.2, was fixed in 2.3 but reintroduced in a different form
-	in 2.5 as part of a code clean up and refactoring.
+	2 GB of memory. This is a signed vs unsigned issue, which existed
+	up to version 2.2, was fixed in 2.3 but reintroduced in a different
+	form in 2.5 as part of a code clean up and refactoring.
 	https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=112355
 	Thanks to Petter Reinholdtsen for reporting. Thanks to Don Howard
 	for additional insight.
@@ -482,11 +487,11 @@
 
 	* biosdecode.c, ownership.c, vpddecode.c: Make use of the mem_chunk
 	  function.
-	* vpddecode.c: Simplify the mem loop code a bit.
+	* vpddecode.c: Simplify the memory loop code a bit.
 
 2004-11-12  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Hide bank connection type for uninstalled memory
+	* dmidecode.c: Hide bank connection type for non-installed memory
 	  modules.
 	* dmidecode.c: Reference comment fix.
 	* dmidecode.c: Hide watchdog timer details when no watchdog is
@@ -566,8 +571,8 @@
 
 2004-04-22  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c, biosdecode.c, ownership.c, types.h: Refactor WORD-like
-	  macros into types.h.
+	* dmidecode.c, biosdecode.c, ownership.c, types.h: Move common
+	  WORD-like macros to types.h.
 
 2004-04-21  Jean Delvare  <khali@linux-fr.org>
 
@@ -669,8 +674,8 @@
 
 	* vpddecode.c: Add product ID "KX". Reported by Klaus Ade Johnstad,
 	  confirmed by Pamela Huntley.
-	* dmidecode.c: Display CPUID values as decimal, not hexa. This is
-	  a reversal of the 2003-07-18 change to be consistent with
+	* dmidecode.c: Display CPUID values as decimal, not hexadecimal.
+	  This is a reversal of the 2003-07-18 change to be consistent with
 	  /proc/cpuinfo under Linux.
 	* dmidecode.c: Fix processor ID decoding for older 80486. Not very
 	  important since such systems are unlikely to support SMBIOS.
@@ -689,7 +694,7 @@
 
 2003-10-17  Jean Delvare  <khali@linux-fr.org>
 
-	* biosdecode.c: Use (void) instead of __attribute__ ((usused)) to
+	* biosdecode.c: Use (void) instead of __attribute__ ((unused)) to
 	  declare that a function parameter isn't used. According to Alexandre
 	  Duret-Lutz, this is the portable way do to it. Fix typo in comment.
 	* dmidecode.c: Fix typo.
@@ -775,7 +780,7 @@
 
 2003-07-18  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Display CPUID values as hexa, not decimal.
+	* dmidecode.c: Display CPUID values as hexadecimal, not decimal.
 	* dmidecode.c: Shift the I2C slave address by one bit to the right
 	  (DMI case 38).
 
