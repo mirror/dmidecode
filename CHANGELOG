@@ -1,3 +1,9 @@
+2007-03-16  Jean Delvare  <khali@linux-fr.org>
+
+	* vpddecode.c: Stop asking the user to report bad checksums,
+	  unaligned records and the like. Such machines exist, too bad,
+	  we have to live with it.
+
 2007-02-27  Jean Delvare  <khali@linux-fr.org>
 
 	* biosdecode.c: Fix a compilation error with non-C99 compilers.
