@@ -102,7 +102,7 @@ static int decode(const u8 *p)
 		   and 345 with early BIOS) but the record is otherwise
 		   valid. */
 		if(!(opt.flags & FLAG_QUIET))
-			printf("Bad checksum! Please report.\n");
+			printf("# Bad checksum!\n");
 	}
 	
 	if(opt.string!=NULL)
@@ -126,8 +126,7 @@ static int decode(const u8 *p)
 
 	if(p[5]>=0x46 && p[0x44]!=0x00)
 	{
-		printf("%s: %u (Please report!)\n", "BIOS Revision",
-		       p[0x44]);
+		printf("%s: %u\n", "BIOS Revision", p[0x44]);
 	}
 	
 	return 1;
@@ -178,7 +177,7 @@ int main(int argc, char * const argv[])
 		&& fp+p[5]-1<=0xFFFF)
 		{
 			if(fp%16 && !(opt.flags & FLAG_QUIET))
-				printf("Unaligned address (%#x), please report!\n",
+				printf("# Unaligned address (%#x)\n",
 				       0xf0000+fp);
 			if(opt.flags & FLAG_DUMP)
 			{
