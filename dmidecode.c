@@ -4113,8 +4113,10 @@ memory_scan:
 		if(memcmp(buf+fp, "_SM_", 4)==0 && fp<=0xFFE0)
 		{
 			if(smbios_decode(buf+fp, opt.devmem))
+			{
 				found++;
-			fp+=16;
+				fp+=16;
+			}
 		}
 		else if(memcmp(buf+fp, "_DMI_", 5)==0)
 		{
