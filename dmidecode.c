@@ -228,9 +228,9 @@ static void dmi_bios_characteristics(u64 code, const char *prefix)
 		"EDD is supported",
 		"Japanese floppy for NEC 9800 1.2 MB is supported (int 13h)",
 		"Japanese floppy for Toshiba 1.2 MB is supported (int 13h)",
-		"5.25\"/360 KB floppy services are supported (int 13h)",
+		"5.25\"/360 kB floppy services are supported (int 13h)",
 		"5.25\"/1.2 MB floppy services are supported (int 13h)",
-		"3.5\"/720 KB floppy services are supported (int 13h)",
+		"3.5\"/720 kB floppy services are supported (int 13h)",
 		"3.5\"/2.88 MB floppy services are supported (int 13h)",
 		"Print screen service is supported (int 5h)",
 		"8042 keyboard services are supported (int 9h)",
@@ -1305,9 +1305,9 @@ static const char *dmi_cache_location(u8 code)
 static void dmi_cache_size(u16 code)
 {
 	if(code&0x8000)
-		printf(" %u KB", (code&0x7FFF)<<6);
+		printf(" %u kB", (code&0x7FFF)<<6);
 	else
-		printf(" %u KB", code);
+		printf(" %u kB", code);
 }
 
 static void dmi_cache_types(u16 code, const char *sep)
