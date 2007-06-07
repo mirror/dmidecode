@@ -1,3 +1,11 @@
+2007-06-07  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: If the SMBIOS entry point decoding fails (for
+	  example due to a bad checksum), still try decoding the
+	  encapsulated DMI entry point. Suggested by Luke Suchocki.
+	* dmidecode.c: Replace all occurrences of "KB" by the more
+	  correct "kB".
+
 2007-03-16  Jean Delvare  <khali@linux-fr.org>
 
 	* vpddecode.c: Stop asking the user to report bad checksums,
