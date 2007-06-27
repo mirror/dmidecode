@@ -115,7 +115,7 @@ install-man :
 
 uninstall-man :
 	for program in $(PROGRAMS) ; do \
-	$(RM) $(DESTDIR)$(man8dir)/$$program.8
+	$(RM) $(DESTDIR)$(man8dir)/$$program.8 ; done
 
 install-doc :
 	$(INSTALL_DIR) $(DESTDIR)$(docdir)
