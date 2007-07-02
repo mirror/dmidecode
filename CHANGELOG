@@ -1,3 +1,13 @@
+2007-06-30  Jean Delvare  <khali@linux-fr.org>
+
+	* config.h: Add support for Solaris (x86 only, of course). Based
+	  on a patch by Sun's Dan Mick, brought to my knowledge by
+	  Attila Nagy.
+
+2007-06-27  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Fix the uninstall-man target.
+
 2007-06-07  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: If the SMBIOS entry point decoding fails (for
