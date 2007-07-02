@@ -29,7 +29,7 @@ and other interesting material, such as a list of related projects and
 articles.
 
 This program was first written for Linux, and has since been reported to work
-on FreeBSD, NetBSD, OpenBSD, BeOS and Cygwin as well.
+on FreeBSD, NetBSD, OpenBSD, BeOS, Cygwin and Solaris as well.
 
 There's no configure script, so simply run "make" to build dmidecode, and
 "make install" to install it. You also can use "make uninstall" to remove
@@ -46,8 +46,9 @@ Two parameters can be set in the Makefile file to make dmidecode work on
 non-i386 systems. They should be used if your system uses the big endian
 byte ordering (Motorola) or doesn't support unaligned memory accesses,
 respectively. For example, compiling for a SPARC processor would require
-both. Compiling for an IA64 processor requires the memory alignment
-workaround, and it is enabled automatically.
+both (but I am not aware of SPARC-based systems implementing SMBIOS).
+Compiling for an IA64 processor requires the memory alignment workaround,
+and it is enabled automatically.
 
 
 ** DOCUMENTATION **
