@@ -4,6 +4,9 @@
 	* dmidecode.c, dmiopt.c, dmiopt.h: New option --dump-bin, dump
 	  the DMI data to a sparse binary file.
 	* dmidecode.8: Document the new option --dump-bin.
+	* Makefile, biosdecode.c, dmidecode.c, dmidecode.h, dmioem.c,
+	  dmioem.h, dmiopt.c, dmiopt.h, ownership.c, util.c, util.h,
+	  vpddecode.c, vpdopt.c, vpdopt.h: Update copyright statements.
 
 2007-06-30  Jean Delvare  <khali@linux-fr.org>
 

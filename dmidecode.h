@@ -1,7 +1,7 @@
 /*
  * This file is part of the dmidecode project.
  *
- *   (C) 2005-2007 Jean Delvare <khali@linux-fr.org>
+ *   Copyright (C) 2005-2007 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by

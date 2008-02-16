@@ -2,8 +2,8 @@
 #	DMI Decode
 #	BIOS Decode
 #
-#	(C) 2000-2002 Alan Cox <alan@redhat.com>
-#	(C) 2002-2007 Jean Delvare <khali@linux-fr.org>
+#	Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
+#	Copyright (C) 2002-2007 Jean Delvare <khali@linux-fr.org>
 #
 #	Licensed under the GNU Public License.
 #
