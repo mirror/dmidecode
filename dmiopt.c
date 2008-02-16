@@ -314,6 +314,6 @@ void print_help(void)
 		" -u, --dump             Do not decode the entries\n"
 		"     --dump-bin FILE    Dump the DMI data to a sparse binary file\n"
 		" -V, --version          Display the version and exit\n";
-	
+
 	printf("%s", help);
 }

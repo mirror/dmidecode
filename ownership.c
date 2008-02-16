@@ -62,13 +62,13 @@ static void ownership(u32 base, const char *pname, const char *devmem)
 		perror(pname);
 		return;
 	}
-	
+
 	/* chop the trailing garbage */
 	i=0x4f;
 	while(i>=0 && (buf[i]==0x20 || buf[i]==0x00))
 		i--;
 	buf[i+1]='\0';
-	
+
 	/* filter and print */
 	if(i>=0)
 	{
@@ -99,12 +99,12 @@ static u32 decode(const u8 *p)
 			return 0;
 		}
 	}
-	
+
 	/* search for the right entry */
 	for(i=0; i<p[4]; i++)
 		if(memcmp(p+5+i*10, "$ERB", 4)==0)
 			return DWORD(p+9+i*10);
-	
+
 	return 0;
 }
 
@@ -147,7 +147,7 @@ static void print_help(void)
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
 		" -h, --help             Display this help text and exit\n"
 		" -V, --version          Display the version and exit\n";
-	
+
 	printf("%s", help);
 }
 
@@ -156,7 +156,7 @@ int main(int argc, char * const argv[])
 	u8 *buf;
 	off_t fp;
 	int ok=0;
-	
+
 	if(sizeof(u8)!=1 || sizeof(u32)!=4)
 	{
 		fprintf(stderr, "%s: compiler incompatibility\n", argv[0]);
@@ -181,7 +181,7 @@ int main(int argc, char * const argv[])
 		printf("%s\n", VERSION);
 		return 0;
 	}
-	
+
 	if((buf=mem_chunk(0xE0000, 0x20000, opt.devmem))==NULL)
 		exit(1);
 
@@ -196,7 +196,7 @@ int main(int argc, char * const argv[])
 			if(fp+len-1<=0x1FFFF)
 			{
 				u32 base;
-				
+
 				if((base=decode(p)))
 				{
 					ok=1;
@@ -205,8 +205,8 @@ int main(int argc, char * const argv[])
 			}
 		}
 	}
-	
+
 	free(buf);
-	
+
 	return 0;
 }

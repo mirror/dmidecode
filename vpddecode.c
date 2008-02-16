@@ -47,7 +47,7 @@
 static void print_entry(const char *name, const u8 *p, size_t len)
 {
 	size_t i;
-	
+
 	if(name!=NULL)
 		printf("%s: ", name);
 	for(i=0; i<len; i++)
@@ -89,7 +89,7 @@ static int decode(const u8 *p)
 {
 	if(p[5]<0x30)
 		return 0;
-	
+
 	/* XSeries have longer records, exact length seems to vary. */
 	if(!(p[5]>=0x45 && checksum(p, p[5]))
 	/* Some Netvista seem to work with this. */
@@ -104,7 +104,7 @@ static int decode(const u8 *p)
 		if(!(opt.flags & FLAG_QUIET))
 			printf("# Bad checksum!\n");
 	}
-	
+
 	if(opt.string!=NULL)
 	{
 		if(opt.string->offset+opt.string->len<p[5])
@@ -117,10 +117,10 @@ static int decode(const u8 *p)
 	print_entry("Box Serial Number", p+0x16, 7);
 	print_entry("Motherboard Serial Number", p+0x1D, 11);
 	print_entry("Machine Type/Model", p+0x28, 7);
-	
+
 	if(p[5]<0x44)
 		return 1;
-	
+
 	print_entry("BIOS Release Date", p+0x30, 8);
 	print_entry("Default Flash Image File Name", p+0x38, 12);
 
@@ -128,7 +128,7 @@ static int decode(const u8 *p)
 	{
 		printf("%s: %u\n", "BIOS Revision", p[0x44]);
 	}
-	
+
 	return 1;
 }
 
@@ -137,13 +137,13 @@ int main(int argc, char * const argv[])
 	u8 *buf;
 	int found=0;
 	unsigned int fp;
-	
+
 	if(sizeof(u8)!=1)
 	{
 		fprintf(stderr, "%s: compiler incompatibility\n", argv[0]);
 		exit(255);
 	}
-	
+
 	/* Set default option values */
 	opt.devmem=DEFAULT_MEM_DEV;
 	opt.flags=0;
@@ -193,9 +193,9 @@ int main(int argc, char * const argv[])
 	}
 
 	free(buf);
-	
+
 	if(!found && !(opt.flags && FLAG_QUIET))
 		printf("# No VPD structure found, sorry.\n");
-	
+
 	return 0;
 }

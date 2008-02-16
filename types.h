@@ -35,10 +35,10 @@ typedef struct {
 static inline u64 U64(u32 low, u32 high)
 {
 	u64 self;
-	
+
 	self.l=low;
 	self.h=high;
-	
+
 	return self;
 }
 #endif

@@ -152,6 +152,6 @@ void print_help(void)
 		" -s, --string KEYWORD   Only display the value of the given VPD string\n"
 		" -u, --dump             Do not decode the VPD records\n"
 		" -V, --version          Display the version and exit\n";
-	
+
 	printf("%s", help);
 }

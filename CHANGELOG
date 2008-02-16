@@ -363,7 +363,7 @@
 
 2005-05-25  Jean Delvare  <khali@linux-fr.org>
 
-	* vpddecode.c: Add product IDs "KE", "NT" and "ZR". Reported by 
+	* vpddecode.c: Add product IDs "KE", "NT" and "ZR". Reported by
 	  Bernd Krumboeck.
 
 2005-05-15  Jean Delvare  <khali@linux-fr.org>
@@ -462,7 +462,7 @@
 	https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=112355
 	Thanks to Petter Reinholdtsen for reporting. Thanks to Don Howard
 	for additional insight.
-	
+
 	* dmidecode.c, util.c, util.h: Use size_t instead of off_t when
 	  handling memory addresses.
 
@@ -493,7 +493,7 @@
 2004-12-10  Jean Delvare  <khali@linux-fr.org>
 
 	Increase portability and configurability to in order to support BeOS.
-	
+
 	* config.h: New.
 	* config.h: Define a default memory device.
 	* biosdecode.c, dmidecode.c, ownership.c, vpddecide.c: Include
@@ -843,7 +843,7 @@
 
 2003-06-10  Jean Delvare  <khali@linux-fr.org>
 
-	* dmidecode.c: Fix typo in IPMI register spacing table. 
+	* dmidecode.c: Fix typo in IPMI register spacing table.
 	* version.h: Set version to 2.1.
 
 2003-06-04  Jean Delvare  <khali@linux-fr.org>

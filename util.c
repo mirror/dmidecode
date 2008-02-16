@@ -20,7 +20,7 @@
  *
  *   For the avoidance of doubt the "preferred form" of this code is one which
  *   is in an open unpatent encumbered format. Where cryptographic key signing
- *   forms part of the process of creating an executable the information 
+ *   forms part of the process of creating an executable the information
  *   including keys needed to generate an equivalently functional executable
  *   are deemed to be part of the source code.
  */
@@ -52,7 +52,7 @@ static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 {
 	ssize_t r=1;
 	size_t r2=0;
-	
+
 	while(r2!=count && r!=0)
 	{
 		r=read(fd, buf+r2, count-r2);
@@ -68,14 +68,14 @@ static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 		else
 			r2+=r;
 	}
-	
+
 	if(r2!=count)
 	{
 		close(fd);
 		fprintf(stderr, "%s: Unexpected end of file\n", prefix);
 		return -1;
 	}
-	
+
 	return 0;
 }
 #endif
@@ -84,7 +84,7 @@ int checksum(const u8 *buf, size_t len)
 {
 	u8 sum=0;
 	size_t a;
-	
+
 	for(a=0; a<len; a++)
 		sum+=buf[a];
 	return (sum==0);
@@ -102,19 +102,19 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 	size_t mmoffset;
 	void *mmp;
 #endif
-	
+
 	if((fd=open(devmem, O_RDONLY))==-1)
 	{
 		perror(devmem);
 		return NULL;
 	}
-	
+
 	if((p=malloc(len))==NULL)
 	{
 		perror("malloc");
 		return NULL;
 	}
-	
+
 #ifdef USE_MMAP
 #ifdef _SC_PAGESIZE
 	mmoffset=base%sysconf(_SC_PAGESIZE);
@@ -134,9 +134,9 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 		free(p);
 		return NULL;
 	}
-	
+
 	memcpy(p, (u8 *)mmp+mmoffset, len);
-	
+
 	if(munmap(mmp, mmoffset+len)==-1)
 	{
 		fprintf(stderr, "%s: ", devmem);
@@ -150,24 +150,24 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 		free(p);
 		return NULL;
 	}
-	
+
 	if(myread(fd, p, len, devmem)==-1)
 	{
 		free(p);
 		return NULL;
 	}
 #endif /* USE_MMAP */
-	
+
 	if(close(fd)==-1)
 		perror(devmem);
-	
+
 	return p;
 }
 
 int write_dump(size_t base, size_t len, const void *data, const char *dumpfile)
 {
 	FILE *f;
-	
+
 	f=fopen(dumpfile, "r+b");
 	if(!f && errno==ENOENT)
 		f=fopen(dumpfile, "wb");
