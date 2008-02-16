@@ -202,6 +202,6 @@ int write_dump(size_t base, size_t len, const void *data, const char *dumpfile)
 	return 0;
 
 err_close:
- 	fclose(f);
- 	return -1;
+	fclose(f);
+	return -1;
 }

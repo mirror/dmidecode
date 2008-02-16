@@ -442,7 +442,7 @@ const char *dmi_chassis_type(u8 code)
 		"Rack Mount Chassis",
 		"Sealed-case PC",
 		"Multi-system",
-	   	"CompactPCI",
+		"CompactPCI",
 		"AdvancedTCA" /* 0x1B */
 	};
 
@@ -1036,7 +1036,7 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket 754",
 		"Socket 940",
 		"Socket 939",
-	   	"Socket mPGA604",
+		"Socket mPGA604",
 		"Socket LGA771",
 		"Socket LGA775" /* 0x15 */
 	};
@@ -1429,7 +1429,7 @@ static const char *dmi_port_connector_type(u8 code)
 		"Mini Jack (headphones)",
 		"BNC",
 		"IEEE 1394",
-	   	"SAS/SATA Plug Receptacle" /* 0x22 */
+		"SAS/SATA Plug Receptacle" /* 0x22 */
 	};
 	static const char *type_0xA0[]={
 		"PC-98", /* 0xA0 */
@@ -1484,7 +1484,7 @@ static const char *dmi_port_type(u8 code)
 		"Audio Port",
 		"Modem Port",
 		"Network Port",
-	   	"SATA",
+		"SATA",
 		"SAS" /* 0x21 */
 	};
 	static const char *type_0xA0[]={
@@ -2063,7 +2063,7 @@ static const char *dmi_memory_device_form_factor(u8 code)
 		"RIMM",
 		"SODIMM",
 		"SRIMM",
-	   	"FB-DIMM" /* 0x0F */
+		"FB-DIMM" /* 0x0F */
 	};
 
 	if(code>=0x01 && code<=0x0F)
@@ -2104,7 +2104,7 @@ static const char *dmi_memory_device_type(u8 code)
 		"RDRAM",
 		"DDR",
 		"DDR2",
-	   	"DDR2 FB-DIMM" /* 0x14 */
+		"DDR2 FB-DIMM" /* 0x14 */
 	};
 
 	if(code>=0x01 && code<=0x14)
@@ -3684,7 +3684,7 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 				    WORD(data+0x07));
 				if(WORD(data+0x09)!=0xFFFF)
 					printf("\tThreshold Handle: 0x%04X\n",
-			    		WORD(data+0x09));
+					WORD(data+0x09));
 			}
 			break;
 
