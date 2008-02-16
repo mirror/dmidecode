@@ -3847,12 +3847,39 @@ static void to_dmi_header(struct dmi_header *h, u8 *data)
 	h->data=data;
 }
 
+static void dmi_table_dump(u32 base, u16 len, const char *devmem)
+{
+	u8 *buf;
+
+	if(base+len>0xFFFFF)
+	{
+		fprintf(stderr, "Table is too far away in memory, can't dump, sorry.\n");
+		return;
+	}
+
+	if((buf=mem_chunk(base, len, devmem))==NULL)
+	{
+		fprintf(stderr, "Failed to read table, sorry.\n");
+		return;
+	}
+
+	printf("# Writing %d bytes to %s.\n", len, opt.dumpfile);
+	write_dump(base, len, buf, opt.dumpfile);
+	free(buf);
+}
+
 static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 {
 	u8 *buf;
 	u8 *data;
 	int i=0;
 	
+	if(opt.flags & FLAG_DUMP_BIN)
+	{
+		dmi_table_dump(base, len, devmem);
+		return;
+	}
+
 	if(!(opt.flags & FLAG_QUIET))
 	{
 		if(opt.type==NULL)
@@ -4108,6 +4135,16 @@ memory_scan:
 		goto exit_free;
 	}
 	
+	if(opt.flags & FLAG_DUMP_BIN)
+	{
+		printf("# Writing %d bytes to %s.\n", 0x10000, opt.dumpfile);
+		if(write_dump(0xF0000, 0x10000, buf, opt.dumpfile))
+		{
+			ret=2;
+			goto exit_free_buf;
+		}
+	}
+
 	for(fp=0; fp<=0xFFF0; fp+=16)
 	{
 		if(memcmp(buf+fp, "_SM_", 4)==0 && fp<=0xFFE0)
@@ -4126,11 +4163,11 @@ memory_scan:
 	}
 	
 done:
-	free(buf);
-	
 	if(!found && !(opt.flags & FLAG_QUIET))
 		printf("# No SMBIOS nor DMI entry point found, sorry.\n");
 
+exit_free_buf:
+	free(buf);
 exit_free:
 	free(opt.type);
 

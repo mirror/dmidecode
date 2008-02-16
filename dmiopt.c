@@ -223,6 +223,7 @@ int parse_command_line(int argc, char * const argv[])
 		{ "string", required_argument, NULL, 's' },
 		{ "type", required_argument, NULL, 't' },
 		{ "dump", no_argument, NULL, 'u' },
+		{ "dump-bin", required_argument, NULL, 'B' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0, 0, 0, 0 }
 	};
@@ -230,6 +231,10 @@ int parse_command_line(int argc, char * const argv[])
 	while((option=getopt_long(argc, argv, optstring, longopts, NULL))!=-1)
 		switch(option)
 		{
+			case 'B':
+				opt.flags|=FLAG_DUMP_BIN;
+				opt.dumpfile=optarg;
+				break;
 			case 'd':
 				opt.devmem=optarg;
 				break;
@@ -287,6 +292,11 @@ int parse_command_line(int argc, char * const argv[])
 		fprintf(stderr, "Options --quiet and --dump are mutually exclusive\n");
 		return -1;
 	}
+	if((opt.flags & FLAG_DUMP_BIN) && (opt.type!=NULL || opt.string!=NULL))
+	{
+		fprintf(stderr, "Options --dump-bin, --string and --type are mutually exclusive\n");
+		return -1;
+	}
 
 	return 0;
 }
@@ -302,6 +312,7 @@ void print_help(void)
 		" -s, --string KEYWORD   Only display the value of the given DMI string\n"
 		" -t, --type TYPE        Only display the entries of given type\n"
 		" -u, --dump             Do not decode the entries\n"
+		"     --dump-bin FILE    Dump the DMI data to a sparse binary file\n"
 		" -V, --version          Display the version and exit\n";
 	
 	printf("%s", help);

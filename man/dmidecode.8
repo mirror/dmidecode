@@ -114,6 +114,13 @@ you. The strings attached to each entry are displayed as both
 hexadecimal and \s-1ASCII\s0. This option is mainly useful for debugging.
 Mutually exclusive with \fB--quiet\fR and \fB--string\fR.
 .TP
+.BR "  " "  " "--dump-bin FILE"
+Do not decode the entries, instead dump the DMI data to a sparse file
+in binary form. This is only supported when the DMI data lives in the
+first MB of memory, and only if the system doesn't use EFI to locate
+the DMI table. The generated file is suitable to pass to \fB--dev-mem\fR
+later. Mutually exclusive with \fB--type\fR and \fB--string\fR.
+.TP
 .BR "-h" ", " "--help"
 Display usage information and exit
 .TP

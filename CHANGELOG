@@ -1,3 +1,10 @@
+2008-02-16  Jean Delvare  <khali@linux-fr.org>
+
+	* util.c, util.h: New helper function write_dump.
+	* dmidecode.c, dmiopt.c, dmiopt.h: New option --dump-bin, dump
+	  the DMI data to a sparse binary file.
+	* dmidecode.8: Document the new option --dump-bin.
+
 2007-06-30  Jean Delvare  <khali@linux-fr.org>
 
 	* config.h: Add support for Solaris (x86 only, of course). Based

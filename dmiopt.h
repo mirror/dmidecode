@@ -34,6 +34,7 @@ struct opt
 	unsigned int flags;
 	u8 *type;
 	const struct string_keyword *string;
+	char *dumpfile;
 };
 extern struct opt opt;
 
@@ -41,6 +42,7 @@ extern struct opt opt;
 #define FLAG_HELP               (1<<1)
 #define FLAG_DUMP               (1<<2)
 #define FLAG_QUIET              (1<<3)
+#define FLAG_DUMP_BIN           (1<<4)
 
 int parse_command_line(int argc, char * const argv[]);
 void print_help(void);
