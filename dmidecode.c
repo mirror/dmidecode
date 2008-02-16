@@ -3891,9 +3891,11 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 
 	if((buf=mem_chunk(base, len, devmem))==NULL)
 	{
+		fprintf(stderr, "Table is unreachable, sorry."
 #ifndef USE_MMAP
-		printf("Table is unreachable, sorry. Try compiling dmidecode with -DUSE_MMAP.\n");
+			" Try compiling dmidecode with -DUSE_MMAP."
 #endif
+			"\n");
 		return;
 	}
 

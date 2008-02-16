@@ -7,6 +7,8 @@
 	* Makefile, biosdecode.c, dmidecode.c, dmidecode.h, dmioem.c,
 	  dmioem.h, dmiopt.c, dmiopt.h, ownership.c, util.c, util.h,
 	  vpddecode.c, vpdopt.c, vpdopt.h: Update copyright statements.
+	* dmidecode.c: Adjust the error message which is displayed when
+	  the table is unreachable.
 
 2007-06-30  Jean Delvare  <khali@linux-fr.org>
 
