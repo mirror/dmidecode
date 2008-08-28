@@ -3561,7 +3561,7 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 			printf("\tMaximum Value:");
 			dmi_temperature_probe_value(WORD(data+0x06));
 			printf("\n");
-			printf("\tMinimum Value");
+			printf("\tMinimum Value:");
 			dmi_temperature_probe_value(WORD(data+0x08));
 			printf("\n");
 			printf("\tResolution:");

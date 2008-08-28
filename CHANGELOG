@@ -1,3 +1,8 @@
+2008-08-28  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Add missing colon to temperature probe label.
+	  Patch from Alex Iribarren.
+
 2008-02-16  Jean Delvare  <khali@linux-fr.org>
 
 	* util.c, util.h: New helper function write_dump.
