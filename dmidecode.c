@@ -3851,12 +3851,6 @@ static void dmi_table_dump(u32 base, u16 len, const char *devmem)
 {
 	u8 *buf;
 
-	if(base+len>0xFFFFF)
-	{
-		fprintf(stderr, "Table is too far away in memory, can't dump, sorry.\n");
-		return;
-	}
-
 	if((buf=mem_chunk(base, len, devmem))==NULL)
 	{
 		fprintf(stderr, "Failed to read table, sorry.\n");
@@ -3864,7 +3858,7 @@ static void dmi_table_dump(u32 base, u16 len, const char *devmem)
 	}
 
 	printf("# Writing %d bytes to %s.\n", len, opt.dumpfile);
-	write_dump(base, len, buf, opt.dumpfile);
+	write_dump(32, len, buf, opt.dumpfile);
 	free(buf);
 }
 
@@ -3990,6 +3984,20 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 }
 
 
+/*
+ * Build a crafted entry point with table address hard-coded to 32,
+ * as this is where we will put it in the output file. We adjust the
+ * DMI checksum appropriately. The SMBIOS checksum needs no adjustment.
+ */
+static void overwrite_dmi_address(u8 *buf)
+{
+	buf[0x05]+=buf[0x08]+buf[0x09]+buf[0x0A]+buf[0x0B]-32;
+	buf[0x08]=32;
+	buf[0x09]=0;
+	buf[0x0A]=0;
+	buf[0x0B]=0;
+}
+
 static int smbios_decode(u8 *buf, const char *devmem)
 {
 	if(!checksum(buf, buf[0x05])
@@ -4003,6 +4011,17 @@ static int smbios_decode(u8 *buf, const char *devmem)
 
 	dmi_table(DWORD(buf+0x18), WORD(buf+0x16), WORD(buf+0x1C),
 		(buf[0x06]<<8)+buf[0x07], devmem);
+
+	if(opt.flags & FLAG_DUMP_BIN)
+	{
+		u8 crafted[32];
+
+		memcpy(crafted, buf, 32);
+		overwrite_dmi_address(crafted+0x10);
+
+		printf("# Writing %d bytes to %s.\n", crafted[0x05], opt.dumpfile);
+		write_dump(0, crafted[0x05], crafted, opt.dumpfile);
+	}
 
 	return 1;
 }
@@ -4018,6 +4037,17 @@ static int legacy_decode(u8 *buf, const char *devmem)
 
 	dmi_table(DWORD(buf+0x08), WORD(buf+0x06), WORD(buf+0x0C),
 		((buf[0x0E]&0xF0)<<4)+(buf[0x0E]&0x0F), devmem);
+
+	if(opt.flags & FLAG_DUMP_BIN)
+	{
+		u8 crafted[16];
+
+		memcpy(crafted, buf, 16);
+		overwrite_dmi_address(crafted);
+
+		printf("# Writing %d bytes to %s.\n", 0x0F, opt.dumpfile);
+		write_dump(0, 0x0F, crafted, opt.dumpfile);
+	}
 
 	return 1;
 }
@@ -4137,16 +4167,6 @@ memory_scan:
 		goto exit_free;
 	}
 
-	if(opt.flags & FLAG_DUMP_BIN)
-	{
-		printf("# Writing %d bytes to %s.\n", 0x10000, opt.dumpfile);
-		if(write_dump(0xF0000, 0x10000, buf, opt.dumpfile))
-		{
-			ret=2;
-			goto exit_free_buf;
-		}
-	}
-
 	for(fp=0; fp<=0xFFF0; fp+=16)
 	{
 		if(memcmp(buf+fp, "_SM_", 4)==0 && fp<=0xFFE0)
@@ -4168,7 +4188,6 @@ done:
 	if(!found && !(opt.flags & FLAG_QUIET))
 		printf("# No SMBIOS nor DMI entry point found, sorry.\n");
 
-exit_free_buf:
 	free(buf);
 exit_free:
 	free(opt.type);

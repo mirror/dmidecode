@@ -312,7 +312,7 @@ void print_help(void)
 		" -s, --string KEYWORD   Only display the value of the given DMI string\n"
 		" -t, --type TYPE        Only display the entries of given type\n"
 		" -u, --dump             Do not decode the entries\n"
-		"     --dump-bin FILE    Dump the DMI data to a sparse binary file\n"
+		"     --dump-bin FILE    Dump the DMI data to a binary file\n"
 		" -V, --version          Display the version and exit\n";
 
 	printf("%s", help);
