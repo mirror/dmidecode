@@ -1,4 +1,4 @@
-.TH DMIDECODE 8 "February 2007" "dmidecode"
+.TH DMIDECODE 8 "October 2008" "dmidecode"
 .SH NAME
 dmidecode \- \s-1DMI\s0 table decoder
 .SH SYNOPSIS
@@ -115,11 +115,13 @@ hexadecimal and \s-1ASCII\s0. This option is mainly useful for debugging.
 Mutually exclusive with \fB--quiet\fR and \fB--string\fR.
 .TP
 .BR "  " "  " "--dump-bin FILE"
-Do not decode the entries, instead dump the DMI data to a sparse file
-in binary form. This is only supported when the DMI data lives in the
-first MB of memory, and only if the system doesn't use EFI to locate
-the DMI table. The generated file is suitable to pass to \fB--dev-mem\fR
+Do not decode the entries, instead dump the DMI data to a file in binary
+form. The generated file is suitable to pass to \fB--from-dump\fR
 later. Mutually exclusive with \fB--type\fR and \fB--string\fR.
+.TP
+.BR "  " "  " "--from-dump FILE"
+Read the DMI data from a binary file previously generated using 
+\fB--dump-bin\fR. Mutually exclusive with \fB--dump-bin\fR.
 .TP
 .BR "-h" ", " "--help"
 Display usage information and exit
