@@ -1,3 +1,14 @@
+2008-10-25  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Limit indentation in smbios_decode and
+	  legacy_decode.
+	* dmidecode.c, dmiopt.c: Write binary dump to a compact file
+	  rather than a sparse file.
+	* dmidecode.c, dmiopt.c, dmiopt.h: New option --from-dump, read
+	  the DMI data from a binary file.
+	* dmidecode.8: Update the option --dump-bin, document the new
+	  option --from-dump.
+
 2008-08-28  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Add missing colon to temperature probe label.
