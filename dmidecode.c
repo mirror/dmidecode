@@ -3992,34 +3992,34 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 
 static int smbios_decode(u8 *buf, const char *devmem)
 {
-	if(checksum(buf, buf[0x05])
-	 && memcmp(buf+0x10, "_DMI_", 5)==0
-	 && checksum(buf+0x10, 0x0F))
-	{
-		if(!(opt.flags & FLAG_QUIET))
-			printf("SMBIOS %u.%u present.\n",
-				buf[0x06], buf[0x07]);
-		dmi_table(DWORD(buf+0x18), WORD(buf+0x16), WORD(buf+0x1C),
-			(buf[0x06]<<8)+buf[0x07], devmem);
-		return 1;
-	}
+	if(!checksum(buf, buf[0x05])
+	 || memcmp(buf+0x10, "_DMI_", 5)!=0
+	 || !checksum(buf+0x10, 0x0F))
+		return 0;
 
-	return 0;
+	if(!(opt.flags & FLAG_QUIET))
+		printf("SMBIOS %u.%u present.\n",
+			buf[0x06], buf[0x07]);
+
+	dmi_table(DWORD(buf+0x18), WORD(buf+0x16), WORD(buf+0x1C),
+		(buf[0x06]<<8)+buf[0x07], devmem);
+
+	return 1;
 }
 
 static int legacy_decode(u8 *buf, const char *devmem)
 {
-	if(checksum(buf, 0x0F))
-	{
-		if(!(opt.flags & FLAG_QUIET))
-			printf("Legacy DMI %u.%u present.\n",
-				buf[0x0E]>>4, buf[0x0E]&0x0F);
-		dmi_table(DWORD(buf+0x08), WORD(buf+0x06), WORD(buf+0x0C),
-			((buf[0x0E]&0xF0)<<4)+(buf[0x0E]&0x0F), devmem);
-		return 1;
-	}
+	if(!checksum(buf, 0x0F))
+		return 0;
 
-	return 0;
+	if(!(opt.flags & FLAG_QUIET))
+		printf("Legacy DMI %u.%u present.\n",
+			buf[0x0E]>>4, buf[0x0E]&0x0F);
+
+	dmi_table(DWORD(buf+0x08), WORD(buf+0x06), WORD(buf+0x0C),
+		((buf[0x0E]&0xF0)<<4)+(buf[0x0E]&0x0F), devmem);
+
+	return 1;
 }
 
 /*
