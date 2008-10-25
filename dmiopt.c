@@ -224,6 +224,7 @@ int parse_command_line(int argc, char * const argv[])
 		{ "type", required_argument, NULL, 't' },
 		{ "dump", no_argument, NULL, 'u' },
 		{ "dump-bin", required_argument, NULL, 'B' },
+		{ "from-dump", required_argument, NULL, 'F' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0, 0, 0, 0 }
 	};
@@ -233,6 +234,10 @@ int parse_command_line(int argc, char * const argv[])
 		{
 			case 'B':
 				opt.flags|=FLAG_DUMP_BIN;
+				opt.dumpfile=optarg;
+				break;
+			case 'F':
+				opt.flags|=FLAG_FROM_DUMP;
 				opt.dumpfile=optarg;
 				break;
 			case 'd':
@@ -297,6 +302,11 @@ int parse_command_line(int argc, char * const argv[])
 		fprintf(stderr, "Options --dump-bin, --string and --type are mutually exclusive\n");
 		return -1;
 	}
+	if((opt.flags & FLAG_FROM_DUMP) && (opt.flags & FLAG_DUMP_BIN))
+	{
+		fprintf(stderr, "Options --from-dump and --dump-bin are mutually exclusive\n");
+		return -1;
+	}
 
 	return 0;
 }
@@ -313,6 +323,7 @@ void print_help(void)
 		" -t, --type TYPE        Only display the entries of given type\n"
 		" -u, --dump             Do not decode the entries\n"
 		"     --dump-bin FILE    Dump the DMI data to a binary file\n"
+		"     --from-dump FILE   Read the DMI data from a binary file\n"
 		" -V, --version          Display the version and exit\n";
 
 	printf("%s", help);

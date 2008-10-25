@@ -3877,9 +3877,12 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 	if(!(opt.flags & FLAG_QUIET))
 	{
 		if(opt.type==NULL)
-			printf("%u structures occupying %u bytes.\n"
-				"Table at 0x%08X.\n",
-				num, len, base);
+		{
+			printf("%u structures occupying %u bytes.\n",
+				num, len);
+			if(!(opt.flags & FLAG_FROM_DUMP))
+				printf("Table at 0x%08X.\n", base);
+		}
 		printf("\n");
 	}
 
@@ -4137,6 +4140,29 @@ int main(int argc, char * const argv[])
 
 	if(!(opt.flags & FLAG_QUIET))
 		printf("# dmidecode %s\n", VERSION);
+
+	/* Read from dump if so instructed */
+	if(opt.flags & FLAG_FROM_DUMP)
+	{
+		printf("Reading SMBIOS/DMI data from file %s.\n", opt.dumpfile);
+		if((buf=mem_chunk(0, 0x20, opt.dumpfile))==NULL)
+		{
+			ret=1;
+			goto exit_free;
+		}
+
+		if(memcmp(buf, "_SM_", 4)==0)
+		{
+			if(smbios_decode(buf, opt.dumpfile))
+				found++;
+		}
+		else if(memcmp(buf, "_DMI_", 5)==0)
+		{
+			if (legacy_decode(buf, opt.dumpfile))
+				found++;
+		}
+		goto done;
+	}
 
 	/* First try EFI (ia64, Intel-based Mac) */
 	efi=address_from_efi(&fp);
