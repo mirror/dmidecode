@@ -299,7 +299,7 @@ static void dmi_bios_characteristics_x2(u8 code, const char *prefix)
  * 3.3.2 System Information (Type 1)
  */
 
-void dmi_system_uuid(u8 *p)
+void dmi_system_uuid(u8 *p, u16 ver)
 {
 	int only0xFF = 1, only0x00 = 1;
 	int i;
@@ -321,9 +321,22 @@ void dmi_system_uuid(u8 *p)
 		return;
 	}
 
-	printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-		p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-		p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+	/*
+	 * As off version 2.6 of the SMBIOS specification, the first 3
+	 * fields of the UUID are supposed to be encoded on little-endian.
+	 * The specification says that this is the defacto standard,
+	 * however I've seen systems following RFC 4122 instead and use
+	 * network byte order, so I am reluctant to apply the byte-swapping
+	 * for older versions.
+	 */
+	if (ver >= 0x0206)
+		printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+			p[3], p[2], p[1], p[0], p[5], p[4], p[7], p[6],
+			p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+	else
+		printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+			p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+			p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
 }
 
 static const char *dmi_system_wake_up_type(u8 code)
@@ -991,9 +1004,10 @@ static void dmi_processor_voltage(u8 code)
 	}
 }
 
-void dmi_processor_frequency(u8 *p)
+void dmi_processor_frequency(u8 *p, u16 ver)
 {
 	u16 code = WORD(p);
+	(void) ver;
 
 	if (code)
 		printf("%u MHz", code);
@@ -2926,7 +2940,7 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 				dmi_string(h, data[0x07]));
 			if (h->length < 0x19) break;
 			printf("\tUUID: ");
-			dmi_system_uuid(data + 0x08);
+			dmi_system_uuid(data + 0x08, ver);
 			printf("\n");
 			printf("\tWake-up Type: %s\n",
 				dmi_system_wake_up_type(data[0x18]));
@@ -3021,13 +3035,13 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 			dmi_processor_voltage(data[0x11]);
 			printf("\n");
 			printf("\tExternal Clock: ");
-			dmi_processor_frequency(data + 0x12);
+			dmi_processor_frequency(data + 0x12, ver);
 			printf("\n");
 			printf("\tMax Speed: ");
-			dmi_processor_frequency(data + 0x14);
+			dmi_processor_frequency(data + 0x14, ver);
 			printf("\n");
 			printf("\tCurrent Speed: ");
-			dmi_processor_frequency(data + 0x16);
+			dmi_processor_frequency(data + 0x16, ver);
 			printf("\n");
 			if (data[0x18]&(1<<6))
 				printf("\tStatus: Populated, %s\n",
@@ -3967,7 +3981,7 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 			if (opt.string->lookup != NULL)
 				printf("%s\n", opt.string->lookup(data[opt.string->offset]));
 			else if (opt.string->print != NULL) {
-				opt.string->print(data + opt.string->offset);
+				opt.string->print(data + opt.string->offset, ver);
 				printf("\n");
 			}
 			else
