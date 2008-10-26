@@ -40,7 +40,7 @@ struct opt opt;
 /* This lookup table could admittedly be reworked for improved performance.
    Due to the low count of items in there at the moment, it did not seem
    worth the additional code complexity though. */
-static const struct string_keyword opt_string_keyword[]={
+static const struct string_keyword opt_string_keyword[] = {
 	{ "bios-build-id", 0x0D, 9 },
 	{ "box-serial-number", 0x16, 7 },
 	{ "motherboard-serial-number", 0x1D, 11 },
@@ -53,7 +53,7 @@ static void print_opt_string_list(void)
 	unsigned int i;
 
 	fprintf(stderr, "Valid string keywords are:\n");
-	for(i=0; i<ARRAY_SIZE(opt_string_keyword); i++)
+	for (i = 0; i < ARRAY_SIZE(opt_string_keyword); i++)
 	{
 		fprintf(stderr, "  %s\n", opt_string_keyword[i].keyword);
 	}
@@ -63,17 +63,17 @@ static int parse_opt_string(const char *arg)
 {
 	unsigned int i;
 
-	if(opt.string)
+	if (opt.string)
 	{
 		fprintf(stderr, "Only one string can be specified\n");
 		return -1;
 	}
 
-	for(i=0; i<ARRAY_SIZE(opt_string_keyword); i++)
+	for (i = 0; i<ARRAY_SIZE(opt_string_keyword); i++)
 	{
-		if(!strcasecmp(arg, opt_string_keyword[i].keyword))
+		if (!strcasecmp(arg, opt_string_keyword[i].keyword))
 		{
-			opt.string=&opt_string_keyword[i];
+			opt.string = &opt_string_keyword[i];
 			return 0;
 		}
 	}
@@ -93,7 +93,7 @@ int parse_command_line(int argc, char * const argv[])
 {
 	int option;
 	const char *optstring = "d:hs:uV";
-	struct option longopts[]={
+	struct option longopts[] = {
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
 		{ "string", required_argument, NULL, 's' },
@@ -102,28 +102,28 @@ int parse_command_line(int argc, char * const argv[])
 		{ 0, 0, 0, 0 }
 	};
 
-	while((option=getopt_long(argc, argv, optstring, longopts, NULL))!=-1)
-		switch(option)
+	while ((option = getopt_long(argc, argv, optstring, longopts, NULL)) != -1)
+		switch (option)
 		{
 			case 'd':
-				opt.devmem=optarg;
+				opt.devmem = optarg;
 				break;
 			case 'h':
-				opt.flags|=FLAG_HELP;
+				opt.flags |= FLAG_HELP;
 				break;
 			case 's':
-				if(parse_opt_string(optarg)<0)
+				if (parse_opt_string(optarg) < 0)
 					return -1;
-				opt.flags|=FLAG_QUIET;
+				opt.flags |= FLAG_QUIET;
 				break;
 			case 'u':
-				opt.flags|=FLAG_DUMP;
+				opt.flags |= FLAG_DUMP;
 				break;
 			case 'V':
-				opt.flags|=FLAG_VERSION;
+				opt.flags |= FLAG_VERSION;
 				break;
 			case '?':
-				switch(optopt)
+				switch (optopt)
 				{
 					case 's':
 						fprintf(stderr, "String keyword expected\n");
@@ -133,7 +133,7 @@ int parse_command_line(int argc, char * const argv[])
 				return -1;
 		}
 
-	if((opt.flags & FLAG_DUMP) && opt.string!=NULL)
+	if ((opt.flags & FLAG_DUMP) && opt.string != NULL)
 	{
 		fprintf(stderr, "Options --string and --dump are mutually exclusive\n");
 		return -1;
@@ -144,7 +144,7 @@ int parse_command_line(int argc, char * const argv[])
 
 void print_help(void)
 {
-	static const char *help=
+	static const char *help =
 		"Usage: vpddecode [OPTIONS]\n"
 		"Options are:\n"
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"

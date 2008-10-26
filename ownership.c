@@ -43,13 +43,13 @@
 /* Options are global */
 struct opt
 {
-	const char* devmem;
+	const char *devmem;
 	unsigned int flags;
 };
 static struct opt opt;
 
-#define FLAG_VERSION            (1<<0)
-#define FLAG_HELP               (1<<1)
+#define FLAG_VERSION            (1 << 0)
+#define FLAG_HELP               (1 << 1)
 
 static void ownership(u32 base, const char *pname, const char *devmem)
 {
@@ -57,25 +57,25 @@ static void ownership(u32 base, const char *pname, const char *devmem)
 	int i;
 
 	/* read the ownership tag */
-	if((buf=mem_chunk(base, 0x51, devmem))==NULL)
+	if ((buf = mem_chunk(base, 0x51, devmem)) == NULL)
 	{
 		perror(pname);
 		return;
 	}
 
 	/* chop the trailing garbage */
-	i=0x4f;
-	while(i>=0 && (buf[i]==0x20 || buf[i]==0x00))
+	i = 0x4f;
+	while (i >= 0 && (buf[i] == 0x20 || buf[i] == 0x00))
 		i--;
-	buf[i+1]='\0';
+	buf[i + 1] = '\0';
 
 	/* filter and print */
-	if(i>=0)
+	if (i >= 0)
 	{
-		for(; i>=0; i--)
+		for (; i >= 0; i--)
 		{
-			if(buf[i]<32 || (buf[i]>=127 && buf[i]<160))
-				buf[i]='?';
+			if (buf[i] < 32 || (buf[i] >= 127 && buf[i] < 160))
+				buf[i] = '?';
 		}
 		printf("%s\n", (char *)buf);
 	}
@@ -88,22 +88,24 @@ static u32 decode(const u8 *p)
 	int i;
 
 	/* integrity checking (lack of checksum) */
-	for(i=0; i<p[4]; i++)
+	for (i = 0; i < p[4]; i++)
 	{
-		if(p[5+i*10]!='$' || !(p[6+i*10]>='A' && p[6+i*10]<='Z')
-			|| !(p[7+i*10]>='A' && p[7+i*10]<='Z')
-			|| !(p[8+i*10]>='A' && p[8+i*10]<='Z'))
+		if (p[5 + i * 10] != '$'
+		 || !(p[6 + i * 10] >= 'A' && p[6 + i * 10] <= 'Z')
+		 || !(p[7 + i * 10] >= 'A' && p[7 + i * 10] <= 'Z')
+		 || !(p[8 + i * 10] >= 'A' && p[8 + i * 10] <= 'Z'))
 		{
 			printf("\t Abnormal Entry! Please report. [%02x %02x %02x %02x]\n",
-				p[5+i*10], p[6+i*10], p[7+i*10], p[8+i*10]);
+				p[5 + i * 10], p[6 + i * 10],
+				p[7 + i * 10], p[8 + i * 10]);
 			return 0;
 		}
 	}
 
 	/* search for the right entry */
-	for(i=0; i<p[4]; i++)
-		if(memcmp(p+5+i*10, "$ERB", 4)==0)
-			return DWORD(p+9+i*10);
+	for (i = 0; i < p[4]; i++)
+		if (memcmp(p + 5 + i * 10, "$ERB", 4) == 0)
+			return DWORD(p + 9 + i * 10);
 
 	return 0;
 }
@@ -120,17 +122,17 @@ static int parse_command_line(int argc, char * const argv[])
 		{ 0, 0, 0, 0 }
 	};
 
-	while((option=getopt_long(argc, argv, optstring, longopts, NULL))!=-1)
-		switch(option)
+	while ((option = getopt_long(argc, argv, optstring, longopts, NULL)) != -1)
+		switch (option)
 		{
 			case 'd':
-				opt.devmem=optarg;
+				opt.devmem = optarg;
 				break;
 			case 'h':
-				opt.flags|=FLAG_HELP;
+				opt.flags |= FLAG_HELP;
 				break;
 			case 'V':
-				opt.flags|=FLAG_VERSION;
+				opt.flags |= FLAG_VERSION;
 				break;
 			case '?':
 				return -1;
@@ -141,7 +143,7 @@ static int parse_command_line(int argc, char * const argv[])
 
 static void print_help(void)
 {
-	static const char *help=
+	static const char *help =
 		"Usage: ownership [OPTIONS]\n"
 		"Options are:\n"
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
@@ -155,51 +157,51 @@ int main(int argc, char * const argv[])
 {
 	u8 *buf;
 	off_t fp;
-	int ok=0;
+	int ok = 0;
 
-	if(sizeof(u8)!=1 || sizeof(u32)!=4)
+	if (sizeof(u8) != 1 || sizeof(u32) != 4)
 	{
 		fprintf(stderr, "%s: compiler incompatibility\n", argv[0]);
 		exit(255);
 	}
 
 	/* Set default option values */
-	opt.devmem=DEFAULT_MEM_DEV;
-	opt.flags=0;
+	opt.devmem = DEFAULT_MEM_DEV;
+	opt.flags = 0;
 
-	if(parse_command_line(argc, argv)<0)
+	if (parse_command_line(argc, argv)<0)
 		exit(2);
 
-	if(opt.flags & FLAG_HELP)
+	if (opt.flags & FLAG_HELP)
 	{
 		print_help();
 		return 0;
 	}
 
-	if(opt.flags & FLAG_VERSION)
+	if (opt.flags & FLAG_VERSION)
 	{
 		printf("%s\n", VERSION);
 		return 0;
 	}
 
-	if((buf=mem_chunk(0xE0000, 0x20000, opt.devmem))==NULL)
+	if ((buf = mem_chunk(0xE0000, 0x20000, opt.devmem)) == NULL)
 		exit(1);
 
-	for(fp=0; !ok && fp<=0x1FFF0; fp+=16)
+	for (fp = 0; !ok && fp <= 0x1FFF0; fp += 16)
 	{
-		u8 *p=buf+fp;
+		u8 *p = buf + fp;
 
-		if(memcmp((char *)p, "32OS", 4)==0)
+		if (memcmp((char *)p, "32OS", 4) == 0)
 		{
-			off_t len=p[4]*10+5;
+			off_t len = p[4] * 10 + 5;
 
-			if(fp+len-1<=0x1FFFF)
+			if (fp + len - 1 <= 0x1FFFF)
 			{
 				u32 base;
 
-				if((base=decode(p)))
+				if ((base = decode(p)))
 				{
-					ok=1;
+					ok = 1;
 					ownership(base, argv[0], opt.devmem);
 				}
 			}

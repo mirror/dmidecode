@@ -50,15 +50,15 @@
 #ifndef USE_MMAP
 static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 {
-	ssize_t r=1;
-	size_t r2=0;
+	ssize_t r = 1;
+	size_t r2 = 0;
 
-	while(r2!=count && r!=0)
+	while (r2 != count && r != 0)
 	{
-		r=read(fd, buf+r2, count-r2);
-		if(r==-1)
+		r = read(fd, buf + r2, count - r2);
+		if (r == -1)
 		{
-			if(errno!=EINTR)
+			if (errno != EINTR)
 			{
 				close(fd);
 				perror(prefix);
@@ -66,10 +66,10 @@ static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 			}
 		}
 		else
-			r2+=r;
+			r2 += r;
 	}
 
-	if(r2!=count)
+	if (r2 != count)
 	{
 		close(fd);
 		fprintf(stderr, "%s: Unexpected end of file\n", prefix);
@@ -82,12 +82,12 @@ static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 
 int checksum(const u8 *buf, size_t len)
 {
-	u8 sum=0;
+	u8 sum = 0;
 	size_t a;
 
-	for(a=0; a<len; a++)
-		sum+=buf[a];
-	return (sum==0);
+	for (a = 0; a < len; a++)
+		sum += buf[a];
+	return (sum == 0);
 }
 
 /*
@@ -103,13 +103,13 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 	void *mmp;
 #endif
 
-	if((fd=open(devmem, O_RDONLY))==-1)
+	if ((fd = open(devmem, O_RDONLY)) == -1)
 	{
 		perror(devmem);
 		return NULL;
 	}
 
-	if((p=malloc(len))==NULL)
+	if ((p = malloc(len)) == NULL)
 	{
 		perror("malloc");
 		return NULL;
@@ -117,17 +117,17 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 
 #ifdef USE_MMAP
 #ifdef _SC_PAGESIZE
-	mmoffset=base%sysconf(_SC_PAGESIZE);
+	mmoffset = base % sysconf(_SC_PAGESIZE);
 #else
-	mmoffset=base%getpagesize();
+	mmoffset = base % getpagesize();
 #endif /* _SC_PAGESIZE */
 	/*
 	 * Please note that we don't use mmap() for performance reasons here,
 	 * but to workaround problems many people encountered when trying
 	 * to read from /dev/mem using regular read() calls.
 	 */
-	mmp=mmap(0, mmoffset+len, PROT_READ, MAP_SHARED, fd, base-mmoffset);
-	if(mmp==MAP_FAILED)
+	mmp = mmap(0, mmoffset + len, PROT_READ, MAP_SHARED, fd, base - mmoffset);
+	if (mmp == MAP_FAILED)
 	{
 		fprintf(stderr, "%s: ", devmem);
 		perror("mmap");
@@ -135,15 +135,15 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 		return NULL;
 	}
 
-	memcpy(p, (u8 *)mmp+mmoffset, len);
+	memcpy(p, (u8 *)mmp + mmoffset, len);
 
-	if(munmap(mmp, mmoffset+len)==-1)
+	if (munmap(mmp, mmoffset + len) == -1)
 	{
 		fprintf(stderr, "%s: ", devmem);
 		perror("munmap");
 	}
 #else /* USE_MMAP */
-	if(lseek(fd, base, SEEK_SET)==-1)
+	if (lseek(fd, base, SEEK_SET) == -1)
 	{
 		fprintf(stderr, "%s: ", devmem);
 		perror("lseek");
@@ -151,14 +151,14 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 		return NULL;
 	}
 
-	if(myread(fd, p, len, devmem)==-1)
+	if (myread(fd, p, len, devmem) == -1)
 	{
 		free(p);
 		return NULL;
 	}
 #endif /* USE_MMAP */
 
-	if(close(fd)==-1)
+	if (close(fd) == -1)
 		perror(devmem);
 
 	return p;
@@ -169,30 +169,30 @@ int write_dump(size_t base, size_t len, const void *data, const char *dumpfile)
 	FILE *f;
 
 	f=fopen(dumpfile, "r+b");
-	if(!f && errno==ENOENT)
-		f=fopen(dumpfile, "wb");
-	if(!f)
+	if (!f && errno == ENOENT)
+		f = fopen(dumpfile, "wb");
+	if (!f)
 	{
 		fprintf(stderr, "%s: ", dumpfile);
 		perror("fopen");
 		return -1;
 	}
 
-	if(fseek(f, base, SEEK_SET)!=0)
+	if (fseek(f, base, SEEK_SET) != 0)
 	{
 		fprintf(stderr, "%s: ", dumpfile);
 		perror("fseek");
 		goto err_close;
 	}
 
-	if(fwrite(data, len, 1, f)!=1)
+	if (fwrite(data, len, 1, f) != 1)
 	{
 		fprintf(stderr, "%s: ", dumpfile);
 		perror("fwrite");
 		goto err_close;
 	}
 
-	if(fclose(f))
+	if (fclose(f))
 	{
 		fprintf(stderr, "%s: ", dumpfile);
 		perror("fclose");

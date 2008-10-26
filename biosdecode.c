@@ -68,13 +68,13 @@
 /* Options are global */
 struct opt
 {
-	const char* devmem;
+	const char *devmem;
 	unsigned int flags;
 };
 static struct opt opt;
 
-#define FLAG_VERSION            (1<<0)
-#define FLAG_HELP               (1<<1)
+#define FLAG_VERSION            (1 << 0)
+#define FLAG_HELP               (1 << 1)
 
 struct bios_entry {
 	const char *anchor;
@@ -92,14 +92,14 @@ struct bios_entry {
 
 static size_t smbios_length(const u8 *p)
 {
-	return(p[0x05]==0x1E?0x1F:p[0x05]);
+	return p[0x05] == 0x1E ? 0x1F : p[0x05];
 }
 
 static int smbios_decode(const u8 *p, size_t len)
 {
-	if(len<0x1F || !checksum(p, p[0x05])
-	 || memcmp("_DMI_", p+0x10, 5)!=0
-	 || !checksum(p+0x10, 0x0F))
+	if (len < 0x1F || !checksum(p, p[0x05])
+	 || memcmp("_DMI_", p + 0x10, 5) != 0
+	 || !checksum(p + 0x10, 0x0F))
 		return 0;
 
 	printf("SMBIOS %u.%u present.\n",
@@ -107,11 +107,11 @@ static int smbios_decode(const u8 *p, size_t len)
 	printf("\tStructure Table Length: %u bytes\n",
 		WORD(p+0x16));
 	printf("\tStructure Table Address: 0x%08X\n",
-		DWORD(p+0x18));
+		DWORD(p + 0x18));
 	printf("\tNumber Of Structures: %u\n",
-		WORD(p+0x1C));
+		WORD(p + 0x1C));
 	printf("\tMaximum Structure Size: %u bytes\n",
-		WORD(p+0x08));
+		WORD(p + 0x08));
 
 	return 1;
 }
@@ -120,22 +120,22 @@ static size_t dmi_length(const u8 *p)
 {
 	(void) p;
 
-	return(0x0F);
+	return 0x0F;
 }
 
 static int dmi_decode(const u8 *p, size_t len)
 {
-	if(len<0x0F || !checksum(p, len))
+	if (len < 0x0F || !checksum(p, len))
 		return 0;
 
 	printf("Legacy DMI %u.%u present.\n",
-		p[0x0E]>>4, p[0x0E]&0x0F);
+		p[0x0E]>>4, p[0x0E] & 0x0F);
 	printf("\tStructure Table Length: %u bytes\n",
-		WORD(p+0x06));
+		WORD(p + 0x06));
 	printf("\tStructure Table Address: 0x%08X\n",
-		DWORD(p+0x08));
+		DWORD(p + 0x08));
 	printf("\tNumber Of Structures: %u\n",
-		WORD(p+0x0C));
+		WORD(p + 0x0C));
 
 	return 1;
 }
@@ -146,21 +146,21 @@ static int dmi_decode(const u8 *p, size_t len)
 
 static size_t sysid_length(const u8 *p)
 {
-	return WORD(p+0x08);
+	return WORD(p + 0x08);
 }
 
 static int sysid_decode(const u8 *p, size_t len)
 {
-	if(len<0x11 || !checksum(p, WORD(p+0x08)))
+	if (len < 0x11 || !checksum(p, WORD(p + 0x08)))
 		return 0;
 
 	printf("SYSID present.\n");
 	printf("\tRevision: %u\n",
 		p[0x10]);
 	printf("\tStructure Table Address: 0x%08X\n",
-		DWORD(p+0x0A));
+		DWORD(p + 0x0A));
 	printf("\tNumber Of Structures: %u\n",
-		WORD(p+0x0E));
+		WORD(p + 0x0E));
 
 	return 1;
 }
@@ -171,7 +171,7 @@ static int sysid_decode(const u8 *p, size_t len)
 
 static size_t pnp_length(const u8 *p)
 {
-	return(p[0x05]);
+	return p[0x05];
 }
 
 static const char *pnp_event_notification(u8 code)
@@ -188,29 +188,29 @@ static const char *pnp_event_notification(u8 code)
 
 static int pnp_decode(const u8 *p, size_t len)
 {
-	if(len<0x21 || !checksum(p, p[0x05]))
+	if (len < 0x21 || !checksum(p, p[0x05]))
 		return 0;
 
 	printf("PNP BIOS %u.%u present.\n",
-		p[0x04]>>4, p[0x04]&0x0F);
+		p[0x04]>>4, p[0x04] & 0x0F);
 	printf("\tEvent Notification: %s\n",
-		pnp_event_notification(WORD(p+0x06)&0x03));
-	if((WORD(p+0x06)&0x03)==0x01)
+		pnp_event_notification(WORD(p + 0x06) & 0x03));
+	if ((WORD(p+0x06)&0x03)==0x01)
 		printf("\tEvent Notification Flag Address: 0x%08X\n",
-			DWORD(p+0x09));
+			DWORD(p + 0x09));
 	printf("\tReal Mode 16-bit Code Address: %04X:%04X\n",
-		WORD(p+0x0F), WORD(p+0x0D));
+		WORD(p + 0x0F), WORD(p + 0x0D));
 	printf("\tReal Mode 16-bit Data Address: %04X:0000\n",
-		WORD(p+0x1B));
+		WORD(p + 0x1B));
 	printf("\t16-bit Protected Mode Code Address: 0x%08X\n",
-		DWORD(p+0x13)+WORD(p+0x11));
+		DWORD(p + 0x13) + WORD(p + 0x11));
 	printf("\t16-bit Protected Mode Data Address: 0x%08X\n",
-		DWORD(p+0x1D));
-	if(DWORD(p+0x17)!=0)
+		DWORD(p + 0x1D));
+	if (DWORD(p + 0x17)!=0)
 		printf("\tOEM Device Identifier: %c%c%c%02X%02X\n",
-			0x40+((p[0x17]>>2)&0x1F),
-			0x40+((p[0x17]&0x03)<<3)+((p[0x18]>>5)&0x07),
-			0x40+(p[0x18]&0x1F), p[0x19], p[0x20]);
+			0x40 + ((p[0x17] >> 2) & 0x1F),
+			0x40 + ((p[0x17] & 0x03) << 3) + ((p[0x18] >> 5) & 0x07),
+			0x40 + (p[0x18] & 0x1F), p[0x19], p[0x20]);
 
 	return 1;
 }
@@ -221,12 +221,12 @@ static int pnp_decode(const u8 *p, size_t len)
 
 static size_t acpi_length(const u8 *p)
 {
-	return(p[15]==2?36:20);
+	return p[15] == 2 ? 36 : 20;
 }
 
 static const char *acpi_revision(u8 code)
 {
-	switch(code)
+	switch (code)
 	{
 		case 0:
 			return " 1.0";
@@ -239,7 +239,7 @@ static const char *acpi_revision(u8 code)
 
 static int acpi_decode(const u8 *p, size_t len)
 {
-	if(len<20 || !checksum(p, 20))
+	if (len < 20 || !checksum(p, 20))
 		return 0;
 
 	printf("ACPI%s present.\n",
@@ -247,18 +247,18 @@ static int acpi_decode(const u8 *p, size_t len)
 	printf("\tOEM Identifier: %c%c%c%c%c%c\n",
 		p[9], p[10], p[11], p[12], p[13], p[14]);
 	printf("\tRSD Table 32-bit Address: 0x%08X\n",
-		DWORD(p+16));
+		DWORD(p + 16));
 
-	if(len<36)
+	if (len < 36)
 		return 1;
 
-	if(DWORD(p+20)>len || !checksum(p, DWORD(p+20)))
+	if (DWORD(p + 20) > len || !checksum(p, DWORD(p + 20)))
 		return 0;
 
-	if(DWORD(p+20)<32) return 1;
+	if (DWORD(p + 20) < 32) return 1;
 
 	printf("\tXSD Table 64-bit Address: 0x%08X%08X\n",
-		QWORD(p+24).h, QWORD(p+24).l);
+		QWORD(p + 24).h, QWORD(p + 24).l);
 
 	return 1;
 }
@@ -269,12 +269,12 @@ static int acpi_decode(const u8 *p, size_t len)
 
 static size_t sony_length(const u8 *p)
 {
-	return(p[0x05]);
+	return p[0x05];
 }
 
 static int sony_decode(const u8 *p, size_t len)
 {
-	if(!checksum(p, len))
+	if (!checksum(p, len))
 		return 0;
 
 	printf("Sony system detected.\n");
@@ -288,19 +288,19 @@ static int sony_decode(const u8 *p, size_t len)
 
 static size_t bios32_length(const u8 *p)
 {
-	return p[0x09]<<4;
+	return p[0x09] << 4;
 }
 
 static int bios32_decode(const u8 *p, size_t len)
 {
-	if(len<0x0A || !checksum(p, p[0x09]<<4))
+	if (len < 0x0A || !checksum(p, p[0x09] << 4))
 		return 0;
 
 	printf("BIOS32 Service Directory present.\n");
 	printf("\tRevision: %u\n",
 		p[0x08]);
 	printf("\tCalling Interface Address: 0x%08X\n",
-		DWORD(p+0x04));
+		DWORD(p + 0x04));
 
 	return 1;
 }
@@ -311,21 +311,21 @@ static int bios32_decode(const u8 *p, size_t len)
 
 static void pir_irqs(u16 code)
 {
-	if(code==0)
+	if (code == 0)
 		printf(" None");
 	else
 	{
 		u8 i;
 
-		for(i=0; i<16; i++)
-			if(code&(1<<i))
+		for (i = 0; i < 16; i++)
+			if (code & (1 << i))
 				printf(" %u", i);
 	}
 }
 
 static void pir_slot_number(u8 code)
 {
-	if(code==0)
+	if (code == 0)
 		printf(" on-board");
 	else
 		printf(" slot number %u", code);
@@ -333,61 +333,61 @@ static void pir_slot_number(u8 code)
 
 static size_t pir_length(const u8 *p)
 {
-	return WORD(p+6);
+	return WORD(p + 6);
 }
 
 static int pir_decode(const u8 *p, size_t len)
 {
 	int i;
 
-	if(len<32 || !checksum(p, WORD(p+6)))
+	if (len < 32 || !checksum(p, WORD(p + 6)))
 		return 0;
 
 	printf("PCI Interrupt Routing %u.%u present.\n",
 		p[5], p[4]);
 	printf("\tRouter ID: %02x:%02x.%1x\n",
-		p[8], p[9]>>3, p[9]&0x07);
+		p[8], p[9]>>3, p[9] & 0x07);
 	printf("\tExclusive IRQs:");
-	pir_irqs(WORD(p+10));
+	pir_irqs(WORD(p + 10));
 	printf("\n");
-	if(DWORD(p+12)!=0)
+	if (DWORD(p + 12) != 0)
 		printf("\tCompatible Router: %04x:%04x\n",
-			WORD(p+12), WORD(p+14));
-	if(DWORD(p+16)!=0)
+			WORD(p + 12), WORD(p + 14));
+	if (DWORD(p + 16) != 0)
 		printf("\tMiniport Data: 0x%08X\n",
-			DWORD(p+16));
+			DWORD(p + 16));
 
-	for(i=1; i<=(WORD(p+6)-32)/16; i++)
+	for (i = 1; i <= (WORD(p + 6) - 32) / 16; i++)
 	{
 		printf("\tSlot Entry %u: ID %02x:%02x,",
-			i, p[(i+1)*16], p[(i+1)*16+1]>>3);
-		pir_slot_number(p[(i+1)*16+14]);
+			i, p[(i + 1) * 16], p[(i + 1) * 16 + 1] >> 3);
+		pir_slot_number(p[(i + 1) * 16 + 14]);
 		printf("\n");
 /*		printf("\tSlot Entry %u\n", i);
 		printf("\t\tID: %02x:%02x\n",
-			p[(i+1)*16], p[(i+1)*16+1]>>3);
+			p[(i + 1) * 16], p[(i + 1) * 16 + 1] >> 3);
 		printf("\t\tLink Value for INTA#: %u\n",
-			p[(i+1)*16+2]);
+			p[(i + 1) * 16 + 2]);
 		printf("\t\tIRQ Bitmap for INTA#:");
-		pir_irqs(WORD(p+(i+1)*16+3));
+		pir_irqs(WORD(p + (i + 1) * 16 + 3));
 		printf("\n");
 		printf("\t\tLink Value for INTB#: %u\n",
-			p[(i+1)*16+5]);
+			p[(i + 1) * 16 + 5]);
 		printf("\t\tIRQ Bitmap for INTB#:");
-		pir_irqs(WORD(p+(i+1)*16+6));
+		pir_irqs(WORD(p + (i + 1) * 16 + 6));
 		printf("\n");
 		printf("\t\tLink Value for INTC#: %u\n",
-			p[(i+1)*16+8]);
+			p[(i + 1) * 16 + 8]);
 		printf("\t\tIRQ Bitmap for INTC#:");
-		pir_irqs(WORD(p+(i+1)*16+9));
+		pir_irqs(WORD(p + (i + 1) * 16 + 9));
 		printf("\n");
 		printf("\t\tLink Value for INTD#: %u\n",
-			p[(i+1)*16+11]);
+			p[(i + 1) * 16 + 11]);
 		printf("\t\tIRQ Bitmap for INTD#:");
-		pir_irqs(WORD(p+(i+1)*16+12));
+		pir_irqs(WORD(p + (i + 1) * 16 + 12));
 		printf("\n");
 		printf("\t\tSlot Number:");
-		pir_slot_number(p[(i+1)*16+14]);
+		pir_slot_number(p[(i + 1) * 16 + 14]);
 		printf("\n");*/
 	}
 
@@ -400,7 +400,7 @@ static int pir_decode(const u8 *p, size_t len)
 
 static size_t compaq_length(const u8 *p)
 {
-	return (p[4]*10+5);
+	return p[4] * 10 + 5;
 }
 
 static int compaq_decode(const u8 *p, size_t len)
@@ -411,29 +411,31 @@ static int compaq_decode(const u8 *p, size_t len)
 	printf("Compaq-specific entries present.\n");
 
 	/* integrity checking (lack of checksum) */
-	for(i=0; i<p[4]; i++)
+	for (i = 0; i < p[4]; i++)
 	{
 		/*
 		 * We do not check for truncated entries, because the length
 		 * was computed from the number of records in compaq_length
 		 * right above, so it can't be wrong.
 		 */
-		if(p[5+i*10]!='$' || !(p[6+i*10]>='A' && p[6+i*10]<='Z')
-			|| !(p[7+i*10]>='A' && p[7+i*10]<='Z')
-			|| !(p[8+i*10]>='A' && p[8+i*10]<='Z'))
+		if (p[5 + i * 10] != '$'
+		 || !(p[6 + i * 10] >= 'A' && p[6 + i * 10] <= 'Z')
+		 || !(p[7 + i * 10] >= 'A' && p[7 + i * 10] <= 'Z')
+		 || !(p[8 + i * 10] >= 'A' && p[8 + i * 10] <= 'Z'))
 		{
 			printf("\t Abnormal entry! Please report. [%02X %02X "
-				"%02X %02X]\n", p[5+i*10], p[6+i*10],
-				p[7+i*10], p[8+i*10]);
+				"%02X %02X]\n", p[5 + i * 10], p[6 + i * 10],
+				p[7 + i * 10], p[8 + i * 10]);
 			return 0;
 		}
 	}
 
-	for(i=0; i<p[4]; i++)
+	for (i = 0; i < p[4]; i++)
 	{
 		printf("\tEntry %u: %c%c%c%c at 0x%08X (%u bytes)\n",
-			i+1, p[5+i*10], p[6+i*10], p[7+i*10], p[8+i*10],
-			DWORD(p+9+i*10), WORD(p+13+i*10));
+			i + 1, p[5 + i * 10], p[6 + i * 10], p[7 + i * 10],
+			p[8 + i * 10], DWORD(p + 9 + i * 10),
+			WORD(p + 13 + i * 10));
 	}
 
 	return 1;
@@ -448,41 +450,41 @@ static void vpd_print_entry(const char *name, const u8 *p, size_t len)
 	size_t i;
 
 	printf("\t%s: ", name);
-	for(i=0; i<len; i++)
-		if(p[i]>=32 && p[i]<127)
+	for (i = 0; i < len; i++)
+		if (p[i] >= 32 && p[i] < 127)
 			printf("%c", p[i]);
 	printf("\n");
 }
 
 static size_t vpd_length(const u8 *p)
 {
-	return (p[5]);
+	return p[5];
 }
 
 static int vpd_decode(const u8 *p, size_t len)
 {
-	if(len<0x30)
+	if (len < 0x30)
 		return 0;
 
 	/* XSeries have longer records. */
-	if(!(len>=0x45 && checksum(p, len))
+	if (!(len >= 0x45 && checksum(p, len))
 	/* Some Netvista seem to work with this. */
-	&& !checksum(p, 0x30)
+	 && !checksum(p, 0x30)
 	/* The Thinkpad checksum does *not* include the first 13 bytes. */
-	&& !checksum(p+0x0D, 0x30-0x0D))
+	 && !checksum(p + 0x0D, 0x30 - 0x0D))
 		return 0;
 
 	printf("VPD present.\n");
 
-	vpd_print_entry("BIOS Build ID", p+0x0D, 9);
-	vpd_print_entry("Box Serial Number", p+0x16, 7);
-	vpd_print_entry("Motherboard Serial Number", p+0x1D, 11);
-	vpd_print_entry("Machine Type/Model", p+0x28, 7);
+	vpd_print_entry("BIOS Build ID", p + 0x0D, 9);
+	vpd_print_entry("Box Serial Number", p + 0x16, 7);
+	vpd_print_entry("Motherboard Serial Number", p + 0x1D, 11);
+	vpd_print_entry("Machine Type/Model", p + 0x28, 7);
 
-	if(len<0x45)
+	if (len < 0x45)
 		return 1;
 
-	vpd_print_entry("BIOS Release Date", p+0x30, 8);
+	vpd_print_entry("BIOS Release Date", p + 0x30, 8);
 
 	return 1;
 }
@@ -510,12 +512,13 @@ static int fjkeyinf_decode(const u8 *p, size_t len)
 
 	for (i = 0; i < 6; i++)
 	{
-		if (*(p+8+i*4)==0)
+		if (*(p + 8 + i * 4)==0)
 			return 1;
-		printf("\tDevice %d: type %u, chip %u", i+1,
-		       *(p+8+i*4), *(p+8+i*4+2));
+		printf("\tDevice %d: type %u, chip %u", i + 1,
+		       *(p + 8 + i * 4), *(p + 8 + i * 4 + 2));
 		if (*(p+8+i*4+1)) /* Access method */
-			printf(", SMBus address 0x%x", *(p+8+i*4+3) >> 1);
+			printf(", SMBus address 0x%x",
+				*(p + 8 + i * 4 + 3) >> 1);
 		printf("\n");
 	}
 
@@ -526,7 +529,7 @@ static int fjkeyinf_decode(const u8 *p, size_t len)
  * Main
  */
 
-static struct bios_entry bios_entries[]={
+static struct bios_entry bios_entries[] = {
 	{ "_SM_", 0, 0xF0000, 0xFFFFF, smbios_length, smbios_decode },
 	{ "_DMI_", 0, 0xF0000, 0xFFFFF, dmi_length, dmi_decode },
 	{ "_SYSID_", 0, 0xE0000, 0xFFFFF, sysid_length, sysid_decode },
@@ -546,8 +549,8 @@ static inline int anchor_match(const struct bios_entry *entry, const char *p)
 {
 	size_t i;
 
-	for(i=0; i<entry->anchor_len; i++)
-		if(entry->anchor[i]!=p[i])
+	for (i = 0; i < entry->anchor_len; i++)
+		if (entry->anchor[i] != p[i])
 			return 0;
 
 	return 1;
@@ -558,24 +561,24 @@ static int parse_command_line(int argc, char * const argv[])
 {
 	int option;
 	const char *optstring = "d:hV";
-	struct option longopts[]={
+	struct option longopts[] = {
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0, 0, 0, 0 }
 	};
 
-	while((option=getopt_long(argc, argv, optstring, longopts, NULL))!=-1)
-		switch(option)
+	while ((option = getopt_long(argc, argv, optstring, longopts, NULL)) != -1)
+		switch (option)
 		{
 			case 'd':
-				opt.devmem=optarg;
+				opt.devmem = optarg;
 				break;
 			case 'h':
-				opt.flags|=FLAG_HELP;
+				opt.flags |= FLAG_HELP;
 				break;
 			case 'V':
-				opt.flags|=FLAG_VERSION;
+				opt.flags |= FLAG_VERSION;
 				break;
 			case '?':
 				return -1;
@@ -586,7 +589,7 @@ static int parse_command_line(int argc, char * const argv[])
 
 static void print_help(void)
 {
-	static const char *help=
+	static const char *help =
 		"Usage: biosdecode [OPTIONS]\n"
 		"Options are:\n"
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
@@ -602,26 +605,26 @@ int main(int argc, char * const argv[])
 	off_t fp;
 	int i;
 
-	if(sizeof(u8)!=1 || sizeof(u16)!=2 || sizeof(u32)!=4)
+	if (sizeof(u8) != 1 || sizeof(u16) != 2 || sizeof(u32) != 4)
 	{
 		fprintf(stderr, "%s: compiler incompatibility\n", argv[0]);
 		exit(255);
 	}
 
 	/* Set default option values */
-	opt.devmem=DEFAULT_MEM_DEV;
-	opt.flags=0;
+	opt.devmem = DEFAULT_MEM_DEV;
+	opt.flags = 0;
 
-	if(parse_command_line(argc, argv)<0)
+	if (parse_command_line(argc, argv) < 0)
 		exit(2);
 
-	if(opt.flags & FLAG_HELP)
+	if (opt.flags & FLAG_HELP)
 	{
 		print_help();
 		return 0;
 	}
 
-	if(opt.flags & FLAG_VERSION)
+	if (opt.flags & FLAG_VERSION)
 	{
 		printf("%s\n", VERSION);
 		return 0;
@@ -629,30 +632,30 @@ int main(int argc, char * const argv[])
 
 	printf("# biosdecode %s\n", VERSION);
 
-	if((buf=mem_chunk(0xE0000, 0x20000, opt.devmem))==NULL)
+	if ((buf = mem_chunk(0xE0000, 0x20000, opt.devmem)) == NULL)
 		exit(1);
 
 	/* Compute anchor lengths once and for all */
-	for(i=0; bios_entries[i].anchor!=NULL; i++)
+	for (i = 0; bios_entries[i].anchor != NULL; i++)
 		bios_entries[i].anchor_len = strlen(bios_entries[i].anchor);
 
-	for(fp=0xE0000; fp<=0xFFFF0; fp+=16)
+	for (fp = 0xE0000; fp <= 0xFFFF0; fp += 16)
 	{
-		u8 *p=buf+fp-0xE0000;
+		u8 *p = buf + fp - 0xE0000;
 
-		for(i=0; bios_entries[i].anchor!=NULL; i++)
+		for (i = 0; bios_entries[i].anchor != NULL; i++)
 		{
-			if(anchor_match(&bios_entries[i], (char *)p)
-			 && fp>=bios_entries[i].low_address
-			 && fp<bios_entries[i].high_address)
+			if (anchor_match(&bios_entries[i], (char *)p)
+			 && fp >= bios_entries[i].low_address
+			 && fp < bios_entries[i].high_address)
 			{
-				off_t len=bios_entries[i].length(p);
+				off_t len = bios_entries[i].length(p);
 
-				if(fp+len-1<=bios_entries[i].high_address)
+				if (fp + len - 1 <= bios_entries[i].high_address)
 				{
-					if(bios_entries[i].decode(p, len))
+					if (bios_entries[i].decode(p, len))
 					{
-						fp+=(((len-1)>>4)<<4);
+						fp += (((len - 1) >> 4) << 4);
 						break;
 					}
 				}
