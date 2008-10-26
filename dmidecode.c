@@ -4144,7 +4144,9 @@ int main(int argc, char * const argv[])
 	/* Read from dump if so instructed */
 	if(opt.flags & FLAG_FROM_DUMP)
 	{
-		printf("Reading SMBIOS/DMI data from file %s.\n", opt.dumpfile);
+		if(!(opt.flags & FLAG_QUIET))
+			printf("Reading SMBIOS/DMI data from file %s.\n",
+			       opt.dumpfile);
 		if((buf=mem_chunk(0, 0x20, opt.dumpfile))==NULL)
 		{
 			ret=1;
