@@ -1,3 +1,29 @@
+2008-10-26  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support SMBIOS specification version 2.6, first round.
+
+	* dmidecode.c: Byte-swap the first 3 fields of the UUID
+	  (DMI type 1).
+	* dmidecode.c: Add chassis types "Blade" and "Blade Enclosure"
+	  (DMI type 3).
+
+2008-10-26  Jean Delvare  <khali@linux-fr.org>
+
+	* dmiopt.c, dmidecode.8: Simplify the handling and documentation
+	  of mutually exclusive output format options.
+	* dmidecode.8: Document the binary dump file format.
+	* dmidecode.c: Don't display the source dump file name in quiet
+	  mode.
+	* biosdecode.c, dmidecode.c, dmioem.c, dmiopt.c, dmiopt.h,
+	  ownership.c, types.h, util.c, vpddecode.c, vpdopt.c, vpdopt.h:
+	  Mass coding-style change: add spaces around operators.
+	* vpddecode.c: Fix --quiet option.
+	* dmidecode.h, dmiopt.h: Pass version information to print
+	  callback functions.
+	* dmidecode.c: Fix up invalid SMBIOS version.
+	* dmidecode.c: Handle base board information records of size 10
+	  (DMI type 2).
+
 2008-10-25  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Limit indentation in smbios_decode and
