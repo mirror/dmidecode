@@ -457,10 +457,12 @@ const char *dmi_chassis_type(u8 code)
 		"Sealed-case PC",
 		"Multi-system",
 		"CompactPCI",
-		"AdvancedTCA" /* 0x1B */
+		"AdvancedTCA",
+		"Blade",
+		"Blade Enclosing" /* 0x1D */
 	};
 
-	if (code >= 0x01 && code <= 0x1B)
+	if (code >= 0x01 && code <= 0x1D)
 		return type[code - 0x01];
 	return out_of_spec;
 }
