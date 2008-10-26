@@ -194,7 +194,7 @@ int main(int argc, char * const argv[])
 
 	free(buf);
 
-	if (!found && !(opt.flags && FLAG_QUIET))
+	if (!found && !(opt.flags & FLAG_QUIET))
 		printf("# No VPD structure found, sorry.\n");
 
 	return 0;
