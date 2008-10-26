@@ -4023,17 +4023,27 @@ static void overwrite_dmi_address(u8 *buf)
 
 static int smbios_decode(u8 *buf, const char *devmem)
 {
+	u16 ver;
+
 	if (!checksum(buf, buf[0x05])
 	 || memcmp(buf + 0x10, "_DMI_", 5) != 0
 	 || !checksum(buf + 0x10, 0x0F))
 		return 0;
 
+	ver = (buf[0x06] << 8) + buf[0x07];
+	/* Some BIOS attempt to encode version 2.3.1 as 2.31, fix it up */
+	if (ver == 0x021F)
+	{
+		if (!(opt.flags & FLAG_QUIET))
+			printf("SMBIOS version fixup (2.31 -> 2.3).\n");
+		ver = 0x0203;
+	}
 	if (!(opt.flags & FLAG_QUIET))
 		printf("SMBIOS %u.%u present.\n",
-			buf[0x06], buf[0x07]);
+			ver >> 8, ver & 0xFF);
 
 	dmi_table(DWORD(buf + 0x18), WORD(buf + 0x16), WORD(buf + 0x1C),
-		(buf[0x06] << 8) + buf[0x07], devmem);
+		ver, devmem);
 
 	if (opt.flags & FLAG_DUMP_BIN)
 	{
