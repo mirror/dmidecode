@@ -62,8 +62,7 @@ Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
 .TP
 .BR "-q" ", " "--quiet"
 Be less verbose. Unknown, inactive and \s-1OEM\s0-specific entries are not
-displayed. Meta-data and handle references are hidden. Mutually exclusive
-with \fB--dump\fR.
+displayed. Meta-data and handle references are hidden.
 .TP
 .BR "-s" ", " "--string KEYWORD"
 Only display the value of the \s-1DMI\s0 string identified by \fBKEYWORD\fR.
@@ -89,8 +88,7 @@ If \fBKEYWORD\fR is not provided or not valid, a list of all valid
 keywords is printed and
 .B dmidecode
 exits with an error.
-This option cannot be used more than once, and implies \fB--quiet\fR.
-Mutually exclusive with \fB--type\fR and \fB--dump\fR.
+This option cannot be used more than once.
 .TP
 .BR "-t" ", " "--type TYPE"
 Only display the entries of type \fBTYPE\fR. \fBTYPE\fR can be either a
@@ -105,29 +103,30 @@ If \fBTYPE\fR is not provided or not valid, a list of all valid keywords
 is printed and
 .B dmidecode
 exits with an error.
-Mutually exclusive with \fB--string\fR.
 .TP
 .BR "-u" ", " "--dump"
 Do not decode the entries, dump their contents as hexadecimal instead.
 Note that this is still a text output, no binary data will be thrown upon
 you. The strings attached to each entry are displayed as both
 hexadecimal and \s-1ASCII\s0. This option is mainly useful for debugging.
-Mutually exclusive with \fB--quiet\fR and \fB--string\fR.
 .TP
 .BR "  " "  " "--dump-bin FILE"
 Do not decode the entries, instead dump the DMI data to a file in binary
 form. The generated file is suitable to pass to \fB--from-dump\fR
-later. Mutually exclusive with \fB--type\fR and \fB--string\fR.
+later.
 .TP
 .BR "  " "  " "--from-dump FILE"
 Read the DMI data from a binary file previously generated using 
-\fB--dump-bin\fR. Mutually exclusive with \fB--dump-bin\fR.
+\fB--dump-bin\fR.
 .TP
 .BR "-h" ", " "--help"
 Display usage information and exit
 .TP
 .BR "-V" ", " "--version"
 Display the version and exit
+.P
+Options --string, --type, --dump and --dump-bin
+determine the output format and are mutually exclusive.
 
 .SH "DMI TYPES"
 The \s-1SMBIOS\s0 specification defines the following \s-1DMI\s0 types:

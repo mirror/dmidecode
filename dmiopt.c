@@ -280,28 +280,16 @@ int parse_command_line(int argc, char * const argv[])
 				return -1;
 		}
 
-	if(opt.type!=NULL && opt.string!=NULL)
+	/* Check for mutually exclusive output format options */
+	if((opt.string!=NULL)+(opt.type!=NULL)
+	 +!!(opt.flags & FLAG_DUMP)+!!(opt.flags & FLAG_DUMP_BIN)>1)
 	{
-		fprintf(stderr, "Options --string and --type are mutually exclusive\n");
+		fprintf(stderr, "Options --string, --type, --dump and --dump-bin are mutually exclusive\n");
 		return -1;
 	}
+	if(opt.flags & (FLAG_DUMP | FLAG_DUMP_BIN))
+		opt.flags&=~FLAG_QUIET;
 
-	if((opt.flags & FLAG_DUMP) && opt.string!=NULL)
-	{
-		fprintf(stderr, "Options --string and --dump are mutually exclusive\n");
-		return -1;
-	}
-
-	if((opt.flags & FLAG_DUMP) && (opt.flags & FLAG_QUIET))
-	{
-		fprintf(stderr, "Options --quiet and --dump are mutually exclusive\n");
-		return -1;
-	}
-	if((opt.flags & FLAG_DUMP_BIN) && (opt.type!=NULL || opt.string!=NULL))
-	{
-		fprintf(stderr, "Options --dump-bin, --string and --type are mutually exclusive\n");
-		return -1;
-	}
 	if((opt.flags & FLAG_FROM_DUMP) && (opt.flags & FLAG_DUMP_BIN))
 	{
 		fprintf(stderr, "Options --from-dump and --dump-bin are mutually exclusive\n");
