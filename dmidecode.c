@@ -3875,7 +3875,8 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 		{
 			if (opt.string->lookup != NULL)
 				printf("%s\n", opt.string->lookup(data[opt.string->offset]));
-			else if (opt.string->print != NULL) {
+			else if (opt.string->print != NULL)
+			{
 				opt.string->print(data + opt.string->offset, ver);
 				printf("\n");
 			}

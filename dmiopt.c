@@ -176,7 +176,7 @@ static void print_opt_string_list(void)
 	unsigned int i;
 
 	fprintf(stderr, "Valid string keywords are:\n");
-	for (i = 0; i<ARRAY_SIZE(opt_string_keyword); i++)
+	for (i = 0; i < ARRAY_SIZE(opt_string_keyword); i++)
 	{
 		fprintf(stderr, "  %s\n", opt_string_keyword[i].keyword);
 	}
