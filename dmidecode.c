@@ -946,10 +946,13 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket 939",
 		"Socket mPGA604",
 		"Socket LGA771",
-		"Socket LGA775" /* 0x15 */
+		"Socket LGA775",
+		"Socket S1",
+		"Socket AM2",
+		"Socket F (1207)" /* 0x18 */
 	};
 
-	if (code >= 0x01 && code <= 0x15)
+	if (code >= 0x01 && code <= 0x18)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }
