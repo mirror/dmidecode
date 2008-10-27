@@ -1,3 +1,16 @@
+2008-10-27  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support SMBIOS specification version 2.6, second round.
+
+	* dmidecode.c: Add support for Processor Family 2 field
+	  (DMI type 4).
+	* dmidecode.c: Add processor types "Turion 64 X2", "Core Solo",
+	  "Core 2 Duo", "ESA/390 G6", "z/Architectur", "C7-M", "C7-D",
+	  "C7" and "Eden" (DMI type 4).
+	* dmidecode.c: Fix typo in processor type "AMD29000" (DMI type 4).
+	* dmidecode.c: Add processor upgrade types "Socket S1",
+	  "Socket AM2" and "Socket F (1207)" (DMI type 4).
+
 2008-10-26  Jean Delvare  <khali@linux-fr.org>
 
 	Update to support SMBIOS specification version 2.6, first round.
