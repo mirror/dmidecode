@@ -28,6 +28,6 @@ struct dmi_header
 
 const char *dmi_string(struct dmi_header *dm, u8 s);
 void dmi_system_uuid(u8 *p, u16 ver);
-const char *dmi_chassis_type(u8 code);
-const char *dmi_processor_family(u8 code);
+const char *dmi_chassis_type(u16 code);
+const char *dmi_processor_family(u16 code);
 void dmi_processor_frequency(u8 *p, u16 ver);

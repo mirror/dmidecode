@@ -24,7 +24,7 @@ struct string_keyword
 	const char *keyword;
 	u8 type;
 	u8 offset;
-	const char *(*lookup)(u8);
+	const char *(*lookup)(u16);
 	void (*print)(u8 *, u16);
 };
 

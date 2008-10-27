@@ -427,7 +427,7 @@ static void dmi_base_board_handles(u8 count, u8 *p, const char *prefix)
  * 3.3.4 Chassis Information (Type 3)
  */
 
-const char *dmi_chassis_type(u8 code)
+const char *dmi_chassis_type(u16 code)
 {
 	/* 3.3.4.1 */
 	static const char *type[] = {
@@ -570,10 +570,12 @@ static const char *dmi_processor_type(u8 code)
 	return out_of_spec;
 }
 
-const char *dmi_processor_family(u8 code)
+const char *dmi_processor_family(u16 code)
 {
+	unsigned int i;
+
 	/* 3.3.5.2 */
-	static const char *family[256] = {
+	static const char *family[254] = {
 		NULL, /* 0x00 */
 		"Other",
 		"Unknown",
@@ -604,7 +606,7 @@ const char *dmi_processor_family(u8 code)
 		"K6-2",
 		"K6-3",
 		"Athlon",
-		"AMD2900",
+		"AMD29000",
 		"K6-2+",
 		"Power PC",
 		"Power PC 601",
@@ -711,8 +713,8 @@ const char *dmi_processor_family(u8 code)
 		"Turion 64",
 		"Dual-Core Opteron",
 		"Athlon 64 X2",
-		NULL, /* 0x89 */
-		NULL,
+		"Turion 64 X2",
+		NULL, /* 0x8A */
 		NULL,
 		NULL,
 		NULL,
@@ -763,10 +765,10 @@ const char *dmi_processor_family(u8 code)
 		"Celeron D",
 		"Pentium D",
 		"Pentium EE",
-		NULL, /* 0xBD */
-		NULL,
-		NULL,
-		NULL,
+		"Core Solo",
+		NULL, /* 0xBE */
+		"Core 2 Duo",
+		NULL, /* 0xC0 */
 		NULL,
 		NULL,
 		NULL,
@@ -777,18 +779,18 @@ const char *dmi_processor_family(u8 code)
 		"IBM390",
 		"G4",
 		"G5",
-		NULL, /* 0xCB */
+		"ESA/390 G6",
+		"z/Architectur",
+		NULL, /* 0xCD */
 		NULL,
 		NULL,
 		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
+		NULL, /* 0xD1 */
+		"C7-M",
+		"C7-D",
+		"C7",
+		"Eden",
+		NULL, /* 0xD6 */
 		NULL,
 		NULL,
 		NULL,
@@ -827,14 +829,35 @@ const char *dmi_processor_family(u8 code)
 		"i860",
 		"i960",
 		NULL, /* 0xFC */
-		NULL,
-		NULL,
-		NULL /* 0xFF */
-		/* master.mif has values beyond that, but they can't be used for DMI */
+		NULL  /* 0xFD */
 	};
 
-	if (family[code] != NULL)
+	static const struct {
+		int value;
+		const char *name;
+	} family2[] = {
+		{ 0x104, "SH-3" },
+		{ 0x105, "SH-4" },
+		{ 0x118, "ARM" },
+		{ 0x119, "StrongARM" },
+		{ 0x12C, "6x86" },
+		{ 0x12D, "MediaGX" },
+		{ 0x12E, "MII" },
+		{ 0x140, "WinChip" },
+		{ 0x15E, "DSP" },
+		{ 0x1F4, "Video Processor" },
+	};
+
+	if (code <= 0xFD)
+	{
+		if (family[code] == NULL)
+			return out_of_spec;
 		return family[code];
+	}
+
+	for (i = 0; i < ARRAY_SIZE(family2); i++)
+		if (family2[i].value == code)
+			return family2[i].name;
 	return out_of_spec;
 }
 
@@ -3028,6 +3051,8 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 			printf("\tType: %s\n",
 				dmi_processor_type(data[0x05]));
 			printf("\tFamily: %s\n",
+				data[0x06] == 0xFE && h->length >= 0x2A ?
+				dmi_processor_family(WORD(data + 0x28)) :
 				dmi_processor_family(data[0x06]));
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x07]));
