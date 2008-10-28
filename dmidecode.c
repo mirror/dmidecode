@@ -3780,7 +3780,10 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 			printf("%s\n", dmi_chassis_type(data[offset]));
 			break;
 		case 0x406:
-			printf("%s\n", dmi_processor_family(data[offset]));
+			printf("%s\n",
+				data[0x06] == 0xFE && h->length >= 0x2A ?
+				dmi_processor_family(WORD(data + 0x28)) :
+				dmi_processor_family(data[offset]));
 			break;
 		case 0x416:
 			dmi_processor_frequency(data + offset);
