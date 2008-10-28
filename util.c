@@ -164,13 +164,11 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 	return p;
 }
 
-int write_dump(size_t base, size_t len, const void *data, const char *dumpfile)
+int write_dump(size_t base, size_t len, const void *data, const char *dumpfile, int add)
 {
 	FILE *f;
 
-	f=fopen(dumpfile, "r+b");
-	if (!f && errno == ENOENT)
-		f = fopen(dumpfile, "wb");
+	f = fopen(dumpfile, add ? "r+b" : "wb");
 	if (!f)
 	{
 		fprintf(stderr, "%s: ", dumpfile);

@@ -3802,7 +3802,7 @@ static void dmi_table_dump(u32 base, u16 len, const char *devmem)
 	}
 
 	printf("# Writing %d bytes to %s.\n", len, opt.dumpfile);
-	write_dump(32, len, buf, opt.dumpfile);
+	write_dump(32, len, buf, opt.dumpfile, 0);
 	free(buf);
 }
 
@@ -3967,7 +3967,7 @@ static int smbios_decode(u8 *buf, const char *devmem)
 		overwrite_dmi_address(crafted + 0x10);
 
 		printf("# Writing %d bytes to %s.\n", crafted[0x05], opt.dumpfile);
-		write_dump(0, crafted[0x05], crafted, opt.dumpfile);
+		write_dump(0, crafted[0x05], crafted, opt.dumpfile, 1);
 	}
 
 	return 1;
@@ -3993,7 +3993,7 @@ static int legacy_decode(u8 *buf, const char *devmem)
 		overwrite_dmi_address(crafted);
 
 		printf("# Writing %d bytes to %s.\n", 0x0F, opt.dumpfile);
-		write_dump(0, 0x0F, crafted, opt.dumpfile);
+		write_dump(0, 0x0F, crafted, opt.dumpfile, 1);
 	}
 
 	return 1;
