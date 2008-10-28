@@ -299,7 +299,7 @@ static void dmi_bios_characteristics_x2(u8 code, const char *prefix)
  * 3.3.2 System Information (Type 1)
  */
 
-void dmi_system_uuid(u8 *p, u16 ver)
+static void dmi_system_uuid(const u8 *p, u16 ver)
 {
 	int only0xFF = 1, only0x00 = 1;
 	int i;
@@ -427,7 +427,7 @@ static void dmi_base_board_handles(u8 count, u8 *p, const char *prefix)
  * 3.3.4 Chassis Information (Type 3)
  */
 
-const char *dmi_chassis_type(u16 code)
+static const char *dmi_chassis_type(u8 code)
 {
 	/* 3.3.4.1 */
 	static const char *type[] = {
@@ -570,7 +570,7 @@ static const char *dmi_processor_type(u8 code)
 	return out_of_spec;
 }
 
-const char *dmi_processor_family(u16 code)
+static const char *dmi_processor_family(u16 code)
 {
 	unsigned int i;
 
@@ -893,10 +893,9 @@ static void dmi_processor_voltage(u8 code)
 	}
 }
 
-void dmi_processor_frequency(u8 *p, u16 ver)
+static void dmi_processor_frequency(const u8 *p)
 {
 	u16 code = WORD(p);
-	(void) ver;
 
 	if (code)
 		printf("%u MHz", code);
@@ -2930,13 +2929,13 @@ static void dmi_decode(struct dmi_header *h, u16 ver)
 			dmi_processor_voltage(data[0x11]);
 			printf("\n");
 			printf("\tExternal Clock: ");
-			dmi_processor_frequency(data + 0x12, ver);
+			dmi_processor_frequency(data + 0x12);
 			printf("\n");
 			printf("\tMax Speed: ");
-			dmi_processor_frequency(data + 0x14, ver);
+			dmi_processor_frequency(data + 0x14);
 			printf("\n");
 			printf("\tCurrent Speed: ");
-			dmi_processor_frequency(data + 0x16, ver);
+			dmi_processor_frequency(data + 0x16);
 			printf("\n");
 			if (data[0x18]&(1<<6))
 				printf("\tStatus: Populated, %s\n",
@@ -3762,6 +3761,36 @@ static void to_dmi_header(struct dmi_header *h, u8 *data)
 	h->data = data;
 }
 
+static void dmi_table_string(struct dmi_header *h, const u8 *data, u16 ver)
+{
+	int key;
+	u8 offset = opt.string->offset;
+
+	if (offset >= h->length)
+		return;
+
+	key = (opt.string->type << 8) | offset;
+	switch (key)
+	{
+		case 0x108:
+			dmi_system_uuid(data + offset, ver);
+			printf("\n");
+			break;
+		case 0x305:
+			printf("%s\n", dmi_chassis_type(data[offset]));
+			break;
+		case 0x406:
+			printf("%s\n", dmi_processor_family(data[offset]));
+			break;
+		case 0x416:
+			dmi_processor_frequency(data + offset);
+			printf("\n");
+			break;
+		default:
+			printf("%s\n", dmi_string(h, data[offset]));
+	}
+}
+
 static void dmi_table_dump(u32 base, u16 len, const char *devmem)
 {
 	u8 *buf;
@@ -3870,19 +3899,8 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 				printf("\t<TRUNCATED>\n\n");
 		}
 		else if (opt.string != NULL
-		      && opt.string->type == h.type
-		      && opt.string->offset < h.length)
-		{
-			if (opt.string->lookup != NULL)
-				printf("%s\n", opt.string->lookup(data[opt.string->offset]));
-			else if (opt.string->print != NULL)
-			{
-				opt.string->print(data + opt.string->offset, ver);
-				printf("\n");
-			}
-			else
-				printf("%s\n", dmi_string(&h, data[opt.string->offset]));
-		}
+		      && opt.string->type == h.type)
+			dmi_table_string(&h, data, ver);
 
 		data = next;
 		i++;

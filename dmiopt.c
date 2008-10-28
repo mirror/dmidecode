@@ -147,28 +147,28 @@ exit_free:
    Due to the low count of items in there at the moment, it did not seem
    worth the additional code complexity though. */
 static const struct string_keyword opt_string_keyword[] = {
-	{ "bios-vendor", 0, 0x04, NULL, NULL },
-	{ "bios-version", 0, 0x05, NULL, NULL },
-	{ "bios-release-date", 0, 0x08, NULL, NULL },
-	{ "system-manufacturer", 1, 0x04, NULL, NULL },
-	{ "system-product-name", 1, 0x05, NULL, NULL },
-	{ "system-version", 1, 0x06, NULL, NULL },
-	{ "system-serial-number", 1, 0x07, NULL, NULL },
-	{ "system-uuid", 1, 0x08, NULL, dmi_system_uuid },
-	{ "baseboard-manufacturer", 2, 0x04, NULL, NULL },
-	{ "baseboard-product-name", 2, 0x05, NULL, NULL },
-	{ "baseboard-version", 2, 0x06, NULL, NULL },
-	{ "baseboard-serial-number", 2, 0x07, NULL, NULL },
-	{ "baseboard-asset-tag", 2, 0x08, NULL, NULL },
-	{ "chassis-manufacturer", 3, 0x04, NULL, NULL },
-	{ "chassis-type", 3, 0x05, dmi_chassis_type, NULL },
-	{ "chassis-version", 3, 0x06, NULL, NULL },
-	{ "chassis-serial-number", 3, 0x07, NULL, NULL },
-	{ "chassis-asset-tag", 3, 0x08, NULL, NULL },
-	{ "processor-family", 4, 0x06, dmi_processor_family, NULL },
-	{ "processor-manufacturer", 4, 0x07, NULL, NULL },
-	{ "processor-version", 4, 0x10, NULL, NULL },
-	{ "processor-frequency", 4, 0x16, NULL, dmi_processor_frequency },
+	{ "bios-vendor", 0, 0x04 },
+	{ "bios-version", 0, 0x05 },
+	{ "bios-release-date", 0, 0x08 },
+	{ "system-manufacturer", 1, 0x04 },
+	{ "system-product-name", 1, 0x05 },
+	{ "system-version", 1, 0x06 },
+	{ "system-serial-number", 1, 0x07 },
+	{ "system-uuid", 1, 0x08 },             /* dmi_system_uuid() */
+	{ "baseboard-manufacturer", 2, 0x04 },
+	{ "baseboard-product-name", 2, 0x05 },
+	{ "baseboard-version", 2, 0x06 },
+	{ "baseboard-serial-number", 2, 0x07 },
+	{ "baseboard-asset-tag", 2, 0x08 },
+	{ "chassis-manufacturer", 3, 0x04 },
+	{ "chassis-type", 3, 0x05 },            /* dmi_chassis_type() */
+	{ "chassis-version", 3, 0x06 },
+	{ "chassis-serial-number", 3, 0x07 },
+	{ "chassis-asset-tag", 3, 0x08 },
+	{ "processor-family", 4, 0x06 },        /* dmi_processor_family() */
+	{ "processor-manufacturer", 4, 0x07 },
+	{ "processor-version", 4, 0x10 },
+	{ "processor-frequency", 4, 0x16 },     /* dmi_processor_frequency() */
 };
 
 static void print_opt_string_list(void)
