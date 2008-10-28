@@ -67,7 +67,7 @@ static const char *bad_index = "<BAD INDEX>";
  * Type-independant Stuff
  */
 
-const char *dmi_string(struct dmi_header *dm, u8 s)
+const char *dmi_string(const struct dmi_header *dm, u8 s)
 {
 	char *bp = (char *)dm->data;
 	size_t i, len;
@@ -154,7 +154,7 @@ static int dmi_bcd_range(u8 value, u8 low, u8 high)
 	return 1;
 }
 
-static void dmi_dump(struct dmi_header *h, const char *prefix)
+static void dmi_dump(const struct dmi_header *h, const char *prefix)
 {
 	int row, i;
 	const char *s;
@@ -1599,7 +1599,7 @@ static const char *dmi_on_board_devices_type(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_on_board_devices(struct dmi_header *h, const char *prefix)
+static void dmi_on_board_devices(const struct dmi_header *h, const char *prefix)
 {
 	u8 *p = h->data + 4;
 	u8 count = (h->length - 0x04) / 2;
@@ -1626,7 +1626,7 @@ static void dmi_on_board_devices(struct dmi_header *h, const char *prefix)
  * 3.3.12 OEM Strings (Type 11)
  */
 
-static void dmi_oem_strings(struct dmi_header *h, const char *prefix)
+static void dmi_oem_strings(const struct dmi_header *h, const char *prefix)
 {
 	u8 *p = h->data + 4;
 	u8 count = p[0x00];
@@ -1641,7 +1641,7 @@ static void dmi_oem_strings(struct dmi_header *h, const char *prefix)
  * 3.3.13 System Configuration Options (Type 12)
  */
 
-static void dmi_system_configuration_options(struct dmi_header *h, const char *prefix)
+static void dmi_system_configuration_options(const struct dmi_header *h, const char *prefix)
 {
 	u8 *p = h->data + 4;
 	u8 count = p[0x00];
@@ -1656,7 +1656,7 @@ static void dmi_system_configuration_options(struct dmi_header *h, const char *p
  * 3.3.14 BIOS Language Information (Type 13)
  */
 
-static void dmi_bios_languages(struct dmi_header *h, const char *prefix)
+static void dmi_bios_languages(const struct dmi_header *h, const char *prefix)
 {
 	u8 *p = h->data + 4;
 	u8 count=p[0x00];
@@ -2770,7 +2770,7 @@ static const char *dmi_power_supply_range_switching(u8 code)
  * Main
  */
 
-static void dmi_decode(struct dmi_header *h, u16 ver)
+static void dmi_decode(const struct dmi_header *h, u16 ver)
 {
 	const u8 *data = h->data;
 
@@ -3761,7 +3761,7 @@ static void to_dmi_header(struct dmi_header *h, u8 *data)
 	h->data = data;
 }
 
-static void dmi_table_string(struct dmi_header *h, const u8 *data, u16 ver)
+static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver)
 {
 	int key;
 	u8 offset = opt.string->offset;

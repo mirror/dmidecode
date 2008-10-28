@@ -1,7 +1,7 @@
 /*
  * This file is part of the dmidecode project.
  *
- *   Copyright (C) 2005-2007 Jean Delvare <khali@linux-fr.org>
+ *   Copyright (C) 2005-2008 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -26,4 +26,4 @@ struct dmi_header
 	u8 *data;
 };
 
-const char *dmi_string(struct dmi_header *dm, u8 s);
+const char *dmi_string(const struct dmi_header *dm, u8 s);

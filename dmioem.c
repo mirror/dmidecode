@@ -2,7 +2,7 @@
  * Decoding of OEM-specific entries
  * This file is part of the dmidecode project.
  *
- *   Copyright (C) 2007 Jean Delvare <khali@linux-fr.org>
+ *   Copyright (C) 2007-2008 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ void dmi_set_vendor(const char *s)
  * Code contributed by John Cagle.
  */
 
-static int dmi_decode_hp(struct dmi_header *h)
+static int dmi_decode_hp(const struct dmi_header *h)
 {
 	u8 *data = h->data;
 	int nic, ptr;
@@ -117,7 +117,7 @@ static int dmi_decode_hp(struct dmi_header *h)
  * Dispatch vendor-specific entries decoding
  * Return 1 if decoding was successful, 0 otherwise
  */
-int dmi_decode_oem(struct dmi_header *h)
+int dmi_decode_oem(const struct dmi_header *h)
 {
 	switch (dmi_vendor)
 	{
