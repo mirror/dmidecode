@@ -412,7 +412,7 @@ static const char *dmi_base_board_type(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_base_board_handles(u8 count, u8 *p, const char *prefix)
+static void dmi_base_board_handles(u8 count, const u8 *p, const char *prefix)
 {
 	int i;
 
@@ -526,7 +526,7 @@ static void dmi_chassis_power_cords(u8 code)
 		printf(" %u", code);
 }
 
-static void dmi_chassis_elements(u8 count, u8 len, u8 *p, const char *prefix)
+static void dmi_chassis_elements(u8 count, u8 len, const u8 *p, const char *prefix)
 {
 	int i;
 
@@ -725,7 +725,7 @@ static const char *dmi_processor_family(u16 code)
 	return out_of_spec;
 }
 
-static void dmi_processor_id(u8 type, u8 *p, const char *version, const char *prefix)
+static void dmi_processor_id(u8 type, const u8 *p, const char *version, const char *prefix)
 {
 	/* Intel AP-485 revision 31, table 3-4 */
 	static const char *flags[32] = {
@@ -1079,7 +1079,7 @@ static void dmi_memory_controller_speeds(u16 code, const char *prefix)
 	}
 }
 
-static void dmi_memory_controller_slots(u8 count, u8 *p, const char *prefix)
+static void dmi_memory_controller_slots(u8 count, const u8 *p, const char *prefix)
 {
 	int i;
 
@@ -1671,7 +1671,7 @@ static void dmi_bios_languages(struct dmi_header *h, const char *prefix)
  * 3.3.15 Group Associations (Type 14)
  */
 
-static void dmi_group_associations_items(u8 count, u8 *p, const char *prefix)
+static void dmi_group_associations_items(u8 count, const u8 *p, const char *prefix)
 {
 	int i;
 
@@ -1719,7 +1719,7 @@ static void dmi_event_log_status(u8 code)
 		valid[(code >> 0) & 1], full[(code >> 1) & 1]);
 }
 
-static void dmi_event_log_address(u8 method, u8 *p)
+static void dmi_event_log_address(u8 method, const u8 *p)
 {
 	/* 3.3.16.3 */
 	switch (method)
@@ -1813,7 +1813,7 @@ static const char *dmi_event_log_descriptor_format(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_event_log_descriptors(u8 count, u8 len, u8 *p, const char *prefix)
+static void dmi_event_log_descriptors(u8 count, u8 len, const u8 *p, const char *prefix)
 {
 	/* 3.3.16.1 */
 	int i;
@@ -2342,7 +2342,7 @@ static const char *dmi_hardware_security_status(u8 code)
  * 3.3.26 System Power Controls (Type 25)
  */
 
-static void dmi_power_controls_power_on(u8 *p)
+static void dmi_power_controls_power_on(const u8 *p)
 {
 	/* 3.3.26.1 */
 	if (dmi_bcd_range(p[0], 0x01, 0x12))
@@ -2640,7 +2640,7 @@ static const char *dmi_memory_channel_type(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_memory_channel_devices(u8 count, u8 *p, const char *prefix)
+static void dmi_memory_channel_devices(u8 count, const u8 *p, const char *prefix)
 {
 	int i;
 
@@ -2674,7 +2674,7 @@ static const char *dmi_ipmi_interface_type(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_ipmi_base_address(u8 type, u8 *p, u8 lsb)
+static void dmi_ipmi_base_address(u8 type, const u8 *p, u8 lsb)
 {
 	if (type == 0x04) /* SSIF */
 	{
@@ -2772,7 +2772,7 @@ static const char *dmi_power_supply_range_switching(u8 code)
 
 static void dmi_decode(struct dmi_header *h, u16 ver)
 {
-	u8 *data=h->data;
+	const u8 *data = h->data;
 
 	/*
 	 * Note: DMI types 37 and 39 are untested
