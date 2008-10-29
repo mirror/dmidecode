@@ -1,3 +1,22 @@
+2008-10-29  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Handle special case of processor family code 0xBE,
+	  which can be both Core 2 or K7. We use the processor
+	  manufacturer string as a hint (DMI type 4).
+
+2008-10-28  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c, dmidecode.h, dmiopt.c, dmiopt.h: Don't use function
+	  pointers for special string cases. Each special case is itself
+	  special and needs to call a function with its own prototype, so
+	  better have dedicated code to handle it all.
+	* dmidecode.c, dmidecode.h, dmioem.c, dmioem.h: Mark a few
+	  pointers const.
+	* dmidecode.c, util.c, util.h: When dumping the DMI table to a
+	  binary file, truncate the file first.
+	* dmidecode.c: Support Processor Family 2 field also when queried
+	  with option --string.
+
 2008-10-27  Jean Delvare  <khali@linux-fr.org>
 
 	Update to support SMBIOS specification version 2.6, second round.
