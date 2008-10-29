@@ -49,6 +49,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -570,7 +571,7 @@ static const char *dmi_processor_type(u8 code)
 	return out_of_spec;
 }
 
-static const char *dmi_processor_family(u16 code)
+static const char *dmi_processor_family(u16 code, const char *manufacturer)
 {
 	unsigned int i;
 
@@ -690,7 +691,7 @@ static const char *dmi_processor_family(u16 code)
 		{ 0xBB, "Pentium D" },
 		{ 0xBC, "Pentium EE" },
 		{ 0xBD, "Core Solo" },
-
+		/* 0xBE handled as a special case */
 		{ 0xBF, "Core 2 Duo" },
 
 		{ 0xC8, "IBM390" },
@@ -718,6 +719,19 @@ static const char *dmi_processor_family(u16 code)
 		{ 0x15E, "DSP" },
 		{ 0x1F4, "Video Processor" },
 	};
+
+	/* Special case for ambiguous value 0xBE */
+	if (code == 0xBE)
+	{
+		/* Best bet based on manufacturer string */
+		if (strstr(manufacturer, "Intel") != NULL
+		 || strncasecmp(manufacturer, "Intel", 5) == 0)
+			return "Core 2";
+		if (strstr(manufacturer, "AMD") != NULL
+		 || strncasecmp(manufacturer, "AMD", 3) == 0)
+			return "K7";
+		return "Core 2 or K7";
+	}
 
 	for (i = 0; i < ARRAY_SIZE(family2); i++)
 		if (family2[i].value == code)
@@ -2918,8 +2932,8 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_processor_type(data[0x05]));
 			printf("\tFamily: %s\n",
 				data[0x06] == 0xFE && h->length >= 0x2A ?
-				dmi_processor_family(WORD(data + 0x28)) :
-				dmi_processor_family(data[0x06]));
+				dmi_processor_family(WORD(data + 0x28), dmi_string(h, data[0x07])) :
+				dmi_processor_family(data[0x06], dmi_string(h, data[0x07])));
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x07]));
 			dmi_processor_id(data[0x06], data + 8, dmi_string(h, data[0x10]), "\t");
@@ -3782,8 +3796,8 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 		case 0x406:
 			printf("%s\n",
 				data[0x06] == 0xFE && h->length >= 0x2A ?
-				dmi_processor_family(WORD(data + 0x28)) :
-				dmi_processor_family(data[offset]));
+				dmi_processor_family(WORD(data + 0x28), dmi_string(h, data[0x07])) :
+				dmi_processor_family(data[offset], dmi_string(h, data[0x07])));
 			break;
 		case 0x416:
 			dmi_processor_frequency(data + offset);
