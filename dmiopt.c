@@ -282,12 +282,12 @@ int parse_command_line(int argc, char * const argv[])
 
 	/* Check for mutually exclusive output format options */
 	if ((opt.string != NULL) + (opt.type != NULL)
-	  + !!(opt.flags & FLAG_DUMP) + !!(opt.flags & FLAG_DUMP_BIN) > 1)
+	  + !!(opt.flags & FLAG_DUMP_BIN) > 1)
 	{
-		fprintf(stderr, "Options --string, --type, --dump and --dump-bin are mutually exclusive\n");
+		fprintf(stderr, "Options --string, --type and --dump-bin are mutually exclusive\n");
 		return -1;
 	}
-	if (opt.flags & (FLAG_DUMP | FLAG_DUMP_BIN))
+	if (opt.flags & FLAG_DUMP_BIN)
 		opt.flags &= ~FLAG_QUIET;
 
 	if ((opt.flags & FLAG_FROM_DUMP) && (opt.flags & FLAG_DUMP_BIN))

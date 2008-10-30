@@ -3887,7 +3887,8 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 		if ((opt.flags & FLAG_QUIET) && h.type == 127)
 			break;
 
-		if (display && !(opt.flags & FLAG_QUIET))
+		if (display
+		 && (!(opt.flags & FLAG_QUIET) || (opt.flags & FLAG_DUMP)))
 			printf("Handle 0x%04X, DMI type %d, %d bytes\n",
 				h.handle, h.type, h.length);
 
