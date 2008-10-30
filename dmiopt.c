@@ -287,8 +287,6 @@ int parse_command_line(int argc, char * const argv[])
 		fprintf(stderr, "Options --string, --type and --dump-bin are mutually exclusive\n");
 		return -1;
 	}
-	if (opt.flags & FLAG_DUMP_BIN)
-		opt.flags &= ~FLAG_QUIET;
 
 	if ((opt.flags & FLAG_FROM_DUMP) && (opt.flags & FLAG_DUMP_BIN))
 	{
