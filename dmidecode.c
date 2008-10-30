@@ -259,7 +259,7 @@ static void dmi_bios_characteristics(u64 code, const char *prefix)
 	/*
 	 * This isn't very clear what this bit is supposed to mean
 	 */
-	if (code.l & (1<<3))
+	if (code.l & (1 << 3))
 	{
 		printf("%s%s\n",
 			prefix, characteristics[0]);
@@ -2964,7 +2964,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tCurrent Speed: ");
 			dmi_processor_frequency(data + 0x16);
 			printf("\n");
-			if (data[0x18]&(1<<6))
+			if (data[0x18] & (1 << 6))
 				printf("\tStatus: Populated, %s\n",
 					dmi_processor_status(data[0x18] & 0x07));
 			else
@@ -3560,9 +3560,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tManufacturer Name: %s\n",
 				dmi_string(h, data[0x04]));
 			printf("\tInbound Connection: %s\n",
-				data[0x05]&(1<<0)?"Enabled":"Disabled");
+				data[0x05] & (1 << 0) ? "Enabled" : "Disabled");
 			printf("\tOutbound Connection: %s\n",
-				data[0x05]&(1<<1)?"Enabled":"Disabled");
+				data[0x05] & (1 << 1) ? "Enabled" : "Disabled");
 			break;
 
 		case 31: /* 3.3.32 Boot Integrity Services Entry Point */
