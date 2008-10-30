@@ -3979,12 +3979,21 @@ static int smbios_decode(u8 *buf, const char *devmem)
 		return 0;
 
 	ver = (buf[0x06] << 8) + buf[0x07];
-	/* Some BIOS attempt to encode version 2.3.1 as 2.31, fix it up */
-	if (ver == 0x021F)
+	/* Some BIOS report weird SMBIOS version, fix that up */
+	switch (ver)
 	{
-		if (!(opt.flags & FLAG_QUIET))
-			printf("SMBIOS version fixup (2.31 -> 2.3).\n");
-		ver = 0x0203;
+		case 0x021F:
+			if (!(opt.flags & FLAG_QUIET))
+				printf("SMBIOS version fixup (2.%d -> 2.%d).\n",
+				       31, 3);
+			ver = 0x0203;
+			break;
+		case 0x0233:
+			if (!(opt.flags & FLAG_QUIET))
+				printf("SMBIOS version fixup (2.%d -> 2.%d).\n",
+				       51, 6);
+			ver = 0x0206;
+			break;
 	}
 	if (!(opt.flags & FLAG_QUIET))
 		printf("SMBIOS %u.%u present.\n",
