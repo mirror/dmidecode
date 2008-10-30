@@ -584,9 +584,11 @@ static const char *dmi_processor_type(u8 code)
 	return out_of_spec;
 }
 
-static const char *dmi_processor_family(u16 code, const char *manufacturer)
+static const char *dmi_processor_family(const struct dmi_header *h)
 {
+	const u8 *data = h->data;
 	unsigned int i;
+	u16 code;
 
 	/* 3.3.5.2 */
 	static struct {
@@ -733,9 +735,14 @@ static const char *dmi_processor_family(u16 code, const char *manufacturer)
 		{ 0x1F4, "Video Processor" },
 	};
 
+	code = (data[0x06] == 0xFE && h->length >= 0x2A) ?
+		WORD(data + 0x28) : data[0x06];
+
 	/* Special case for ambiguous value 0xBE */
 	if (code == 0xBE)
 	{
+		const char *manufacturer = dmi_string(h, data[0x07]);
+
 		/* Best bet based on manufacturer string */
 		if (strstr(manufacturer, "Intel") != NULL
 		 || strncasecmp(manufacturer, "Intel", 5) == 0)
@@ -2944,9 +2951,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tType: %s\n",
 				dmi_processor_type(data[0x05]));
 			printf("\tFamily: %s\n",
-				data[0x06] == 0xFE && h->length >= 0x2A ?
-				dmi_processor_family(WORD(data + 0x28), dmi_string(h, data[0x07])) :
-				dmi_processor_family(data[0x06], dmi_string(h, data[0x07])));
+				dmi_processor_family(h));
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x07]));
 			dmi_processor_id(data[0x06], data + 8, dmi_string(h, data[0x10]), "\t");
@@ -3807,10 +3812,7 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 			printf("%s\n", dmi_chassis_type(data[offset]));
 			break;
 		case 0x406:
-			printf("%s\n",
-				data[0x06] == 0xFE && h->length >= 0x2A ?
-				dmi_processor_family(WORD(data + 0x28), dmi_string(h, data[0x07])) :
-				dmi_processor_family(data[offset], dmi_string(h, data[0x07])));
+			printf("%s\n", dmi_processor_family(h));
 			break;
 		case 0x416:
 			dmi_processor_frequency(data + offset);
