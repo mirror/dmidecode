@@ -87,11 +87,14 @@ const char *dmi_string(const struct dmi_header *dm, u8 s)
 	if (!*bp)
 		return bad_index;
 
-	/* ASCII filtering */
-	len = strlen(bp);
-	for (i = 0; i < len; i++)
-		if (bp[i] < 32 || bp[i] == 127)
-			bp[i] = '.';
+	if (!(opt.flags & FLAG_DUMP))
+	{
+		/* ASCII filtering */
+		len = strlen(bp);
+		for (i = 0; i < len; i++)
+			if (bp[i] < 32 || bp[i] == 127)
+				bp[i] = '.';
+	}
 
 	return bp;
 }
@@ -187,7 +190,17 @@ static void dmi_dump(const struct dmi_header *h, const char *prefix)
 						       s[(row << 4) + j]);
 					printf("\n");
 				}
-				printf("%s\t\"%s\"\n", prefix, s);
+				/* String isn't filtered yet so do it now */
+				printf("%s\t\"", prefix);
+				while (*s)
+				{
+					if (*s < 32 || *s == 127)
+						fputc('.', stdout);
+					else
+						fputc(*s, stdout);
+					s++;
+				}
+				printf("\"\n");
 			}
 			else
 				printf("%s\t%s\n", prefix, s);
