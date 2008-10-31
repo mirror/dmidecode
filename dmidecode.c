@@ -1940,7 +1940,7 @@ static void dmi_memory_array_capacity(u32 code)
 	{
 		if ((code & 0x000FFFFF) == 0)
 			printf(" %u GB", code >> 20);
-		else if ((code & 0x000003FF)==0)
+		else if ((code & 0x000003FF) == 0)
 			printf(" %u MB", code >> 10);
 		else
 			printf(" %u kB", code);
@@ -3475,7 +3475,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 27: /* 3.3.28 Cooling Device */
 			printf("Cooling Device\n");
 			if (h->length < 0x0C) break;
-			if (!(opt.flags & FLAG_QUIET) && WORD(data + 0x04)!=0xFFFF)
+			if (!(opt.flags & FLAG_QUIET) && WORD(data + 0x04) != 0xFFFF)
 				printf("\tTemperature Probe Handle: 0x%04X\n",
 					WORD(data + 0x04));
 			printf("\tType: %s\n",
@@ -3531,7 +3531,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tDescription: %s\n",
 				dmi_string(h, data[0x04]));
 			printf("\tLocation: %s\n",
-			   dmi_voltage_probe_location(data[5] & 0x1F));
+				dmi_voltage_probe_location(data[5] & 0x1F));
 			printf("\tStatus: %s\n",
 				dmi_probe_status(data[0x05] >> 5));
 			printf("\tMaximum Value:");
@@ -3608,11 +3608,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tDescription: %s\n",
 				dmi_string(h, data[0x04]));
 			printf("\tType: %s\n",
-			    dmi_management_device_type(data[0x05]));
+				dmi_management_device_type(data[0x05]));
 			printf("\tAddress: 0x%08X\n",
 				DWORD(data + 0x06));
 			printf("\tAddress Type: %s\n",
-			    dmi_management_device_address_type(data[0x0A]));
+				dmi_management_device_address_type(data[0x0A]));
 			break;
 
 		case 35: /* 3.3.36 Management Device Component */
@@ -3623,9 +3623,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (!(opt.flags & FLAG_QUIET))
 			{
 				printf("\tManagement Device Handle: 0x%04X\n",
-				    WORD(data + 0x05));
+					WORD(data + 0x05));
 				printf("\tComponent Handle: 0x%04X\n",
-				    WORD(data + 0x07));
+					WORD(data + 0x07));
 				if (WORD(data + 0x09) != 0xFFFF)
 					printf("\tThreshold Handle: 0x%04X\n",
 					WORD(data + 0x09));
@@ -4140,12 +4140,12 @@ int main(int argc, char * const argv[])
 			goto exit_free;
 		}
 
-		if (memcmp(buf, "_SM_", 4)==0)
+		if (memcmp(buf, "_SM_", 4) == 0)
 		{
 			if (smbios_decode(buf, opt.dumpfile))
 				found++;
 		}
-		else if (memcmp(buf, "_DMI_", 5)==0)
+		else if (memcmp(buf, "_DMI_", 5) == 0)
 		{
 			if (legacy_decode(buf, opt.dumpfile))
 				found++;
@@ -4192,7 +4192,7 @@ memory_scan:
 				fp += 16;
 			}
 		}
-		else if (memcmp(buf + fp, "_DMI_", 5)==0)
+		else if (memcmp(buf + fp, "_DMI_", 5) == 0)
 		{
 			if (legacy_decode(buf + fp, opt.devmem))
 				found++;
