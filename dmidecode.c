@@ -937,6 +937,7 @@ static void dmi_processor_frequency(const u8 *p)
 		printf("Unknown");
 }
 
+/* code is assumed to be a 3-bit value */
 static const char *dmi_processor_status(u8 code)
 {
 	static const char *status[] = {
@@ -945,14 +946,12 @@ static const char *dmi_processor_status(u8 code)
 		"Disabled By User",
 		"Disabled By BIOS",
 		"Idle", /* 0x04 */
+		out_of_spec,
+		out_of_spec,
 		"Other" /* 0x07 */
 	};
 
-	if (code <= 0x04)
-		return status[code];
-	if (code == 0x07)
-		return status[0x05];
-	return out_of_spec;
+	return status[code];
 }
 
 static const char *dmi_processor_upgrade(u8 code)
@@ -1232,18 +1231,17 @@ static const char *dmi_cache_mode(u8 code)
 	return mode[code];
 }
 
+/* code is assumed to be a 2-bit value */
 static const char *dmi_cache_location(u8 code)
 {
 	static const char *location[4] = {
 		"Internal", /* 0x00 */
 		"External",
-		NULL, /* 0x02 */
+		out_of_spec, /* 0x02 */
 		"Unknown" /* 0x03 */
 	};
 
-	if (location[code] != NULL)
-		return location[code];
-	return out_of_spec;
+	return location[code];
 }
 
 static void dmi_cache_size(u16 code)
@@ -2327,17 +2325,17 @@ static void dmi_battery_maximum_error(u8 code)
  * 3.3.24 System Reset (Type 23)
  */
 
+/* code is assumed to be a 2-bit value */
 static const char *dmi_system_reset_boot_option(u8 code)
 {
 	static const char *option[] = {
+		out_of_spec, /* 0x0 */
 		"Operating System", /* 0x1 */
 		"System Utilities",
 		"Do Not Reboot" /* 0x3 */
 	};
 
-	if (code >= 0x1)
-		return option[code - 0x1];
-	return out_of_spec;
+	return option[code];
 }
 
 static void dmi_system_reset_count(u16 code)
@@ -2722,18 +2720,18 @@ static void dmi_ipmi_base_address(u8 type, const u8 *p, u8 lsb)
 	}
 }
 
+/* code is assumed to be a 2-bit value */
 static const char *dmi_ipmi_register_spacing(u8 code)
 {
 	/* IPMI 2.0, appendix C1, table C1-1 */
 	static const char *spacing[] = {
 		"Successive Byte Boundaries", /* 0x00 */
 		"32-bit Boundaries",
-		"16-byte Boundaries" /* 0x02 */
+		"16-byte Boundaries", /* 0x02 */
+		out_of_spec /* 0x03 */
 	};
 
-	if (code <= 0x02)
-		return spacing[code];
-	return out_of_spec;
+	return spacing[code];
 }
 
 /*
