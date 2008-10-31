@@ -61,7 +61,7 @@
 #include "dmiopt.h"
 #include "dmioem.h"
 
-static const char *out_of_spec = "<OUT OF SPEC>";
+#define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
 /*
