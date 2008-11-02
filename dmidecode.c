@@ -45,6 +45,8 @@
  *  - AMD publication #25481 revision 2.18
  *    "CPUID Specification"
  *    http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/25481.pdf
+ *  - BIOS Integrity Services Application Programming Interface version 1.0
+ *    http://www.intel.com/design/archives/wfm/downloads/bisspec.htm
  */
 
 #include <stdio.h>
@@ -3583,6 +3585,14 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 
 		case 31: /* 3.3.32 Boot Integrity Services Entry Point */
 			printf("Boot Integrity Services Entry Point\n");
+			if (h->length < 0x1C) break;
+			printf("\tChecksum: %s\n",
+				checksum(data, h->length) ? "OK" : "Invalid");
+			printf("\t16-bit Entry Point Address: %04X:%04X\n",
+				DWORD(data + 0x08) >> 16,
+				DWORD(data + 0x08) & 0xFFFF);
+			printf("\t32-bit Entry Point Address: 0x%08X\n",
+				DWORD(data + 0x0C));
 			break;
 
 		case 32: /* 3.3.33 System Boot Information */
