@@ -587,7 +587,7 @@ static const char *dmi_processor_type(u8 code)
 static const char *dmi_processor_family(const struct dmi_header *h)
 {
 	const u8 *data = h->data;
-	unsigned int i;
+	unsigned int i, low, high;
 	u16 code;
 
 	/* 3.3.5.2 */
@@ -753,10 +753,23 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		return "Core 2 or K7";
 	}
 
-	for (i = 0; i < ARRAY_SIZE(family2); i++)
+	/* Perform a binary search */
+	low = 0;
+	high = ARRAY_SIZE(family2) - 1;
+
+	while (1)
+	{
+		i = (low + high) / 2;
 		if (family2[i].value == code)
 			return family2[i].name;
-	return out_of_spec;
+		if (low == high) /* Not found */
+			return out_of_spec;
+
+		if (code < family2[i].value)
+			high = i;
+		else
+			low = i + 1;
+	}
 }
 
 static void dmi_processor_id(u8 type, const u8 *p, const char *version, const char *prefix)
