@@ -1494,12 +1494,17 @@ static const char *dmi_slot_type(u8 code)
 		"PC-98/E",
 		"PC-98/Local Bus",
 		"PC-98/Card",
-		"PCI Express" /* 0xA5 */
+		"PCI Express",
+		"PCI Express x1",
+		"PCI Express x2",
+		"PCI Express x4",
+		"PCI Express x8",
+		"PCI Express x16" /* 0xAA */
 	};
 
 	if (code >= 0x01 && code <= 0x13)
 		return type[code - 0x01];
-	if (code >= 0xA0 && code <= 0xA5)
+	if (code >= 0xA0 && code <= 0xAA)
 		return type_0xA0[code - 0xA0];
 	return out_of_spec;
 }
