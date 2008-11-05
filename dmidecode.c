@@ -3299,6 +3299,13 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_string(h, data[0x19]));
 			printf("\tPart Number: %s\n",
 				dmi_string(h, data[0x1A]));
+			if (h->length < 0x1C) break;
+			printf("\tRank: ");
+			if ((data[0x1B] & 0x0F) == 0)
+				printf("Unknown");
+			else
+				printf("%u", data[0x1B] & 0x0F);
+			printf("\n");
 			break;
 
 		case 18: /* 3.3.19 32-bit Memory Error Information */
