@@ -115,7 +115,7 @@ static int parse_command_line(int argc, char * const argv[])
 {
 	int option;
 	const char *optstring = "d:hV";
-	struct option longopts[]={
+	struct option longopts[] = {
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
 		{ "version", no_argument, NULL, 'V' },

@@ -176,7 +176,7 @@ static size_t pnp_length(const u8 *p)
 
 static const char *pnp_event_notification(u8 code)
 {
-	static const char *notification[]={
+	static const char *notification[] = {
 		"Not Supported", /* 0x0 */
 		"Polling",
 		"Asynchronous",
@@ -192,10 +192,10 @@ static int pnp_decode(const u8 *p, size_t len)
 		return 0;
 
 	printf("PNP BIOS %u.%u present.\n",
-		p[0x04]>>4, p[0x04] & 0x0F);
+		p[0x04] >> 4, p[0x04] & 0x0F);
 	printf("\tEvent Notification: %s\n",
 		pnp_event_notification(WORD(p + 0x06) & 0x03));
-	if ((WORD(p+0x06)&0x03)==0x01)
+	if ((WORD(p + 0x06) & 0x03) == 0x01)
 		printf("\tEvent Notification Flag Address: 0x%08X\n",
 			DWORD(p + 0x09));
 	printf("\tReal Mode 16-bit Code Address: %04X:%04X\n",
@@ -206,7 +206,7 @@ static int pnp_decode(const u8 *p, size_t len)
 		DWORD(p + 0x13) + WORD(p + 0x11));
 	printf("\t16-bit Protected Mode Data Address: 0x%08X\n",
 		DWORD(p + 0x1D));
-	if (DWORD(p + 0x17)!=0)
+	if (DWORD(p + 0x17) != 0)
 		printf("\tOEM Device Identifier: %c%c%c%02X%02X\n",
 			0x40 + ((p[0x17] >> 2) & 0x1F),
 			0x40 + ((p[0x17] & 0x03) << 3) + ((p[0x18] >> 5) & 0x07),
@@ -512,7 +512,7 @@ static int fjkeyinf_decode(const u8 *p, size_t len)
 
 	for (i = 0; i < 6; i++)
 	{
-		if (*(p + 8 + i * 4)==0)
+		if (*(p + 8 + i * 4) == 0)
 			return 1;
 		printf("\tDevice %d: type %u, chip %u", i + 1,
 		       *(p + 8 + i * 4), *(p + 8 + i * 4 + 2));

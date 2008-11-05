@@ -1716,7 +1716,7 @@ static void dmi_system_configuration_options(const struct dmi_header *h, const c
 static void dmi_bios_languages(const struct dmi_header *h, const char *prefix)
 {
 	u8 *p = h->data + 4;
-	u8 count=p[0x00];
+	u8 count = p[0x00];
 	int i;
 
 	for (i = 1; i <= count; i++)
@@ -4107,8 +4107,8 @@ static int address_from_efi(size_t *address)
 	 * Linux up to 2.6.6: /proc/efi/systab
 	 * Linux 2.6.7 and up: /sys/firmware/efi/systab
 	 */
-	if ((efi_systab = fopen(filename="/sys/firmware/efi/systab", "r")) == NULL
-	 && (efi_systab = fopen(filename="/proc/efi/systab", "r")) == NULL)
+	if ((efi_systab = fopen(filename = "/sys/firmware/efi/systab", "r")) == NULL
+	 && (efi_systab = fopen(filename = "/proc/efi/systab", "r")) == NULL)
 	{
 		/* No EFI interface, fallback to memory scan */
 		return EFI_NOT_FOUND;
@@ -4201,13 +4201,13 @@ int main(int argc, char * const argv[])
 	}
 
 	/* First try EFI (ia64, Intel-based Mac) */
-	efi=address_from_efi(&fp);
+	efi = address_from_efi(&fp);
 	switch (efi)
 	{
 		case EFI_NOT_FOUND:
 			goto memory_scan;
 		case EFI_NO_SMBIOS:
-			ret=1;
+			ret = 1;
 			goto exit_free;
 	}
 

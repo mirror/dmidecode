@@ -135,7 +135,7 @@ static int decode(const u8 *p)
 int main(int argc, char * const argv[])
 {
 	u8 *buf;
-	int found=0;
+	int found = 0;
 	unsigned int fp;
 
 	if (sizeof(u8) != 1)
