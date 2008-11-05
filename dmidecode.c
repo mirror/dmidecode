@@ -143,10 +143,12 @@ static const char *dmi_smbios_structure_type(u8 code)
 		"Management Device Threshold Data",
 		"Memory Channel",
 		"IPMI Device",
-		"Power Supply" /* 39 */
+		"Power Supply",
+		"Additional Information",
+		"Onboard Device", /* 41 */
 	};
 
-	if (code <= 39)
+	if (code <= 41)
 		return type[code];
 	return out_of_spec;
 }
@@ -1621,13 +1623,21 @@ static void dmi_slot_characteristics(u8 code1, u8 code2, const char *prefix)
 	}
 }
 
+static void dmi_slot_segment_bus_func(u16 code1, u8 code2, u8 code3, const char *prefix)
+{
+	/* 3.3.10.8 */
+	if (!(code1 == 0xFFFF && code2 == 0xFF && code3 == 0xFF))
+		printf("%sBus Address: %04x:%02x:%02x.%x\n",
+		       prefix, code1, code2, code3 >> 3, code3 & 0x7);
+}
+
 /*
  * 3.3.11 On Board Devices Information (Type 10)
  */
 
 static const char *dmi_on_board_devices_type(u8 code)
 {
-	/* 3.3.11.1 */
+	/* 3.3.11.1 and 3.3.42.2 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -3144,6 +3154,8 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_slot_characteristics(data[0x0B], 0x00, "\t\t");
 			else
 				dmi_slot_characteristics(data[0x0B], data[0x0C], "\t\t");
+			if (h->length < 0x11) break;
+			dmi_slot_segment_bus_func(WORD(data + 0x0D), data[0x0F], data[0x10], "\t");
 			break;
 
 		case 10: /* 3.3.11 On Board Devices Information */
@@ -3784,6 +3796,18 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					printf("\tInput Current Probe Handle: 0x%04X\n",
 						WORD(data + 0x14));
 			}
+			break;
+
+		case 41: /* 3.3.42 Onboard Device Extended Information */
+			printf("Onboard Device\n");
+			if (h->length < 0x0B) break;
+			printf("\tReference Designation: %s\n", dmi_string(h, data[0x04]));
+			printf("\tType: %s\n",
+				dmi_on_board_devices_type(data[0x05] & 0x7F));
+			printf("\tStatus: %s\n",
+				data[0x05] & 0x80 ? "Enabled" : "Disabled");
+			printf("\tType Instance: %u\n", data[0x06]);
+			dmi_slot_segment_bus_func(WORD(data + 0x07), data[0x09], data[0x0A], "\t");
 			break;
 
 		case 126: /* 3.3.41 Inactive */
