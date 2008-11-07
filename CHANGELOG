@@ -1,3 +1,65 @@
+2008-11-07  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Handle base board information records of size 9
+	  (DMI type 2).
+	* dmidecode.c: Don't display access time equivalent of memory
+	  device speed (DMI type 17). The access time didn't add much
+	  value, and rounding effects made it look bad at times.
+
+2008-11-07  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support SMBIOS specification version 2.6, fourth round.
+
+	* dmidecode.c: Initial support for additional information entries
+	  (DMI type 40). Proper support of this new entry type would
+	  require redesigning a large part of the code, so I am waiting
+	  to see actual implementations of it to decide whether it's worth
+	  the effort.
+	* dmidecode.c, dmidecode.8: Update reference SMBIOS document.
+	* dmiopt.c, dmidecode.8: Include entry type 41 in --type baseboard.
+
+2008-11-05  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support SMBIOS specification version 2.6, third round.
+
+	* dmidecode.c: Decode the group number, bus number and
+	  device/function number of system slots (DMI type 9).
+	  Based on a preliminary patch by Matt Domsch.
+	* dmidecode.c: Decode onboard devices extended information
+	  entries (DMI type 41). Based on a preliminary patch by Matt
+	  Domsch.
+	* dmidecode.c: Add slot types "PCI Express x1", "PCI Express x2",
+	  "PCI Express x4", "PCI Express x8" and "PCI Express x16"
+	  (DMI type 9).
+	* dmidecode.c: Decode the memory device rank (DMI type 17).
+
+2008-11-02  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Use binary search for dmi_processor_family, it's
+	  faster than linear search (DMI type 4).
+	* dmidecode.c: Decode boot integrity services entry point entries
+	  (DMI type 31).
+
+2008-10-31  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: The compiler knows how to reuse strings, it doesn't
+	  need our help, and actually it does a better job without it. So,
+	  turn out_of_spec into a define.
+	* dmidecode.c: Optimize functions dmi_processor_status(),
+	  dmi_cache_location(), dmi_system_reset_boot_option() and
+	  dmi_ipmi_register_spacing().
+
+2008-10-30  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c, dmiopt.c, dmidecode.8: Option --dump is only a
+	  modifier as --quiet is, so it's not actually mutually exclusive
+	  with the output format options.
+	* dmidecode.c: Make options --dump-bin and --quiet work together.
+	* dmidecode.c: Delay string filtering when option --dump is used.
+	* dmidecode.c: Refactor dmi_processor_family function to avoid
+	  code duplication.
+	* dmidecode.c: Fix up invalid SMBIOS version 2.51.
+
 2008-10-29  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Handle special case of processor family code 0xBE,
