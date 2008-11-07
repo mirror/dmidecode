@@ -2829,6 +2829,60 @@ static const char *dmi_power_supply_range_switching(u8 code)
 }
 
 /*
+ * 3.3.41 Additional Information (Type 40)
+ *
+ * Proper support of this entry type would require redesigning a large part of
+ * the code, so I am waiting to see actual implementations of it to decide
+ * whether it's worth the effort.
+ */
+
+static void dmi_additional_info(const struct dmi_header *h, const char *prefix)
+{
+	u8 *p = h->data + 4;
+	u8 count = *p++;
+	u8 length;
+	int i, offset = 5;
+
+	for (i = 0; i < count; i++)
+	{
+		printf("%sAdditional Information %d\n", prefix, i + 1);
+
+		/* Check for short entries */
+		if (h->length < offset + 1) break;
+		length = p[0x00];
+		if (length < 0x05 || h->length < offset + length) break;
+
+		printf("%s\tReferenced Handle: 0x%04x\n",
+			prefix, WORD(p + 0x01));
+		printf("%s\tReferenced Offset: 0x%02x\n",
+			prefix, p[0x03]);
+		printf("%s\tString: %s\n",
+			prefix, dmi_string(h, p[0x04]));
+
+		printf("%s\tValue: ", prefix);
+		switch (length - 0x05)
+		{
+			case 1:
+				printf("0x%02x", p[0x05]);
+				break;
+			case 2:
+				printf("0x%04x", WORD(p + 0x05));
+				break;
+			case 4:
+				printf("0x%08x", DWORD(p + 0x05));
+				break;
+			default:
+				printf("Unexpected size");
+				break;
+		}
+		printf("\n");
+
+		p += length;
+		offset += length;
+	}
+}
+
+/*
  * Main
  */
 
@@ -2837,7 +2891,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 	const u8 *data = h->data;
 
 	/*
-	 * Note: DMI types 37 and 39 are untested
+	 * Note: DMI types 37, 39 and 40 are untested
 	 */
 	switch (h->type)
 	{
@@ -3808,6 +3862,12 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					printf("\tInput Current Probe Handle: 0x%04X\n",
 						WORD(data + 0x14));
 			}
+			break;
+
+		case 40: /* 3.3.41 Additional Information */
+			if (h->length < 0x0B) break;
+			if (!(opt.flags & FLAG_QUIET))
+				dmi_additional_info(h, "");
 			break;
 
 		case 41: /* 3.3.42 Onboard Device Extended Information */
