@@ -25,7 +25,7 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 2.5" document,
+ * Management BIOS Reference Specification, Version 2.6" document,
  * available from http://www.dmtf.org/standards/smbios/.
  *
  * Note to contributors:
@@ -3882,11 +3882,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_slot_segment_bus_func(WORD(data + 0x07), data[0x09], data[0x0A], "\t");
 			break;
 
-		case 126: /* 3.3.41 Inactive */
+		case 126: /* 3.3.43 Inactive */
 			printf("Inactive\n");
 			break;
 
-		case 127: /* 3.3.42 End Of Table */
+		case 127: /* 3.3.44 End Of Table */
 			printf("End Of Table\n");
 			break;
 
