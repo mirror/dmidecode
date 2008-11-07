@@ -2969,9 +2969,10 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_string(h, data[0x06]));
 			printf("\tSerial Number: %s\n",
 				dmi_string(h, data[0x07]));
-			if (h->length < 0x0A) break;
+			if (h->length < 0x09) break;
 			printf("\tAsset Tag: %s\n",
 				dmi_string(h, data[0x08]));
+			if (h->length < 0x0A) break;
 			printf("\tFeatures:");
 			dmi_base_board_features(data[0x09], "\t\t");
 			if (h->length < 0x0F) break;
