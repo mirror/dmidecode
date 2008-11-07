@@ -47,7 +47,7 @@ struct type_keyword
 
 static const u8 opt_type_bios[] = { 0, 13, 255 };
 static const u8 opt_type_system[] = { 1, 12, 15, 23, 32, 255 };
-static const u8 opt_type_baseboard[] = { 2, 10, 255 };
+static const u8 opt_type_baseboard[] = { 2, 10, 41, 255 };
 static const u8 opt_type_chassis[] = { 3, 255 };
 static const u8 opt_type_processor[] = { 4, 255 };
 static const u8 opt_type_memory[] = { 5, 6, 16, 17, 255 };
