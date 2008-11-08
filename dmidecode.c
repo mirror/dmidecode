@@ -36,9 +36,6 @@
  *  - Intel AP-485 revision 31
  *    "Intel Processor Identification and the CPUID Instruction"
  *    http://developer.intel.com/design/xeon/applnots/241618.htm
- *  - DMTF Master MIF version 040707
- *    "DMTF approved standard groups"
- *    http://www.dmtf.org/standards/dmi
  *  - DMTF Common Information Model
  *    CIM Schema version 2.19.1
  *    http://www.dmtf.org/standards/cim/
@@ -468,7 +465,7 @@ static const char *dmi_chassis_type(u8 code)
 		"Sub Notebook",
 		"Space-saving",
 		"Lunch Box",
-		"Main Server Chassis", /* master.mif says System */
+		"Main Server Chassis", /* CIM_Chassis.ChassisPackageType says "Main System Chassis" */
 		"Expansion Chassis",
 		"Sub Chassis",
 		"Bus Expansion Chassis",
@@ -504,7 +501,7 @@ static const char *dmi_chassis_state(u8 code)
 	static const char *state[] = {
 		"Other", /* 0x01 */
 		"Unknown",
-		"Safe", /* master.mif says OK */
+		"Safe",
 		"Warning",
 		"Critical",
 		"Non-recoverable" /* 0x06 */
@@ -1946,14 +1943,13 @@ static const char *dmi_memory_array_location(u8 code)
 		"MCA Add-on Card",
 		"PCMCIA Add-on Card",
 		"Proprietary Add-on Card",
-		"NuBus" /* 0x0A, master.mif says 16 */
+		"NuBus" /* 0x0A */
 	};
 	static const char *location_0xA0[] = {
 		"PC-98/C20 Add-on Card", /* 0xA0 */
 		"PC-98/C24 Add-on Card",
 		"PC-98/E Add-on Card",
-		"PC-98/Local Bus Add-on Card",
-		"PC-98/Card Slot Add-on Card" /* 0xA4, from master.mif */
+		"PC-98/Local Bus Add-on Card" /* 0xA3 */
 	};
 
 	if (code >= 0x01 && code <= 0x0A)
@@ -2552,8 +2548,8 @@ static const char *dmi_cooling_device_type(u8 code)
 		"Integrated Refrigeration" /* 0x09 */
 	};
 	static const char *type_0x10[] = {
-		"Active Cooling", /* 0x10, master.mif says 32 */
-		"Passive Cooling" /* 0x11, master.mif says 33 */
+		"Active Cooling", /* 0x10 */
+		"Passive Cooling" /* 0x11 */
 	};
 
 	if (code >= 0x01 && code <= 0x09)
@@ -2584,7 +2580,7 @@ static const char *dmi_temperature_probe_location(u8 code)
 		"Processor",
 		"Disk",
 		"Peripheral Bay",
-		"System Management Module", /* master.mif says SMB Master */
+		"System Management Module",
 		"Motherboard",
 		"Memory Module",
 		"Processor Module",
