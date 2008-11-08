@@ -39,6 +39,9 @@
  *  - DMTF Master MIF version 040707
  *    "DMTF approved standard groups"
  *    http://www.dmtf.org/standards/dmi
+ *  - DMTF Common Information Model
+ *    CIM Schema version 2.19.1
+ *    http://www.dmtf.org/standards/cim/
  *  - IPMI 2.0 revision 1.0
  *    "Intelligent Platform Management Interface Specification"
  *    http://developer.intel.com/design/servers/ipmi/spec.htm
@@ -618,6 +621,8 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0x11, "Pentium III" },
 		{ 0x12, "M1" },
 		{ 0x13, "M2" },
+		{ 0x14, "Celeron M" }, /* From CIM_Processor.Family */
+		{ 0x15, "Pentium 4 HT" }, /* From CIM_Processor.Family */
 
 		{ 0x18, "Duron" },
 		{ 0x19, "K5" },
@@ -635,6 +640,10 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0x25, "Power PC 620" },
 		{ 0x26, "Power PC x704" },
 		{ 0x27, "Power PC 750" },
+		{ 0x28, "Core Duo" }, /* From CIM_Processor.Family */
+		{ 0x29, "Core Duo Mobile" }, /* From CIM_Processor.Family */
+		{ 0x2A, "Core Solo Mobile" }, /* From CIM_Processor.Family */
+		{ 0x2B, "Atom" }, /* From CIM_Processor.Family */
 
 		{ 0x30, "Alpha" },
 		{ 0x31, "Alpha 21064" },
@@ -685,7 +694,12 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0x87, "Dual-Core Opteron" },
 		{ 0x88, "Athlon 64 X2" },
 		{ 0x89, "Turion 64 X2" },
-
+		{ 0x8A, "Quad-Core Opteron" }, /* From CIM_Processor.Family */
+		{ 0x8B, "Third-Generation Opteron" }, /* From CIM_Processor.Family */
+		{ 0x8C, "Phenom FX" }, /* From CIM_Processor.Family */
+		{ 0x8D, "Phenom X4" }, /* From CIM_Processor.Family */
+		{ 0x8E, "Phenom X2" }, /* From CIM_Processor.Family */
+		{ 0x8F, "Athlon X2" }, /* From CIM_Processor.Family */
 		{ 0x90, "PA-RISC" },
 		{ 0x91, "PA-RISC 8500" },
 		{ 0x92, "PA-RISC 8000" },
@@ -695,6 +709,16 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0x96, "PA-RISC 7100" },
 
 		{ 0xA0, "V30" },
+		{ 0xA1, "Quad-Core Xeon 3200" }, /* From CIM_Processor.Family */
+		{ 0xA2, "Dual-Core Xeon 3000" }, /* From CIM_Processor.Family */
+		{ 0xA3, "Quad-Core Xeon 5300" }, /* From CIM_Processor.Family */
+		{ 0xA4, "Dual-Core Xeon 5100" }, /* From CIM_Processor.Family */
+		{ 0xA5, "Dual-Core Xeon 5000" }, /* From CIM_Processor.Family */
+		{ 0xA6, "Dual-Core Xeon LV" }, /* From CIM_Processor.Family */
+		{ 0xA7, "Dual-Core Xeon ULV" }, /* From CIM_Processor.Family */
+		{ 0xA8, "Dual-Core Xeon 7100" }, /* From CIM_Processor.Family */
+		{ 0xA9, "Quad-Core Xeon 5400" }, /* From CIM_Processor.Family */
+		{ 0xAA, "Quad-Core Xeon" }, /* From CIM_Processor.Family */
 
 		{ 0xB0, "Pentium III Xeon" },
 		{ 0xB1, "Pentium III Speedstep" },
@@ -712,6 +736,12 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0xBD, "Core Solo" },
 		/* 0xBE handled as a special case */
 		{ 0xBF, "Core 2 Duo" },
+		{ 0xC0, "Core 2 Solo" }, /* From CIM_Processor.Family */
+		{ 0xC1, "Core 2 Extreme" }, /* From CIM_Processor.Family */
+		{ 0xC2, "Core 2 Quad" }, /* From CIM_Processor.Family */
+		{ 0xC3, "Core 2 Extreme Mobile" }, /* From CIM_Processor.Family */
+		{ 0xC4, "Core 2 Duo Mobile" }, /* From CIM_Processor.Family */
+		{ 0xC5, "Core 2 Solo Mobile" }, /* From CIM_Processor.Family */
 
 		{ 0xC8, "IBM390" },
 		{ 0xC9, "G4" },
@@ -723,6 +753,13 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0xD3, "C7-D" },
 		{ 0xD4, "C7" },
 		{ 0xD5, "Eden" },
+
+		{ 0xE6, "Embedded Opteron Quad-Core" }, /* From CIM_Processor.Family */
+		{ 0xE7, "Phenom Triple-Core" }, /* From CIM_Processor.Family */
+		{ 0xE8, "Turion Ultra Dual-Core Mobile" }, /* From CIM_Processor.Family */
+		{ 0xE9, "Turion Dual-Core Mobile" }, /* From CIM_Processor.Family */
+		{ 0xEA, "Athlon Dual-Core" }, /* From CIM_Processor.Family */
+		{ 0xEB, "Sempron SI" }, /* From CIM_Processor.Family */
 
 		{ 0xFA, "i860" },
 		{ 0xFB, "i960" },
