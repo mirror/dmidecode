@@ -1,3 +1,22 @@
+2008-11-09  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Decode the CPUID of more Intel, VIA and AMD
+	  processors (DMI type 4).
+	* dmidecode.c: More CPUID exceptions based on the version string
+	  (DMI type 4).
+	* README: Drop reference to the Linux kernel.
+	* README: Drop "model-specific issues" common problem entry, it is
+	  no longer relevant.
+	* README: Simplify "IA-64" common problem entry, most of the
+	  issues are solved by now.
+
+2008-11-08  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Add many processor types taken from the CIM Schema.
+	* dmidecode.c: Drop all references to the DMTF Master MIF
+	  document. This document hasn't been updated in years, so the
+	  additions it may contain are no longer relevant.
+
 2008-11-07  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Handle base board information records of size 9
