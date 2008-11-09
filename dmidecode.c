@@ -914,7 +914,10 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 		 * we use the version string to determine if they are known to
 		 * support the CPUID instruction.
 		 */
-		if (strncmp(version, "Pentium III MMX", 15) == 0)
+		if (strncmp(version, "Pentium III MMX", 15) == 0
+		 || strncmp(version, "Intel(R) Core(TM)2", 18) == 0
+		 || strncmp(version, "Intel(R) Pentium(R)", 19) == 0
+		 || strcmp(version, "Genuine Intel(R) CPU U1400") == 0)
 			sig = 1;
 		else if (strncmp(version, "AMD Athlon(TM)", 14) == 0
 		      || strncmp(version, "AMD Opteron(tm)", 15) == 0)
