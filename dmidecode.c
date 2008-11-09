@@ -920,7 +920,8 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 		 || strcmp(version, "Genuine Intel(R) CPU U1400") == 0)
 			sig = 1;
 		else if (strncmp(version, "AMD Athlon(TM)", 14) == 0
-		      || strncmp(version, "AMD Opteron(tm)", 15) == 0)
+		      || strncmp(version, "AMD Opteron(tm)", 15) == 0
+		      || strncmp(version, "Dual-Core AMD Opteron(tm)", 25) == 0)
 			sig = 2;
 		else
 			return;
