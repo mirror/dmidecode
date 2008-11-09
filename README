@@ -9,11 +9,10 @@ include usage status for the CPU sockets, expansion slots (e.g. AGP, PCI,
 ISA) and memory module slots, and the list of I/O ports (e.g. serial,
 parallel, USB).
 
-Part of the dmidecode code can be found in the Linux kernel, where DMI data
-is used to enable or disable specific portions of code depending on the
-specific hardware. Thus, one use of dmidecode is for kernel developers to
-detect system "signatures" and add them to the kernel source code when
-needed.
+DMI data can be used to enable or disable specific portions of kernel code
+depending on the specific hardware. Thus, one use of dmidecode is for kernel
+developers to detect system "signatures" and add them to the kernel source
+code when needed.
 
 Beware that DMI data have proven to be too unreliable to be blindly trusted.
 Dmidecode does not scan your hardware, it only reports what the BIOS told it
@@ -70,39 +69,9 @@ joining the dmidecode-devel discussion list:
 
 ** COMMON PROBLEMS **
 
-MODEL SPECIFIC ISSUES
-
-Dmidecode used not to work on IBM T-series laptops nor on Fujitsu-Siemens
-S-series laptops under Linux. This was due to the fact that the DMI table
-is at a memory location we couldn't seem to reach through /dev/mem. Although
-I believe this reveals a problem in the Linux kernel, which should be fixed,
-a workaround was found by Chad Smith, and we are using it for now. See the
-IA-64 subsection below for more details. I posted about this problem on the
-LKML but never received any answer. Since then, the list of affected systems
-was extended to IBM X-series laptops and xSeries x445 servers.
-
 IA-64
 
-Dmidecode used to have problems on IA-64 systems. The first reason for
-this is that dmidecode accesses the DMI table through /dev/mem, and reading
-this file on an IA-64 system sometimes leads to a crash. A second reason is
-that the method for locating the above-mentioned table differs on IA-64
-(compared to x86), so dmidecode was likely to miss the table entry point.
-This complex issue was reported by Glen Foster and Chad Smith from HP. We
-have since been working on a solution, and dmidecode now supports IA-64
-systems. Chad Smith noticed that, for some obscure reason, accessing the
-/dev/mem file using mmap() instead of read() would work. Then, he wrote a
-patch to export the DMI table address from the internal EFI table to /proc,
-so dmidecode doesn't have to scan /dev/mem for it anymore. This patch was
-since integrated into the main ia64 patch. Finally, I added the required
-code to make it all work. So, in order to have dmidecode work on your IA-64
-system, you need two things:
- - dmidecode version 2.2 or later;
- - an ia64 patched 2.4 kernel, using linux-2.4.21-ia64-030702.diff or any
-   later version, or a 2.6 kernel.
-Chad Smith tested dmidecode successfully on two different IA-64 systems, and
-success has been reported by other users too. Non-Linux systems are not
-supported.
+Non-Linux systems are not yet supported.
 
 MMAP
 
@@ -110,7 +79,7 @@ Note that mmap() is now used by default wherever possible, since this seems
 to solve a number of problems. This default behavior can be changed in
 config.h. Just to make sure this is clear, mmap() is not used for performance
 reasons but to increase the number of systems on which dmidecode can be
-successfully run. See the IA-64 subsection above for details.
+successfully run.
 
 CYGWIN
 
