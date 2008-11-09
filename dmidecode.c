@@ -893,15 +893,19 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 			return;
 		}
 	}
-	else if ((type >= 0x0B && type <= 0x13) /* Intel, Cyrix */
+	else if ((type >= 0x0B && type <= 0x15) /* Intel, Cyrix */
+	      || (type >= 0x28 && type <= 0x2B) /* Intel */
+	      || (type >= 0xA1 && type <= 0xAA) /* Intel */
 	      || (type >= 0xB0 && type <= 0xB3) /* Intel */
 	      || type == 0xB5 /* Intel */
-	      || (type >= 0xB9 && type <= 0xBC)) /* Intel */
+	      || (type >= 0xB9 && type <= 0xC5) /* Intel */
+	      || (type >= 0xD2 && type <= 0xD5)) /* VIA */
 		sig = 1;
 	else if ((type >= 0x18 && type <= 0x1D) /* AMD */
 	      || type == 0x1F /* AMD */
+	      || (type >= 0x83 && type <= 0x8F) /* AMD */
 	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
-	      || (type >= 0x83 && type <= 0x88)) /* AMD */
+	      || (type >= 0xE6 && type <= 0xEB)) /* AMD */
 		sig = 2;
 	else if (type == 0x01 || type == 0x02)
 	{
