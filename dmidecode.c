@@ -42,7 +42,7 @@
  *  - IPMI 2.0 revision 1.0
  *    "Intelligent Platform Management Interface Specification"
  *    http://developer.intel.com/design/servers/ipmi/spec.htm
- *  - AMD publication #25481 revision 2.18
+ *  - AMD publication #25481 revision 2.28
  *    "CPUID Specification"
  *    http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/25481.pdf
  *  - BIOS Integrity Services Application Programming Interface version 1.0
@@ -940,7 +940,7 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 				((eax >> 12) & 0xF0) + ((eax >> 4) & 0x0F),
 				eax & 0xF);
 			break;
-		case 2: /* AMD */
+		case 2: /* AMD, publication #25481 revision 2.28 */
 			printf("%sSignature: Family %u, Model %u, Stepping %u\n",
 				prefix,
 				((eax >> 8) & 0xF) + (((eax >> 8) & 0xF) == 0xF ? (eax >> 20) & 0xFF : 0),
