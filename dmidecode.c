@@ -33,7 +33,7 @@
  * information does not come from the above mentioned specification.
  *
  * Additional references:
- *  - Intel AP-485 revision 31
+ *  - Intel AP-485 revision 32
  *    "Intel Processor Identification and the CPUID Instruction"
  *    http://developer.intel.com/design/xeon/applnots/241618.htm
  *  - DMTF Common Information Model
@@ -812,7 +812,7 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 
 static void dmi_processor_id(u8 type, const u8 *p, const char *version, const char *prefix)
 {
-	/* Intel AP-485 revision 31, table 3-4 */
+	/* Intel AP-485 revision 32, table 3-4 */
 	static const char *flags[32] = {
 		"FPU (Floating-point unit on-chip)", /* 0 */
 		"VME (Virtual mode extension)",
