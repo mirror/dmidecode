@@ -3056,13 +3056,14 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x11) break;
 			printf("\tOEM Information: 0x%08X\n",
 				DWORD(data + 0x0D));
-			if (h->length < 0x15) break;
+			if (h->length < 0x13) break;
 			printf("\tHeight:");
 			dmi_chassis_height(data[0x11]);
 			printf("\n");
 			printf("\tNumber Of Power Cords:");
 			dmi_chassis_power_cords(data[0x12]);
 			printf("\n");
+			if (h->length < 0x15) break;
 			if (h->length < 0x15 + data[0x13] * data[0x14]) break;
 			dmi_chassis_elements(data[0x13], data[0x14], data + 0x15, "\t");
 			break;
