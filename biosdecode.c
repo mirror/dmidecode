@@ -545,7 +545,7 @@ static struct bios_entry bios_entries[] = {
 };
 
 /* Believe it or not, this is significantly faster than memcmp and strncmp */
-static inline int anchor_match(const struct bios_entry *entry, const char *p)
+static int anchor_match(const struct bios_entry *entry, const char *p)
 {
 	size_t i;
 
