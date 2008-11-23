@@ -1,3 +1,22 @@
+2008-11-23  Jean Delvare  <khali@linux-fr.org>
+
+	* biosdecode.c: Stop using the inline keyword. It causes more
+	  portability issues than is worth given how little we care about
+	  performance in this tool, and recent versions of gcc know when
+	  to inline functions anyway.
+	* version.h: Set version to 2.10.
+
+2008-11-14  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Handle chassis information records of size 19
+	  (DMI type 3).
+
+2008-11-10  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Claim to support revision 32 of Intel AP-485
+	  (CPUID). No relevant change since revision 31.
+	* dmidecode.c: Update reference to AMD CPUID document.
+
 2008-11-09  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Decode the CPUID of more Intel, VIA and AMD
