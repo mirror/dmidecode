@@ -2,7 +2,7 @@
  * BIOS Decode
  *
  *   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   Copyright (C) 2002-2007 Jean Delvare <khali@linux-fr.org>
+ *   Copyright (C) 2002-2008 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -544,7 +544,7 @@ static struct bios_entry bios_entries[] = {
 	{ NULL, 0, 0, 0, NULL, NULL }
 };
 
-/* Believe it or not, this is significantly faster than memcmp and strncmp */
+/* Believe it or not, this is significantly faster than memcmp */
 static int anchor_match(const struct bios_entry *entry, const char *p)
 {
 	size_t i;
