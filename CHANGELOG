@@ -1,3 +1,7 @@
+2009-04-04  Jean Delvare  <khali@linux-fr.org>
+
+	* Makefile: Clarify license.
+
 2008-11-23  Jean Delvare  <khali@linux-fr.org>
 
 	* biosdecode.c: Stop using the inline keyword. It causes more
