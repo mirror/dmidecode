@@ -66,6 +66,8 @@
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
+#define SUPPORTED_SMBIOS_VER 0x0206
+
 /*
  * Type-independant Stuff
  */
@@ -4004,6 +4006,13 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 	u8 *buf;
 	u8 *data;
 	int i = 0;
+
+	if (ver > SUPPORTED_SMBIOS_VER)
+	{
+		printf("# SMBIOS implementations newer than version %u.%u are not\n"
+		       "# fully supported by this version of dmidecode.\n",
+		       SUPPORTED_SMBIOS_VER >> 8, SUPPORTED_SMBIOS_VER & 0xFF);
+	}
 
 	if (opt.flags & FLAG_DUMP_BIN)
 	{
