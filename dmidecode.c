@@ -2007,7 +2007,7 @@ static const char *dmi_memory_array_ec_type(u8 code)
 
 static void dmi_memory_array_capacity(u32 code)
 {
-	if (code == 0x8000000)
+	if (code == 0x80000000)
 		printf(" Unknown");
 	else
 	{
