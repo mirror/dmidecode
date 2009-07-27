@@ -41,7 +41,7 @@ static enum DMI_VENDORS dmi_vendor = VENDOR_UNKNOWN;
  */
 void dmi_set_vendor(const char *s)
 {
-	if (strcmp(s, "HP") == 0)
+	if (strcmp(s, "HP") == 0 || strcmp(s, "Hewlett-Packard") == 0)
 		dmi_vendor = VENDOR_HP;
 }
 
