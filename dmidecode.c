@@ -1042,10 +1042,11 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket LGA775",
 		"Socket S1",
 		"Socket AM2",
-		"Socket F (1207)" /* 0x18 */
+		"Socket F (1207)",
+		"Socket LGA1366" /* 0x19 */
 	};
 
-	if (code >= 0x01 && code <= 0x18)
+	if (code >= 0x01 && code <= 0x19)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }

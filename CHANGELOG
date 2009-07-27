@@ -1,3 +1,10 @@
+2009-07-27  Jean Delvare  <khali@linux-fr.org>
+
+	* dmioem.c: Recognize "Hewlett-Packard" as a possible DMI vendor
+	  string for HP. Orginal patch from Thomas Hiller (HP).
+	* dmidecode.c: Add processor upgrade type "Socket LGA1366"
+	  (DMI type 4).
+
 2009-06-19  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fix decoding of memory array capacity. A maximum
