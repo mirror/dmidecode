@@ -25,7 +25,7 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 2.6" document,
+ * Management BIOS Reference Specification, Version 2.6.1" document,
  * available from http://www.dmtf.org/standards/smbios/.
  *
  * Note to contributors:
@@ -361,7 +361,7 @@ static void dmi_system_uuid(const u8 *p, u16 ver)
 
 static const char *dmi_system_wake_up_type(u8 code)
 {
-	/* 3.3.2.1 */
+	/* 3.3.2.2 */
 	static const char *type[] = {
 		"Reserved", /* 0x00 */
 		"Other",
@@ -719,6 +719,12 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0xA9, "Quad-Core Xeon 5400" }, /* From CIM_Processor.Family */
 		{ 0xAA, "Quad-Core Xeon" }, /* From CIM_Processor.Family */
 
+		{ 0xAB, "Dual-Core Xeon 5200" },
+		{ 0xAC, "Dual-Core Xeon 7200" },
+		{ 0xAD, "Quad-Core Xeon 7300" },
+		{ 0xAE, "Quad-Core Xeon 7400" },
+		{ 0xAF, "Multi-Core Xeon 7400" },
+
 		{ 0xB0, "Pentium III Xeon" },
 		{ 0xB1, "Pentium III Speedstep" },
 		{ 0xB2, "Pentium 4" },
@@ -741,6 +747,8 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0xC3, "Core 2 Extreme Mobile" }, /* From CIM_Processor.Family */
 		{ 0xC4, "Core 2 Duo Mobile" }, /* From CIM_Processor.Family */
 		{ 0xC5, "Core 2 Solo Mobile" }, /* From CIM_Processor.Family */
+		{ 0xC6, "Core i7" },
+		{ 0xC7, "Dual-Core Celeron" },
 
 		{ 0xC8, "IBM390" },
 		{ 0xC9, "G4" },
@@ -752,6 +760,17 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0xD3, "C7-D" },
 		{ 0xD4, "C7" },
 		{ 0xD5, "Eden" },
+
+		{ 0xD6, "Multi-Core Xeon" },
+		{ 0xD7, "Dual-Core Xeon 3xxx" },
+		{ 0xD8, "Quad-Core Xeon 3xxx" },
+
+		{ 0xDA, "Dual-Core Xeon 5xxx" },
+		{ 0xDB, "Quad-Core Xeon 5xxx" },
+
+		{ 0xDD, "Dual-Core Xeon 7xxx" },
+		{ 0xDD, "Quad-Core Xeon 7xxx" },
+		{ 0xDD, "Multi-Core Xeon 7xxx" },
 
 		{ 0xE6, "Embedded Opteron Quad-Core" }, /* From CIM_Processor.Family */
 		{ 0xE7, "Phenom Triple-Core" }, /* From CIM_Processor.Family */
@@ -1383,10 +1402,15 @@ static const char *dmi_cache_associativity(u8 code)
 		"4-way Set-associative",
 		"Fully Associative",
 		"8-way Set-associative",
-		"16-way Set-associative" /* 0x08 */
+		"16-way Set-associative",
+		"12-way Set-associative",
+		"24-way Set-associative",
+		"32-way Set-associative",
+		"48-way Set-associative",
+		"64-way Set-associative" /* 0x0D */
 	};
 
-	if (code >= 0x01 && code <= 0x08)
+	if (code >= 0x01 && code <= 0x0D)
 		return type[code - 0x01];
 	return out_of_spec;
 }
@@ -1544,12 +1568,18 @@ static const char *dmi_slot_type(u8 code)
 		"PCI Express x2",
 		"PCI Express x4",
 		"PCI Express x8",
-		"PCI Express x16" /* 0xAA */
+		"PCI Express x16", /* 0xAA */
+		"PCI Express Gen 2",
+		"PCI Express Gen 2 x1",
+		"PCI Express Gen 2 x2",
+		"PCI Express Gen 2 x4",
+		"PCI Express Gen 2 x8",
+		"PCI Express Gen 2 x16", /* 0xB0 */
 	};
 
 	if (code >= 0x01 && code <= 0x13)
 		return type[code - 0x01];
-	if (code >= 0xA0 && code <= 0xAA)
+	if (code >= 0xA0 && code <= 0xB0)
 		return type_0xA0[code - 0xA0];
 	return out_of_spec;
 }
@@ -2120,10 +2150,15 @@ static const char *dmi_memory_device_type(u8 code)
 		"RDRAM",
 		"DDR",
 		"DDR2",
-		"DDR2 FB-DIMM" /* 0x14 */
+		"DDR2 FB-DIMM",
+		"Reserved",
+		"Reserved",
+		"Reserved",
+		"DDR3",
+		"FBD2", /* 0x19 */
 	};
 
-	if (code >= 0x01 && code <= 0x14)
+	if (code >= 0x01 && code <= 0x19)
 		return type[code - 0x01];
 	return out_of_spec;
 }
