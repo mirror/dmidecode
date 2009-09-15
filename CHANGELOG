@@ -8,7 +8,6 @@
 	  "Multi-Core Xeon", "Dual-Core Xeon 3xxx", "Quad-Core Xeon 3xxx",
 	  "Dual-Core Xeon 5xxx", "Quad-Core Xeon 5xxx", "Dual-Core Xeon 7xxx",
 	  "Quad-Core Xeon 7xxx" and "Multi-Core Xeon 7xxx" (DMI type 4).
-	* dmidecode.c: Add processor upgrade type "Socket LGA1366" (DMI type 4).
 	* dmidecode.c: Add slot types "PCI Express Gen 2 x1",
 	  "PCI Express Gen 2 x2", "PCI Express Gen 2 x4",
 	  "PCI Express Gen 2 x8" and "PCI Express Gen 2 x16" (DMI type 9).
