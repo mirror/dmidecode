@@ -1,3 +1,8 @@
+2010-09-21  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix Xeon 7xxx entries in CPU name lookup table
+	  (DMI type 4). Patch from Paul Flo Williams.
+
 2009-08-28  Jarod Wilson  <jarod@redhat.com>
 
 	Update to support SMBIOS specification version 2.6.1.

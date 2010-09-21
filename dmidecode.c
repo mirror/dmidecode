@@ -769,8 +769,8 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0xDB, "Quad-Core Xeon 5xxx" },
 
 		{ 0xDD, "Dual-Core Xeon 7xxx" },
-		{ 0xDD, "Quad-Core Xeon 7xxx" },
-		{ 0xDD, "Multi-Core Xeon 7xxx" },
+		{ 0xDE, "Quad-Core Xeon 7xxx" },
+		{ 0xDF, "Multi-Core Xeon 7xxx" },
 
 		{ 0xE6, "Embedded Opteron Quad-Core" }, /* From CIM_Processor.Family */
 		{ 0xE7, "Phenom Triple-Core" }, /* From CIM_Processor.Family */
