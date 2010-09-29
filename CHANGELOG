@@ -1,3 +1,8 @@
+2010-09-29  Anton Arapov  <anton@redhat.com>
+
+	* util.c: makes dmidecode fall back to regular reads if the mmap
+	  fails. Patch from Olof Johansson.
+
 2010-09-21  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fix Xeon 7xxx entries in CPU name lookup table

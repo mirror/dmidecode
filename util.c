@@ -47,7 +47,6 @@
 #include "types.h"
 #include "util.h"
 
-#ifndef USE_MMAP
 static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 {
 	ssize_t r = 1;
@@ -78,7 +77,6 @@ static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 
 	return 0;
 }
-#endif
 
 int checksum(const u8 *buf, size_t len)
 {
@@ -128,12 +126,7 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 	 */
 	mmp = mmap(0, mmoffset + len, PROT_READ, MAP_SHARED, fd, base - mmoffset);
 	if (mmp == MAP_FAILED)
-	{
-		fprintf(stderr, "%s: ", devmem);
-		perror("mmap");
-		free(p);
-		return NULL;
-	}
+		goto try_read;
 
 	memcpy(p, (u8 *)mmp + mmoffset, len);
 
@@ -142,7 +135,12 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 		fprintf(stderr, "%s: ", devmem);
 		perror("munmap");
 	}
-#else /* USE_MMAP */
+
+	goto out;
+
+#endif /* USE_MMAP */
+
+try_read:
 	if (lseek(fd, base, SEEK_SET) == -1)
 	{
 		fprintf(stderr, "%s: ", devmem);
@@ -156,8 +154,8 @@ void *mem_chunk(size_t base, size_t len, const char *devmem)
 		free(p);
 		return NULL;
 	}
-#endif /* USE_MMAP */
 
+out:
 	if (close(fd) == -1)
 		perror(devmem);
 
