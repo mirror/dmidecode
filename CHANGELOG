@@ -1,3 +1,9 @@
+2010-10-11  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: One more SMBIOS version fix-up case.
+	* Makefile: Rework BSD make compatibility trick. The previous
+	  trick would break GNU make 3.82.
+
 2010-09-29  Anton Arapov  <anton@redhat.com>
 
 	* util.c: makes dmidecode fall back to regular reads if the mmap
