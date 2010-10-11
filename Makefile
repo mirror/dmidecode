@@ -38,12 +38,18 @@ INSTALL_DIR     := $(INSTALL) -m 755 -d
 INSTALL_PROGRAM := $(INSTALL) -m 755
 RM              := rm -f
 
-PROGRAMS := dmidecode
-PROGRAMS += $(shell test `uname -m 2>/dev/null` != ia64 && echo biosdecode ownership vpddecode)
-# BSD make doesn't understand the $(shell) syntax above, it wants the !=
-# syntax below. GNU make ignores the line below so in the end both BSD
-# make and GNU make are happy.
-PROGRAMS != echo dmidecode ; test `uname -m 2>/dev/null` != ia64 && echo biosdecode ownership vpddecode
+# BSD make provides $MACHINE, but GNU make doesn't
+MACHINE ?= $(shell uname -m 2>/dev/null)
+
+# These programs are only useful on x86
+PROGRAMS-i386 := biosdecode ownership vpddecode
+PROGRAMS-i486 := $(PROGRAMS-i386)
+PROGRAMS-i586 := $(PROGRAMS-i386)
+PROGRAMS-i686 := $(PROGRAMS-i386)
+PROGRAMS-x86_64 := biosdecode ownership vpddecode
+PROGRAMS-amd64 := $(PROGRAMS-x86_64)
+
+PROGRAMS := dmidecode $(PROGRAMS-$(MACHINE))
 
 all : $(PROGRAMS)
 
