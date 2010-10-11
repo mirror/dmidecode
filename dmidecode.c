@@ -4188,9 +4188,10 @@ static int smbios_decode(u8 *buf, const char *devmem)
 	switch (ver)
 	{
 		case 0x021F:
+		case 0x0221:
 			if (!(opt.flags & FLAG_QUIET))
 				printf("SMBIOS version fixup (2.%d -> 2.%d).\n",
-				       31, 3);
+				       ver & 0xFF, 3);
 			ver = 0x0203;
 			break;
 		case 0x0233:
