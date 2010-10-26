@@ -342,7 +342,7 @@ static void dmi_system_uuid(const u8 *p, u16 ver)
 	}
 
 	/*
-	 * As off version 2.6 of the SMBIOS specification, the first 3
+	 * As of version 2.6 of the SMBIOS specification, the first 3
 	 * fields of the UUID are supposed to be encoded on little-endian.
 	 * The specification says that this is the defacto standard,
 	 * however I've seen systems following RFC 4122 instead and use
