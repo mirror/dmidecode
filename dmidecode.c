@@ -718,13 +718,11 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0xA8, "Dual-Core Xeon 7100" }, /* From CIM_Processor.Family */
 		{ 0xA9, "Quad-Core Xeon 5400" }, /* From CIM_Processor.Family */
 		{ 0xAA, "Quad-Core Xeon" }, /* From CIM_Processor.Family */
-
 		{ 0xAB, "Dual-Core Xeon 5200" },
 		{ 0xAC, "Dual-Core Xeon 7200" },
 		{ 0xAD, "Quad-Core Xeon 7300" },
 		{ 0xAE, "Quad-Core Xeon 7400" },
 		{ 0xAF, "Multi-Core Xeon 7400" },
-
 		{ 0xB0, "Pentium III Xeon" },
 		{ 0xB1, "Pentium III Speedstep" },
 		{ 0xB2, "Pentium 4" },
@@ -749,7 +747,6 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0xC5, "Core 2 Solo Mobile" }, /* From CIM_Processor.Family */
 		{ 0xC6, "Core i7" },
 		{ 0xC7, "Dual-Core Celeron" },
-
 		{ 0xC8, "IBM390" },
 		{ 0xC9, "G4" },
 		{ 0xCA, "G5" },
@@ -760,7 +757,6 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0xD3, "C7-D" },
 		{ 0xD4, "C7" },
 		{ 0xD5, "Eden" },
-
 		{ 0xD6, "Multi-Core Xeon" },
 		{ 0xD7, "Dual-Core Xeon 3xxx" },
 		{ 0xD8, "Quad-Core Xeon 3xxx" },
