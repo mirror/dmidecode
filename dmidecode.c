@@ -33,9 +33,9 @@
  * information does not come from the above mentioned specification.
  *
  * Additional references:
- *  - Intel AP-485 revision 32
+ *  - Intel AP-485 revision 36
  *    "Intel Processor Identification and the CPUID Instruction"
- *    http://developer.intel.com/design/xeon/applnots/241618.htm
+ *    http://www.intel.com/support/processors/sb/cs-009861.htm
  *  - DMTF Common Information Model
  *    CIM Schema version 2.19.1
  *    http://www.dmtf.org/standards/cim/
@@ -833,7 +833,7 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 
 static void dmi_processor_id(u8 type, const u8 *p, const char *version, const char *prefix)
 {
-	/* Intel AP-485 revision 32, table 3-4 */
+	/* Intel AP-485 revision 36, table 2-4 */
 	static const char *flags[32] = {
 		"FPU (Floating-point unit on-chip)", /* 0 */
 		"VME (Virtual mode extension)",
@@ -859,13 +859,13 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 		"DS (Debug store)",
 		"ACPI (ACPI supported)",
 		"MMX (MMX technology supported)",
-		"FXSR (Fast floating-point save and restore)",
+		"FXSR (FXSAVE and FXSTOR instructions supported)",
 		"SSE (Streaming SIMD extensions)",
 		"SSE2 (Streaming SIMD extensions 2)",
 		"SS (Self-snoop)",
-		"HTT (Hyper-threading technology)",
+		"HTT (Multi-threading)",
 		"TM (Thermal monitor supported)",
-		"IA64 (IA64 capabilities)",
+		NULL, /* 30 */
 		"PBE (Pending break enabled)" /* 31 */
 	};
 	/*
@@ -916,11 +916,12 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 	}
 	else if ((type >= 0x0B && type <= 0x15) /* Intel, Cyrix */
 	      || (type >= 0x28 && type <= 0x2B) /* Intel */
-	      || (type >= 0xA1 && type <= 0xAA) /* Intel */
-	      || (type >= 0xB0 && type <= 0xB3) /* Intel */
+	      || (type >= 0xA1 && type <= 0xB3) /* Intel */
 	      || type == 0xB5 /* Intel */
-	      || (type >= 0xB9 && type <= 0xC5) /* Intel */
-	      || (type >= 0xD2 && type <= 0xD5)) /* VIA */
+	      || (type >= 0xB9 && type <= 0xC7) /* Intel */
+	      || (type >= 0xD2 && type <= 0xD8) /* VIA, Intel */
+	      || (type >= 0xDA && type <= 0xDB) /* Intel */
+	      || (type >= 0xDD && type <= 0xDF)) /* Intel */
 		sig = 1;
 	else if ((type >= 0x18 && type <= 0x1D) /* AMD */
 	      || type == 0x1F /* AMD */
