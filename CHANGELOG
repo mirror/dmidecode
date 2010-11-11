@@ -1,3 +1,7 @@
+2010-11-11  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix decoding of IPMI base address LSB.
+
 2010-11-09  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Drop redundant/obsolete references to

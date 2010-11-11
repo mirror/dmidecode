@@ -3867,7 +3867,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				printf("\tNV Storage Device: Not Present\n");
 			printf("\tBase Address: ");
 			dmi_ipmi_base_address(data[0x04], data + 0x08,
-				h->length < 0x12 ? 0 : (data[0x10] >> 5) & 1);
+				h->length < 0x11 ? 0 : (data[0x10] >> 4) & 1);
 			printf("\n");
 			if (h->length < 0x12) break;
 			if (data[0x04] != 0x04)
