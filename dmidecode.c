@@ -3065,7 +3065,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x0A) break;
 			printf("\tFeatures:");
 			dmi_base_board_features(data[0x09], "\t\t");
-			if (h->length < 0x0F) break;
+			if (h->length < 0x0E) break;
 			printf("\tLocation In Chassis: %s\n",
 				dmi_string(h, data[0x0A]));
 			if (!(opt.flags & FLAG_QUIET))
@@ -3073,6 +3073,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					WORD(data + 0x0B));
 			printf("\tType: %s\n",
 				dmi_base_board_type(data[0x0D]));
+			if (h->length < 0x0F) break;
 			if (h->length < 0x0F + data[0x0E] * sizeof(u16)) break;
 			if (!(opt.flags & FLAG_QUIET))
 				dmi_base_board_handles(data[0x0E], data + 0x0F, "\t");

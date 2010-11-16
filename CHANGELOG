@@ -4,6 +4,7 @@
 	  (DMI type 4).
 	* dmidecode.c: Prevent unlikely array overrun when decoding
 	  processor family value 0xBE (DMI type 4).
+	* dmidecode.c: Handle DMI type 2 record of size 0x0E.
 
 2010-11-11  Jean Delvare  <khali@linux-fr.org>
 
