@@ -806,15 +806,19 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 	/* Special case for ambiguous value 0xBE */
 	if (code == 0xBE)
 	{
-		const char *manufacturer = dmi_string(h, data[0x07]);
+		if (h->length >= 0x08)
+		{
+			const char *manufacturer = dmi_string(h, data[0x07]);
 
-		/* Best bet based on manufacturer string */
-		if (strstr(manufacturer, "Intel") != NULL
-		 || strncasecmp(manufacturer, "Intel", 5) == 0)
-			return "Core 2";
-		if (strstr(manufacturer, "AMD") != NULL
-		 || strncasecmp(manufacturer, "AMD", 3) == 0)
-			return "K7";
+			/* Best bet based on manufacturer string */
+			if (strstr(manufacturer, "Intel") != NULL
+			 || strncasecmp(manufacturer, "Intel", 5) == 0)
+				return "Core 2";
+			if (strstr(manufacturer, "AMD") != NULL
+			 || strncasecmp(manufacturer, "AMD", 3) == 0)
+				return "K7";
+		}
+
 		return "Core 2 or K7";
 	}
 
