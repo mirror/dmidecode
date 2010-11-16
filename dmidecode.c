@@ -590,7 +590,7 @@ static const char *dmi_processor_type(u8 code)
 	return out_of_spec;
 }
 
-static const char *dmi_processor_family(const struct dmi_header *h)
+static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 {
 	const u8 *data = h->data;
 	unsigned int i, low, high;
@@ -789,6 +789,16 @@ static const char *dmi_processor_family(const struct dmi_header *h)
 		{ 0x15E, "DSP" },
 		{ 0x1F4, "Video Processor" },
 	};
+
+	/* Special case for ambiguous value 0x30 (SMBIOS 2.0 only) */
+	if (ver == 0x0200 && data[0x06] == 0x30 && h->length >= 0x08)
+	{
+		const char *manufacturer = dmi_string(h, data[0x07]);
+
+		if (strstr(manufacturer, "Intel") != NULL
+		 || strncasecmp(manufacturer, "Intel", 5) == 0)
+			return "Pentium Pro";
+	}
 
 	code = (data[0x06] == 0xFE && h->length >= 0x2A) ?
 		WORD(data + 0x28) : data[0x06];
@@ -3111,7 +3121,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tType: %s\n",
 				dmi_processor_type(data[0x05]));
 			printf("\tFamily: %s\n",
-				dmi_processor_family(h));
+				dmi_processor_family(h, ver));
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x07]));
 			dmi_processor_id(data[0x06], data + 8, dmi_string(h, data[0x10]), "\t");
@@ -4007,7 +4017,7 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 			printf("%s\n", dmi_chassis_type(data[offset]));
 			break;
 		case 0x406:
-			printf("%s\n", dmi_processor_family(h));
+			printf("%s\n", dmi_processor_family(h, ver));
 			break;
 		case 0x416:
 			dmi_processor_frequency(data + offset);

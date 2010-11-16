@@ -1,3 +1,8 @@
+2010-11-16  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Handle ambiguous processor family value 0x30
+	  (DMI type 4).
+
 2010-11-11  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fix decoding of IPMI base address LSB.
