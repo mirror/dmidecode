@@ -3549,7 +3549,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				printf("\tChemistry: %s\n",
 					dmi_battery_chemistry(data[0x09]));
 			printf("\tDesign Capacity:");
-			if (h->length < 0x1A)
+			if (h->length < 0x16)
 				dmi_battery_capacity(WORD(data + 0x0A), 1);
 			else
 				dmi_battery_capacity(WORD(data + 0x0A), data[0x15]);
