@@ -1,3 +1,39 @@
+2010-11-24  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Assume that the max power capacity is expressed in
+	  Watts, not milliWatts (DMI type 39). The specification isn't
+	  clear about the actual unit, but the only implementation I've
+	  seen (HP Proliant G7) clearly uses Watts. Also, using milliWatts
+	  would limit the max value that can be stored to 32 W, which
+	  doesn't make much sense.
+	* dmidecode.c: Fix offset of partition width (DMI type 19).
+	* dmidecode.c: Decode BIOS language information flags
+	  (DMI type 13).
+
+2010-11-24  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support SMBIOS specification version 2.7.0.
+
+	* dmidecode.c: Update all references to the SMBIOS specification
+	  to match the new numbering.
+	* dmidecode.c: Add UEFI support and virtual machine flags to BIOS
+	  characteristics (DMI type 0).
+	* dmideocde.c: Add SKU number field to system enclosure or chassis
+	  (DMI type 3).
+	* dmidecode.c: Add many Intel, AMD and VIA CPU family names
+	  (DMI type 4).
+	* dmidecode.c: Add many socket formats (DMI type 4).
+	* dmidecode.c: Add processor characteristics flags (DMI type 4).
+	* util.c, util.h: Add utility function u64_range, which computes
+	  the range between two u64 values.
+	* dmidecode.c: Add support for memory arrays of 2 TB and more
+	  (DMI types 16, 19 and 20).
+	* dmidecode.c: Add support for memory devices of 32 GB and more
+	  (DMI type 17).
+	* dmidecode.c: Add description of cooling device (DMI type 27).
+	* dmidecode.c: Add limited support for new DMI type 42 (Management
+	  Controller Host Interface).
+
 2010-11-16  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Handle ambiguous processor family value 0x30
