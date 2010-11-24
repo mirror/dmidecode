@@ -9,6 +9,11 @@
 	* dmidecode.c: Fix offset of partition width (DMI type 19).
 	* dmidecode.c: Decode BIOS language information flags
 	  (DMI type 13).
+	* dmidecode.c: Fix CPU flags mask (DMI type 4).
+	* dmidecode.c: Reword "PCI Express Gen 2" to just "PCI Express 2"
+	  (DMI type 9).
+	* dmidecode.c: Decode the slot ID for all PCI Express and PCI
+	  Express 2 slots (DMI type 9).
 
 2010-11-24  Jean Delvare  <khali@linux-fr.org>
 
