@@ -214,6 +214,50 @@ static void dmi_dump(const struct dmi_header *h, const char *prefix)
 	}
 }
 
+/* shift is 0 if the value is in bytes, 1 if it is in kilobytes */
+static void dmi_print_memory_size(u64 code, int shift)
+{
+	unsigned long capacity;
+	u16 split[7];
+	static const char *unit[8] = {
+		"bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB"
+	};
+	int i;
+
+	/*
+	 * We split the overall size in powers of thousand: EB, PB, TB, GB,
+	 * MB, kB and B. In practice, it is expected that only one or two
+	 * (consecutive) of these will be non-zero.
+	 */
+	split[0] = code.l & 0x3FFUL;
+	split[1] = (code.l >> 10) & 0x3FFUL;
+	split[2] = (code.l >> 20) & 0x3FFUL;
+	split[3] = ((code.h << 2) & 0x3FCUL) | (code.l >> 30);
+	split[4] = (code.h >> 8) & 0x3FFUL;
+	split[5] = (code.h >> 18) & 0x3FFUL;
+	split[6] = code.h >> 28;
+
+	/*
+	 * Now we find the highest unit with a non-zero value. If the following
+	 * is also non-zero, we use that as our base. If the following is zero,
+	 * we simply display the highest unit.
+	 */
+	for (i = 6; i > 0; i--)
+	{
+		if (split[i])
+			break;
+	}
+	if (i > 0 && split[i - 1])
+	{
+		i--;
+		capacity = split[i] + (split[i + 1] << 10);
+	}
+	else
+		capacity = split[i];
+
+	printf(" %lu %s", capacity, unit[i + shift]);
+}
+
 /*
  * 7.1 BIOS Information (Type 0)
  */
@@ -2074,21 +2118,6 @@ static const char *dmi_memory_array_ec_type(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_memory_array_capacity(u32 code)
-{
-	if (code == 0x80000000)
-		printf(" Unknown");
-	else
-	{
-		if ((code & 0x000FFFFF) == 0)
-			printf(" %u GB", code >> 20);
-		else if ((code & 0x000003FF) == 0)
-			printf(" %u MB", code >> 10);
-		else
-			printf(" %u kB", code);
-	}
-}
-
 static void dmi_memory_array_error_handle(u16 code)
 {
 	if (code == 0xFFFE)
@@ -2127,6 +2156,19 @@ static void dmi_memory_device_size(u16 code)
 		else
 			printf(" %u MB", code);
 	}
+}
+
+static void dmi_memory_device_extended_size(u32 code)
+{
+	code &= 0x7FFFFFFFUL;
+
+	/* Use the most suitable unit depending on size */
+	if (code & 0x3FFUL)
+		printf(" %lu MB", (unsigned long)code);
+	else if (code & 0xFFFFFUL)
+		printf(" %lu GB", (unsigned long)code >> 10);
+	else
+		printf(" %lu TB", (unsigned long)code >> 20);
 }
 
 static const char *dmi_memory_device_form_factor(u8 code)
@@ -2216,16 +2258,18 @@ static void dmi_memory_device_type_detail(u16 code)
 		"EDO",
 		"Window DRAM",
 		"Cache DRAM",
-		"Non-Volatile" /* 12 */
+		"Non-Volatile",
+		"Registered (Buffered)",
+		"Unbuffered (Unregistered)"  /* 14 */
 	};
 
-	if ((code & 0x1FFE) == 0)
+	if ((code & 0x7FFE) == 0)
 		printf(" None");
 	else
 	{
 		int i;
 
-		for (i = 1; i <= 12; i++)
+		for (i = 1; i <= 14; i++)
 			if (code & (1 << i))
 				printf(" %s", detail[i - 1]);
 	}
@@ -2323,12 +2367,22 @@ static void dmi_mapped_address_size(u32 code)
 {
 	if (code == 0)
 		printf(" Invalid");
-	else if ((code & 0x000FFFFF) == 0)
-		printf(" %u GB", code >> 20);
-	else if ((code & 0x000003FF) == 0)
-		printf(" %u MB", code >> 10);
 	else
-		printf(" %u kB", code);
+	{
+		u64 size;
+
+		size.h = 0;
+		size.l = code;
+		dmi_print_memory_size(size, 1);
+	}
+}
+
+static void dmi_mapped_address_extended_size(u64 start, u64 end)
+{
+	if (start.h == end.h && start.l == end.l)
+		printf(" Invalid");
+	else
+		dmi_print_memory_size(u64_range(start, end), 0);
 }
 
 /*
@@ -3417,7 +3471,21 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tError Correction Type: %s\n",
 				dmi_memory_array_ec_type(data[0x06]));
 			printf("\tMaximum Capacity:");
-			dmi_memory_array_capacity(DWORD(data + 0x07));
+			if (DWORD(data + 0x07) == 0x80000000)
+			{
+				if (h->length < 0x17)
+					printf(" Unknown");
+				else
+					dmi_print_memory_size(QWORD(data + 0x0F), 0);
+			}
+			else
+			{
+				u64 capacity;
+
+				capacity.h = 0;
+				capacity.l = DWORD(data + 0x07);
+				dmi_print_memory_size(capacity, 1);
+			}
 			printf("\n");
 			if (!(opt.flags & FLAG_QUIET))
 			{
@@ -3447,7 +3515,10 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_memory_device_width(WORD(data + 0x0A));
 			printf("\n");
 			printf("\tSize:");
-			dmi_memory_device_size(WORD(data + 0x0C));
+			if (h->length >= 0x20 && WORD(data + 0x0C) == 0x7FFF)
+				dmi_memory_device_extended_size(DWORD(data + 0x1C));
+			else
+				dmi_memory_device_size(WORD(data + 0x0C));
 			printf("\n");
 			printf("\tForm Factor: %s\n",
 				dmi_memory_device_form_factor(data[0x0E]));
@@ -3483,6 +3554,10 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			else
 				printf("%u", data[0x1B] & 0x0F);
 			printf("\n");
+			if (h->length < 0x22) break;
+			printf("\tConfigured Clock Speed:");
+			dmi_memory_device_speed(WORD(data + 0x20));
+			printf("\n");
 			break;
 
 		case 18: /* 7.19 32-bit Memory Error Information */
@@ -3511,12 +3586,31 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 19: /* 7.20 Memory Array Mapped Address */
 			printf("Memory Array Mapped Address\n");
 			if (h->length < 0x0F) break;
-			printf("\tStarting Address: 0x%08X%03X\n",
-				DWORD(data + 0x04) >> 2, (DWORD(data + 0x04) & 0x3) << 10);
-			printf("\tEnding Address: 0x%08X%03X\n",
-				DWORD(data + 0x08) >> 2, ((DWORD(data + 0x08) & 0x3) << 10) + 0x3FF);
-			printf("\tRange Size:");
-			dmi_mapped_address_size(DWORD(data + 0x08) - DWORD(data + 0x04) + 1);
+			if (h->length >= 0x1F && DWORD(data + 0x04) == 0xFFFFFFFF)
+			{
+				u64 start, end;
+
+				start = QWORD(data + 0x0F);
+				end = QWORD(data + 0x17);
+
+				printf("\tStarting Address: 0x%08X%08Xk\n",
+					start.h, start.l);
+				printf("\tEnding Address: 0x%08X%08Xk\n",
+					end.h, end.l);
+				printf("\tRange Size:");
+				dmi_mapped_address_extended_size(start, end);
+			}
+			else
+			{
+				printf("\tStarting Address: 0x%08X%03X\n",
+					DWORD(data + 0x04) >> 2,
+					(DWORD(data + 0x04) & 0x3) << 10);
+				printf("\tEnding Address: 0x%08X%03X\n",
+					DWORD(data + 0x08) >> 2,
+					((DWORD(data + 0x08) & 0x3) << 10) + 0x3FF);
+				printf("\tRange Size:");
+				dmi_mapped_address_size(DWORD(data + 0x08) - DWORD(data + 0x04) + 1);
+			}
 			printf("\n");
 			if (!(opt.flags & FLAG_QUIET))
 				printf("\tPhysical Array Handle: 0x%04X\n",
@@ -3528,12 +3622,31 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 20: /* 7.21 Memory Device Mapped Address */
 			printf("Memory Device Mapped Address\n");
 			if (h->length < 0x13) break;
-			printf("\tStarting Address: 0x%08X%03X\n",
-				DWORD(data + 0x04) >> 2, (DWORD(data + 0x04) & 0x3) << 10);
-			printf("\tEnding Address: 0x%08X%03X\n",
-				DWORD(data + 0x08) >> 2, ((DWORD(data + 0x08) & 0x3) << 10) + 0x3FF);
-			printf("\tRange Size:");
-			dmi_mapped_address_size(DWORD(data + 0x08) - DWORD(data + 0x04) + 1);
+			if (h->length >= 0x23 && DWORD(data + 0x04) == 0xFFFFFFFF)
+			{
+				u64 start, end;
+
+				start = QWORD(data + 0x13);
+				end = QWORD(data + 0x1B);
+
+				printf("\tStarting Address: 0x%08X%08Xk\n",
+					start.h, start.l);
+				printf("\tEnding Address: 0x%08X%08Xk\n",
+					end.h, end.l);
+				printf("\tRange Size:");
+				dmi_mapped_address_extended_size(start, end);
+			}
+			else
+			{
+				printf("\tStarting Address: 0x%08X%03X\n",
+					DWORD(data + 0x04) >> 2,
+					(DWORD(data + 0x04) & 0x3) << 10);
+				printf("\tEnding Address: 0x%08X%03X\n",
+					DWORD(data + 0x08) >> 2,
+					((DWORD(data + 0x08) & 0x3) << 10) + 0x3FF);
+				printf("\tRange Size:");
+				dmi_mapped_address_size(DWORD(data + 0x08) - DWORD(data + 0x04) + 1);
+			}
 			printf("\n");
 			if (!(opt.flags & FLAG_QUIET))
 			{
