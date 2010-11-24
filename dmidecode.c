@@ -3644,7 +3644,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				printf("\tPhysical Array Handle: 0x%04X\n",
 					WORD(data + 0x0C));
 			printf("\tPartition Width: %u\n",
-				data[0x0F]);
+				data[0x0E]);
 			break;
 
 		case 20: /* 7.21 Memory Device Mapped Address */
