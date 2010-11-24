@@ -1890,6 +1890,14 @@ static void dmi_bios_languages(const struct dmi_header *h, const char *prefix)
 			prefix, dmi_string(h, i));
 }
 
+static const char *dmi_bios_language_format(u8 code)
+{
+	if (code & 0x01)
+		return "Abbreviated";
+	else
+		return "Long";
+}
+
 /*
  * 7.15 Group Associations (Type 14)
  */
@@ -3441,6 +3449,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 13: /* 7.14 BIOS Language Information */
 			printf("BIOS Language Information\n");
 			if (h->length < 0x16) break;
+			if (ver >= 0x0201)
+			{
+				printf("\tLanguage Description Format: %s\n",
+					dmi_bios_language_format(data[0x05]));
+			}
 			printf("\tInstallable Languages: %u\n", data[0x04]);
 			dmi_bios_languages(h, "\t\t");
 			printf("\tCurrently Installed Language: %s\n",
