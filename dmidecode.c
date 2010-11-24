@@ -1040,7 +1040,7 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 				prefix,
 				((eax >> 8) & 0xF) + (((eax >> 8) & 0xF) == 0xF ? (eax >> 20) & 0xFF : 0),
 				((eax >> 4) & 0xF) | (((eax >> 8) & 0xF) == 0xF ? (eax >> 12) & 0xF0 : 0),
-				eax&0xF);
+				eax & 0xF);
 			break;
 	}
 
@@ -1654,7 +1654,7 @@ static const char *dmi_slot_type(u8 code)
 		"PCI Express x2",
 		"PCI Express x4",
 		"PCI Express x8",
-		"PCI Express x16", /* 0xAA */
+		"PCI Express x16",
 		"PCI Express Gen 2",
 		"PCI Express Gen 2 x1",
 		"PCI Express Gen 2 x2",
