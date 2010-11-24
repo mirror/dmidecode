@@ -2,7 +2,7 @@
  * DMI Decode
  *
  *   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   Copyright (C) 2002-2008 Jean Delvare <khali@linux-fr.org>
+ *   Copyright (C) 2002-2010 Jean Delvare <khali@linux-fr.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 2.6.1" document,
- * available from http://www.dmtf.org/standards/smbios/.
+ * Management BIOS Reference Specification, Version 2.7.0" document,
+ * available from http://www.dmtf.org/standards/smbios.
  *
  * Note to contributors:
  * Please reference every value you add or modify, especially if the
@@ -215,7 +215,7 @@ static void dmi_dump(const struct dmi_header *h, const char *prefix)
 }
 
 /*
- * 3.3.1 BIOS Information (Type 0)
+ * 7.1 BIOS Information (Type 0)
  */
 
 static void dmi_bios_runtime_size(u32 code)
@@ -228,7 +228,7 @@ static void dmi_bios_runtime_size(u32 code)
 
 static void dmi_bios_characteristics(u64 code, const char *prefix)
 {
-	/* 3.3.1.1 */
+	/* 7.1.1 */
 	static const char *characteristics[] = {
 		"BIOS characteristics not supported", /* 3 */
 		"ISA is supported",
@@ -280,7 +280,7 @@ static void dmi_bios_characteristics(u64 code, const char *prefix)
 
 static void dmi_bios_characteristics_x1(u8 code, const char *prefix)
 {
-	/* 3.3.1.2.1 */
+	/* 7.1.2.1 */
 	static const char *characteristics[] = {
 		"ACPI is supported", /* 0 */
 		"USB legacy is supported",
@@ -301,7 +301,7 @@ static void dmi_bios_characteristics_x1(u8 code, const char *prefix)
 
 static void dmi_bios_characteristics_x2(u8 code, const char *prefix)
 {
-	/* 3.3.1.2.2 */
+	/* 37.1.2.2 */
 	static const char *characteristics[] = {
 		"BIOS boot specification is supported", /* 0 */
 		"Function key-initiated network boot is supported",
@@ -316,7 +316,7 @@ static void dmi_bios_characteristics_x2(u8 code, const char *prefix)
 }
 
 /*
- * 3.3.2 System Information (Type 1)
+ * 7.2 System Information (Type 1)
  */
 
 static void dmi_system_uuid(const u8 *p, u16 ver)
@@ -361,7 +361,7 @@ static void dmi_system_uuid(const u8 *p, u16 ver)
 
 static const char *dmi_system_wake_up_type(u8 code)
 {
-	/* 3.3.2.2 */
+	/* 7.2.2 */
 	static const char *type[] = {
 		"Reserved", /* 0x00 */
 		"Other",
@@ -380,12 +380,12 @@ static const char *dmi_system_wake_up_type(u8 code)
 }
 
 /*
- * 3.3.3 Base Board Information (Type 2)
+ * 7.3 Base Board Information (Type 2)
  */
 
 static void dmi_base_board_features(u8 code, const char *prefix)
 {
-	/* 3.3.3.1 */
+	/* 7.3.1 */
 	static const char *features[] = {
 		"Board is a hosting board", /* 0 */
 		"Board requires at least one daughter board",
@@ -410,7 +410,7 @@ static void dmi_base_board_features(u8 code, const char *prefix)
 
 static const char *dmi_base_board_type(u8 code)
 {
-	/* 3.3.3.2 */
+	/* 7.3.2 */
 	static const char *type[] = {
 		"Unknown", /* 0x01 */
 		"Other",
@@ -444,12 +444,12 @@ static void dmi_base_board_handles(u8 count, const u8 *p, const char *prefix)
 }
 
 /*
- * 3.3.4 Chassis Information (Type 3)
+ * 7.4 Chassis Information (Type 3)
  */
 
 static const char *dmi_chassis_type(u8 code)
 {
-	/* 3.3.4.1 */
+	/* 7.4.1 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -499,7 +499,7 @@ static const char *dmi_chassis_lock(u8 code)
 
 static const char *dmi_chassis_state(u8 code)
 {
-	/* 3.3.4.2 */
+	/* 7.4.2 */
 	static const char *state[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -516,7 +516,7 @@ static const char *dmi_chassis_state(u8 code)
 
 static const char *dmi_chassis_security_status(u8 code)
 {
-	/* 3.3.4.3 */
+	/* 7.4.3 */
 	static const char *status[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -570,12 +570,12 @@ static void dmi_chassis_elements(u8 count, u8 len, const u8 *p, const char *pref
 }
 
 /*
- * 3.3.5 Processor Information (Type 4)
+ * 7.5 Processor Information (Type 4)
  */
 
 static const char *dmi_processor_type(u8 code)
 {
-	/* 3.3.5.1 */
+	/* 7.5.1 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -596,7 +596,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 	unsigned int i, low, high;
 	u16 code;
 
-	/* 3.3.5.2 */
+	/* 7.5.2 */
 	static struct {
 		int value;
 		const char *name;
@@ -998,7 +998,7 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 
 static void dmi_processor_voltage(u8 code)
 {
-	/* 3.3.5.4 */
+	/* 7.5.4 */
 	static const char *voltage[] = {
 		"5.0 V", /* 0 */
 		"3.3 V",
@@ -1047,7 +1047,7 @@ static const char *dmi_processor_status(u8 code)
 
 static const char *dmi_processor_upgrade(u8 code)
 {
-	/* 3.3.5.5 */
+	/* 7.5.5 */
 	static const char *upgrade[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1096,7 +1096,7 @@ static void dmi_processor_cache(u16 code, const char *level, u16 ver)
 
 static void dmi_processor_characteristics(u16 code, const char *prefix)
 {
-	/* 3.3.5.9 */
+	/* 7.5.9 */
 	static const char *characteristics[] = {
 		"64-bit capable" /* 2 */
 	};
@@ -1115,12 +1115,12 @@ static void dmi_processor_characteristics(u16 code, const char *prefix)
 }
 
 /*
- * 3.3.6 Memory Controller Information (Type 5)
+ * 7.6 Memory Controller Information (Type 5)
  */
 
 static const char *dmi_memory_controller_ed_method(u8 code)
 {
-	/* 3.3.6.1 */
+	/* 7.6.1 */
 	static const char *method[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1139,7 +1139,7 @@ static const char *dmi_memory_controller_ed_method(u8 code)
 
 static void dmi_memory_controller_ec_capabilities(u8 code, const char *prefix)
 {
-	/* 3.3.6.2 */
+	/* 7.6.2 */
 	static const char *capabilities[] = {
 		"Other", /* 0 */
 		"Unknown",
@@ -1164,7 +1164,7 @@ static void dmi_memory_controller_ec_capabilities(u8 code, const char *prefix)
 
 static const char *dmi_memory_controller_interleave(u8 code)
 {
-	/* 3.3.6.3 */
+	/* 7.6.3 */
 	static const char *interleave[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1182,7 +1182,7 @@ static const char *dmi_memory_controller_interleave(u8 code)
 
 static void dmi_memory_controller_speeds(u16 code, const char *prefix)
 {
-	/* 3.3.6.4 */
+	/* 7.6.4 */
 	const char *speeds[] = {
 		"Other", /* 0 */
 		"Unknown",
@@ -1216,12 +1216,12 @@ static void dmi_memory_controller_slots(u8 count, const u8 *p, const char *prefi
 }
 
 /*
- * 3.3.7 Memory Module Information (Type 6)
+ * 7.7 Memory Module Information (Type 6)
  */
 
 static void dmi_memory_module_types(u16 code, const char *sep)
 {
-	/* 3.3.7.1 */
+	/* 7.7.1 */
 	static const char *types[] = {
 		"Other", /* 0 */
 		"Unknown",
@@ -1271,7 +1271,7 @@ static void dmi_memory_module_speed(u8 code)
 
 static void dmi_memory_module_size(u8 code)
 {
-	/* 3.3.7.2 */
+	/* 7.7.2 */
 	switch (code & 0x7F)
 	{
 		case 0x7D:
@@ -1308,7 +1308,7 @@ static void dmi_memory_module_error(u8 code, const char *prefix)
 }
 
 /*
- * 3.3.8 Cache Information (Type 7)
+ * 7.8 Cache Information (Type 7)
  */
 
 static const char *dmi_cache_mode(u8 code)
@@ -1346,7 +1346,7 @@ static void dmi_cache_size(u16 code)
 
 static void dmi_cache_types(u16 code, const char *sep)
 {
-	/* 3.3.8.2 */
+	/* 7.8.2 */
 	static const char *types[] = {
 		"Other", /* 0 */
 		"Unknown",
@@ -1371,7 +1371,7 @@ static void dmi_cache_types(u16 code, const char *sep)
 
 static const char *dmi_cache_ec_type(u8 code)
 {
-	/* 3.3.8.3 */
+	/* 7.8.3 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1388,7 +1388,7 @@ static const char *dmi_cache_ec_type(u8 code)
 
 static const char *dmi_cache_type(u8 code)
 {
-	/* 3.3.8.4 */
+	/* 7.8.4 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1404,7 +1404,7 @@ static const char *dmi_cache_type(u8 code)
 
 static const char *dmi_cache_associativity(u8 code)
 {
-	/* 3.3.8.5 */
+	/* 7.8.5 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1427,12 +1427,12 @@ static const char *dmi_cache_associativity(u8 code)
 }
 
 /*
- * 3.3.9 Port Connector Information (Type 8)
+ * 7.9 Port Connector Information (Type 8)
  */
 
 static const char *dmi_port_connector_type(u8 code)
 {
-	/* 3.3.9.2 */
+	/* 7.9.2 */
 	static const char *type[] = {
 		"None", /* 0x00 */
 		"Centronics",
@@ -1489,7 +1489,7 @@ static const char *dmi_port_connector_type(u8 code)
 
 static const char *dmi_port_type(u8 code)
 {
-	/* 3.3.9.3 */
+	/* 7.9.3 */
 	static const char *type[] = {
 		"None", /* 0x00 */
 		"Parallel Port XT/AT Compatible",
@@ -1541,12 +1541,12 @@ static const char *dmi_port_type(u8 code)
 }
 
 /*
- * 3.3.10 System Slots (Type 9)
+ * 7.10 System Slots (Type 9)
  */
 
 static const char *dmi_slot_type(u8 code)
 {
-	/* 3.3.10.1 */
+	/* 7.10.1 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1597,7 +1597,7 @@ static const char *dmi_slot_type(u8 code)
 
 static const char *dmi_slot_bus_width(u8 code)
 {
-	/* 3.3.10.2 */
+	/* 7.10.2 */
 	static const char *width[] = {
 		"", /* 0x01, "Other" */
 		"", /* "Unknown" */
@@ -1622,7 +1622,7 @@ static const char *dmi_slot_bus_width(u8 code)
 
 static const char *dmi_slot_current_usage(u8 code)
 {
-	/* 3.3.10.3 */
+	/* 7.10.3 */
 	static const char *usage[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1637,7 +1637,7 @@ static const char *dmi_slot_current_usage(u8 code)
 
 static const char *dmi_slot_length(u8 code)
 {
-	/* 3.3.1O.4 */
+	/* 7.1O.4 */
 	static const char *length[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1652,7 +1652,7 @@ static const char *dmi_slot_length(u8 code)
 
 static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
 {
-	/* 3.3.10.5 */
+	/* 7.10.5 */
 	switch (type)
 	{
 		case 0x04: /* MCA */
@@ -1679,7 +1679,7 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
 
 static void dmi_slot_characteristics(u8 code1, u8 code2, const char *prefix)
 {
-	/* 3.3.10.6 */
+	/* 7.10.6 */
 	static const char *characteristics1[] = {
 		"5.0 V is provided", /* 1 */
 		"3.3 V is provided",
@@ -1689,7 +1689,7 @@ static void dmi_slot_characteristics(u8 code1, u8 code2, const char *prefix)
 		"Zoom Video is supported",
 		"Modem ring resume is supported" /* 7 */
 	};
-	/* 3.3.10.7 */
+	/* 7.10.7 */
 	static const char *characteristics2[] = {
 		"PME signal is supported", /* 0 */
 		"Hot-plug devices are supported",
@@ -1716,19 +1716,19 @@ static void dmi_slot_characteristics(u8 code1, u8 code2, const char *prefix)
 
 static void dmi_slot_segment_bus_func(u16 code1, u8 code2, u8 code3, const char *prefix)
 {
-	/* 3.3.10.8 */
+	/* 7.10.8 */
 	if (!(code1 == 0xFFFF && code2 == 0xFF && code3 == 0xFF))
 		printf("%sBus Address: %04x:%02x:%02x.%x\n",
 		       prefix, code1, code2, code3 >> 3, code3 & 0x7);
 }
 
 /*
- * 3.3.11 On Board Devices Information (Type 10)
+ * 7.11 On Board Devices Information (Type 10)
  */
 
 static const char *dmi_on_board_devices_type(u8 code)
 {
-	/* 3.3.11.1 and 3.3.42.2 */
+	/* 7.11.1 and 7.42.2 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -1771,7 +1771,7 @@ static void dmi_on_board_devices(const struct dmi_header *h, const char *prefix)
 }
 
 /*
- * 3.3.12 OEM Strings (Type 11)
+ * 7.12 OEM Strings (Type 11)
  */
 
 static void dmi_oem_strings(const struct dmi_header *h, const char *prefix)
@@ -1786,7 +1786,7 @@ static void dmi_oem_strings(const struct dmi_header *h, const char *prefix)
 }
 
 /*
- * 3.3.13 System Configuration Options (Type 12)
+ * 7.13 System Configuration Options (Type 12)
  */
 
 static void dmi_system_configuration_options(const struct dmi_header *h, const char *prefix)
@@ -1801,7 +1801,7 @@ static void dmi_system_configuration_options(const struct dmi_header *h, const c
 }
 
 /*
- * 3.3.14 BIOS Language Information (Type 13)
+ * 7.14 BIOS Language Information (Type 13)
  */
 
 static void dmi_bios_languages(const struct dmi_header *h, const char *prefix)
@@ -1816,7 +1816,7 @@ static void dmi_bios_languages(const struct dmi_header *h, const char *prefix)
 }
 
 /*
- * 3.3.15 Group Associations (Type 14)
+ * 7.15 Group Associations (Type 14)
  */
 
 static void dmi_group_associations_items(u8 count, const u8 *p, const char *prefix)
@@ -1832,7 +1832,7 @@ static void dmi_group_associations_items(u8 count, const u8 *p, const char *pref
 }
 
 /*
- * 3.3.16 System Event Log (Type 15)
+ * 7.16 System Event Log (Type 15)
  */
 
 static const char *dmi_event_log_method(u8 code)
@@ -1869,7 +1869,7 @@ static void dmi_event_log_status(u8 code)
 
 static void dmi_event_log_address(u8 method, const u8 *p)
 {
-	/* 3.3.16.3 */
+	/* 7.16.3 */
 	switch (method)
 	{
 		case 0x00:
@@ -1904,7 +1904,7 @@ static const char *dmi_event_log_header_type(u8 code)
 
 static const char *dmi_event_log_descriptor_type(u8 code)
 {
-	/* 3.3.16.6.1 */
+	/* 7.16.6.1 */
 	static const char *type[] = {
 		NULL, /* 0x00 */
 		"Single-bit ECC memory error",
@@ -1943,7 +1943,7 @@ static const char *dmi_event_log_descriptor_type(u8 code)
 
 static const char *dmi_event_log_descriptor_format(u8 code)
 {
-	/* 3.3.16.6.2 */
+	/* 7.16.6.2 */
 	static const char *format[] = {
 		"None", /* 0x00 */
 		"Handle",
@@ -1963,7 +1963,7 @@ static const char *dmi_event_log_descriptor_format(u8 code)
 
 static void dmi_event_log_descriptors(u8 count, u8 len, const u8 *p, const char *prefix)
 {
-	/* 3.3.16.1 */
+	/* 7.16.1 */
 	int i;
 
 	for (i = 0; i < count; i++)
@@ -1979,12 +1979,12 @@ static void dmi_event_log_descriptors(u8 count, u8 len, const u8 *p, const char 
 }
 
 /*
- * 3.3.17 Physical Memory Array (Type 16)
+ * 7.17 Physical Memory Array (Type 16)
  */
 
 static const char *dmi_memory_array_location(u8 code)
 {
-	/* 3.3.17.1 */
+	/* 7.17.1 */
 	static const char *location[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2013,7 +2013,7 @@ static const char *dmi_memory_array_location(u8 code)
 
 static const char *dmi_memory_array_use(u8 code)
 {
-	/* 3.3.17.2 */
+	/* 7.17.2 */
 	static const char *use[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2031,7 +2031,7 @@ static const char *dmi_memory_array_use(u8 code)
 
 static const char *dmi_memory_array_ec_type(u8 code)
 {
-	/* 3.3.17.3 */
+	/* 7.17.3 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2073,7 +2073,7 @@ static void dmi_memory_array_error_handle(u16 code)
 }
 
 /*
- * 3.3.18 Memory Device (Type 17)
+ * 7.18 Memory Device (Type 17)
  */
 
 static void dmi_memory_device_width(u16 code)
@@ -2104,7 +2104,7 @@ static void dmi_memory_device_size(u16 code)
 
 static const char *dmi_memory_device_form_factor(u8 code)
 {
-	/* 3.3.18.1 */
+	/* 7.18.1 */
 	static const char *form_factor[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2140,7 +2140,7 @@ static void dmi_memory_device_set(u8 code)
 
 static const char *dmi_memory_device_type(u8 code)
 {
-	/* 3.3.18.2 */
+	/* 7.18.2 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2176,7 +2176,7 @@ static const char *dmi_memory_device_type(u8 code)
 
 static void dmi_memory_device_type_detail(u16 code)
 {
-	/* 3.3.18.3 */
+	/* 7.18.3 */
 	static const char *detail[] = {
 		"Other", /* 1 */
 		"Unknown",
@@ -2213,12 +2213,12 @@ static void dmi_memory_device_speed(u16 code)
 }
 
 /*
- * 3.3.19 32-bit Memory Error Information (Type 18)
+ * 7.19 32-bit Memory Error Information (Type 18)
  */
 
 static const char *dmi_memory_error_type(u8 code)
 {
-	/* 3.3.19.1 */
+	/* 7.19.1 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2243,7 +2243,7 @@ static const char *dmi_memory_error_type(u8 code)
 
 static const char *dmi_memory_error_granularity(u8 code)
 {
-	/* 3.3.19.2 */
+	/* 7.19.2 */
 	static const char *granularity[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2258,7 +2258,7 @@ static const char *dmi_memory_error_granularity(u8 code)
 
 static const char *dmi_memory_error_operation(u8 code)
 {
-	/* 3.3.19.3 */
+	/* 7.19.3 */
 	static const char *operation[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2289,7 +2289,7 @@ static void dmi_32bit_memory_error_address(u32 code)
 }
 
 /*
- * 3.3.20 Memory Array Mapped Address (Type 19)
+ * 7.20 Memory Array Mapped Address (Type 19)
  */
 
 static void dmi_mapped_address_size(u32 code)
@@ -2305,7 +2305,7 @@ static void dmi_mapped_address_size(u32 code)
 }
 
 /*
- * 3.3.21 Memory Device Mapped Address (Type 20)
+ * 7.21 Memory Device Mapped Address (Type 20)
  */
 
 static void dmi_mapped_address_row_position(u8 code)
@@ -2345,12 +2345,12 @@ static void dmi_mapped_address_interleaved_data_depth(u8 code, const char *prefi
 }
 
 /*
- * 3.3.22 Built-in Pointing Device (Type 21)
+ * 7.22 Built-in Pointing Device (Type 21)
  */
 
 static const char *dmi_pointing_device_type(u8 code)
 {
-	/* 3.3.22.1 */
+	/* 7.22.1 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2370,7 +2370,7 @@ static const char *dmi_pointing_device_type(u8 code)
 
 static const char *dmi_pointing_device_interface(u8 code)
 {
-	/* 3.3.22.2 */
+	/* 7.22.2 */
 	static const char *interface[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2395,12 +2395,12 @@ static const char *dmi_pointing_device_interface(u8 code)
 }
 
 /*
- * 3.3.23 Portable Battery (Type 22)
+ * 7.23 Portable Battery (Type 22)
  */
 
 static const char *dmi_battery_chemistry(u8 code)
 {
-	/* 3.3.23.1 */
+	/* 7.23.1 */
 	static const char *chemistry[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2442,7 +2442,7 @@ static void dmi_battery_maximum_error(u8 code)
 }
 
 /*
- * 3.3.24 System Reset (Type 23)
+ * 7.24 System Reset (Type 23)
  */
 
 /* code is assumed to be a 2-bit value */
@@ -2475,7 +2475,7 @@ static void dmi_system_reset_timer(u16 code)
 }
 
 /*
- * 3.3.25 Hardware Security (Type 24)
+ * 7.25 Hardware Security (Type 24)
  */
 
 static const char *dmi_hardware_security_status(u8 code)
@@ -2491,12 +2491,12 @@ static const char *dmi_hardware_security_status(u8 code)
 }
 
 /*
- * 3.3.26 System Power Controls (Type 25)
+ * 7.26 System Power Controls (Type 25)
  */
 
 static void dmi_power_controls_power_on(const u8 *p)
 {
-	/* 3.3.26.1 */
+	/* 7.26.1 */
 	if (dmi_bcd_range(p[0], 0x01, 0x12))
 		printf(" %02X", p[0]);
 	else
@@ -2520,12 +2520,12 @@ static void dmi_power_controls_power_on(const u8 *p)
 }
 
 /*
- * 3.3.27 Voltage Probe (Type 26)
+ * 7.27 Voltage Probe (Type 26)
  */
 
 static const char *dmi_voltage_probe_location(u8 code)
 {
-	/* 3.3.27.1 */
+	/* 7.27.1 */
 	static const char *location[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2547,7 +2547,7 @@ static const char *dmi_voltage_probe_location(u8 code)
 
 static const char *dmi_probe_status(u8 code)
 {
-	/* 3.3.27.1 */
+	/* 7.27.1 */
 	static const char *status[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2587,12 +2587,12 @@ static void dmi_probe_accuracy(u16 code)
 }
 
 /*
- * 3.3.28 Cooling Device (Type 27)
+ * 7.28 Cooling Device (Type 27)
  */
 
 static const char *dmi_cooling_device_type(u8 code)
 {
-	/* 3.3.28.1 */
+	/* 7.28.1 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2625,12 +2625,12 @@ static void dmi_cooling_device_speed(u16 code)
 }
 
 /*
- * 3.3.29 Temperature Probe (Type 28)
+ * 7.29 Temperature Probe (Type 28)
  */
 
 static const char *dmi_temperature_probe_location(u8 code)
 {
-	/* 3.3.29.1 */
+	/* 7.29.1 */
 	static const char *location[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2671,7 +2671,7 @@ static void dmi_temperature_probe_resolution(u16 code)
 }
 
 /*
- * 3.3.30 Electrical Current Probe (Type 29)
+ * 7.30 Electrical Current Probe (Type 29)
  */
 
 static void dmi_current_probe_value(u16 code)
@@ -2691,7 +2691,7 @@ static void dmi_current_probe_resolution(u16 code)
 }
 
 /*
- * 3.3.33 System Boot Information (Type 32)
+ * 7.33 System Boot Information (Type 32)
  */
 
 static const char *dmi_system_boot_status(u8 code)
@@ -2718,7 +2718,7 @@ static const char *dmi_system_boot_status(u8 code)
 }
 
 /*
- * 3.3.34 64-bit Memory Error Information (Type 33)
+ * 7.34 64-bit Memory Error Information (Type 33)
  */
 
 static void dmi_64bit_memory_error_address(u64 code)
@@ -2730,12 +2730,12 @@ static void dmi_64bit_memory_error_address(u64 code)
 }
 
 /*
- * 3.3.35 Management Device (Type 34)
+ * 7.35 Management Device (Type 34)
  */
 
 static const char *dmi_management_device_type(u8 code)
 {
-	/* 3.3.35.1 */
+	/* 7.35.1 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2759,7 +2759,7 @@ static const char *dmi_management_device_type(u8 code)
 
 static const char *dmi_management_device_address_type(u8 code)
 {
-	/* 3.3.35.2 */
+	/* 7.35.2 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2774,12 +2774,12 @@ static const char *dmi_management_device_address_type(u8 code)
 }
 
 /*
- * 3.3.38 Memory Channel (Type 37)
+ * 7.38 Memory Channel (Type 37)
  */
 
 static const char *dmi_memory_channel_type(u8 code)
 {
-	/* 3.3.38.1 */
+	/* 7.38.1 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2807,12 +2807,12 @@ static void dmi_memory_channel_devices(u8 count, const u8 *p, const char *prefix
 }
 
 /*
- * 3.3.39 IPMI Device Information (Type 38)
+ * 7.39 IPMI Device Information (Type 38)
  */
 
 static const char *dmi_ipmi_interface_type(u8 code)
 {
-	/* 3.3.39.1 and IPMI 2.0, appendix C1, table C1-2 */
+	/* 7.39.1 and IPMI 2.0, appendix C1, table C1-2 */
 	static const char *type[] = {
 		"Unknown", /* 0x00 */
 		"KCS (Keyboard Control Style)",
@@ -2855,7 +2855,7 @@ static const char *dmi_ipmi_register_spacing(u8 code)
 }
 
 /*
- * 3.3.40 System Power Supply (Type 39)
+ * 7.40 System Power Supply (Type 39)
  */
 
 static void dmi_power_supply_power(u16 code)
@@ -2868,7 +2868,7 @@ static void dmi_power_supply_power(u16 code)
 
 static const char *dmi_power_supply_type(u8 code)
 {
-	/* 3.3.40.1 */
+	/* 7.40.1 */
 	static const char *type[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2887,7 +2887,7 @@ static const char *dmi_power_supply_type(u8 code)
 
 static const char *dmi_power_supply_status(u8 code)
 {
-	/* 3.3.40.1 */
+	/* 7.40.1 */
 	static const char *status[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2903,7 +2903,7 @@ static const char *dmi_power_supply_status(u8 code)
 
 static const char *dmi_power_supply_range_switching(u8 code)
 {
-	/* 3.3.40.1 */
+	/* 7.40.1 */
 	static const char *switching[] = {
 		"Other", /* 0x01 */
 		"Unknown",
@@ -2919,7 +2919,7 @@ static const char *dmi_power_supply_range_switching(u8 code)
 }
 
 /*
- * 3.3.41 Additional Information (Type 40)
+ * 7.41 Additional Information (Type 40)
  *
  * Proper support of this entry type would require redesigning a large part of
  * the code, so I am waiting to see actual implementations of it to decide
@@ -2985,7 +2985,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 	 */
 	switch (h->type)
 	{
-		case 0: /* 3.3.1 BIOS Information */
+		case 0: /* 7.1 BIOS Information */
 			printf("BIOS Information\n");
 			if (h->length < 0x12) break;
 			printf("\tVendor: %s\n",
@@ -3024,7 +3024,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					data[0x16], data[0x17]);
 			break;
 
-		case 1: /* 3.3.2 System Information */
+		case 1: /* 7.2 System Information */
 			printf("System Information\n");
 			if (h->length < 0x08) break;
 			printf("\tManufacturer: %s\n",
@@ -3048,7 +3048,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_string(h, data[0x1A]));
 			break;
 
-		case 2: /* 3.3.3 Base Board Information */
+		case 2: /* 7.3 Base Board Information */
 			printf("Base Board Information\n");
 			if (h->length < 0x08) break;
 			printf("\tManufacturer: %s\n",
@@ -3079,7 +3079,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_base_board_handles(data[0x0E], data + 0x0F, "\t");
 			break;
 
-		case 3: /* 3.3.4 Chassis Information */
+		case 3: /* 7.4 Chassis Information */
 			printf("Chassis Information\n");
 			if (h->length < 0x09) break;
 			printf("\tManufacturer: %s\n",
@@ -3118,7 +3118,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_chassis_elements(data[0x13], data[0x14], data + 0x15, "\t");
 			break;
 
-		case 4: /* 3.3.5 Processor Information */
+		case 4: /* 7.5 Processor Information */
 			printf("Processor Information\n");
 			if (h->length < 0x1A) break;
 			printf("\tSocket Designation: %s\n",
@@ -3182,7 +3182,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_processor_characteristics(WORD(data + 0x26), "\t\t");
 			break;
 
-		case 5: /* 3.3.6 Memory Controller Information */
+		case 5: /* 7.6 Memory Controller Information */
 			printf("Memory Controller Information\n");
 			if (h->length < 0x0F) break;
 			printf("\tError Detecting Method: %s\n",
@@ -3212,7 +3212,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_memory_controller_ec_capabilities(data[0x0F + data[0x0E] * sizeof(u16)], "\t\t");
 			break;
 
-		case 6: /* 3.3.7 Memory Module Information */
+		case 6: /* 7.7 Memory Module Information */
 			printf("Memory Module Information\n");
 			if (h->length < 0x0C) break;
 			printf("\tSocket Designation: %s\n",
@@ -3236,7 +3236,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_memory_module_error(data[0x0B], "\t\t");
 			break;
 
-		case 7: /* 3.3.8 Cache Information */
+		case 7: /* 7.8 Cache Information */
 			printf("Cache Information\n");
 			if (h->length < 0x0F) break;
 			printf("\tSocket Designation: %s\n",
@@ -3273,7 +3273,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_cache_associativity(data[0x12]));
 			break;
 
-		case 8: /* 3.3.9 Port Connector Information */
+		case 8: /* 7.9 Port Connector Information */
 			printf("Port Connector Information\n");
 			if (h->length < 0x09) break;
 			printf("\tInternal Reference Designator: %s\n",
@@ -3288,7 +3288,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_port_type(data[0x08]));
 			break;
 
-		case 9: /* 3.3.10 System Slots */
+		case 9: /* 7.10 System Slots */
 			printf("System Slot Information\n");
 			if (h->length < 0x0C) break;
 			printf("\tDesignation: %s\n",
@@ -3310,23 +3310,23 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_slot_segment_bus_func(WORD(data + 0x0D), data[0x0F], data[0x10], "\t");
 			break;
 
-		case 10: /* 3.3.11 On Board Devices Information */
+		case 10: /* 7.11 On Board Devices Information */
 			dmi_on_board_devices(h, "");
 			break;
 
-		case 11: /* 3.3.12 OEM Strings */
+		case 11: /* 7.12 OEM Strings */
 			printf("OEM Strings\n");
 			if (h->length < 0x05) break;
 			dmi_oem_strings(h, "\t");
 			break;
 
-		case 12: /* 3.3.13 System Configuration Options */
+		case 12: /* 7.13 System Configuration Options */
 			printf("System Configuration Options\n");
 			if (h->length < 0x05) break;
 			dmi_system_configuration_options(h, "\t");
 			break;
 
-		case 13: /* 3.3.14 BIOS Language Information */
+		case 13: /* 7.14 BIOS Language Information */
 			printf("BIOS Language Information\n");
 			if (h->length < 0x16) break;
 			printf("\tInstallable Languages: %u\n", data[0x04]);
@@ -3335,7 +3335,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_string(h, data[0x15]));
 			break;
 
-		case 14: /* 3.3.15 Group Associations */
+		case 14: /* 7.15 Group Associations */
 			printf("Group Associations\n");
 			if (h->length < 0x05) break;
 			printf("\tName: %s\n",
@@ -3345,7 +3345,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_group_associations_items((h->length - 0x05) / 3, data + 0x05, "\t\t");
 			break;
 
-		case 15: /* 3.3.16 System Event Log */
+		case 15: /* 7.16 System Event Log */
 			printf("System Event Log\n");
 			if (h->length < 0x14) break;
 			printf("\tArea Length: %u bytes\n",
@@ -3377,7 +3377,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_event_log_descriptors(data[0x15], data[0x16], data + 0x17, "\t");
 			break;
 
-		case 16: /* 3.3.17 Physical Memory Array */
+		case 16: /* 7.17 Physical Memory Array */
 			printf("Physical Memory Array\n");
 			if (h->length < 0x0F) break;
 			printf("\tLocation: %s\n",
@@ -3399,7 +3399,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				WORD(data + 0x0D));
 			break;
 
-		case 17: /* 3.3.18 Memory Device */
+		case 17: /* 7.18 Memory Device */
 			printf("Memory Device\n");
 			if (h->length < 0x15) break;
 			if (!(opt.flags & FLAG_QUIET))
@@ -3455,7 +3455,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\n");
 			break;
 
-		case 18: /* 3.3.19 32-bit Memory Error Information */
+		case 18: /* 7.19 32-bit Memory Error Information */
 			printf("32-bit Memory Error Information\n");
 			if (h->length < 0x17) break;
 			printf("\tType: %s\n",
@@ -3478,7 +3478,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\n");
 			break;
 
-		case 19: /* 3.3.20 Memory Array Mapped Address */
+		case 19: /* 7.20 Memory Array Mapped Address */
 			printf("Memory Array Mapped Address\n");
 			if (h->length < 0x0F) break;
 			printf("\tStarting Address: 0x%08X%03X\n",
@@ -3495,7 +3495,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				data[0x0F]);
 			break;
 
-		case 20: /* 3.3.21 Memory Device Mapped Address */
+		case 20: /* 7.21 Memory Device Mapped Address */
 			printf("Memory Device Mapped Address\n");
 			if (h->length < 0x13) break;
 			printf("\tStarting Address: 0x%08X%03X\n",
@@ -3519,7 +3519,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_mapped_address_interleaved_data_depth(data[0x12], "\t");
 			break;
 
-		case 21: /* 3.3.22 Built-in Pointing Device */
+		case 21: /* 7.22 Built-in Pointing Device */
 			printf("Built-in Pointing Device\n");
 			if (h->length < 0x07) break;
 			printf("\tType: %s\n",
@@ -3530,7 +3530,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				data[0x06]);
 			break;
 
-		case 22: /* 3.3.23 Portable Battery */
+		case 22: /* 7.23 Portable Battery */
 			printf("Portable Battery\n");
 			if (h->length < 0x10) break;
 			printf("\tLocation: %s\n",
@@ -3578,7 +3578,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				DWORD(data + 0x16));
 			break;
 
-		case 23: /* 3.3.24 System Reset */
+		case 23: /* 7.24 System Reset */
 			printf("System Reset\n");
 			if (h->length < 0x0D) break;
 			printf("\tStatus: %s\n",
@@ -3605,7 +3605,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\n");
 			break;
 
-		case 24: /* 3.3.25 Hardware Security */
+		case 24: /* 7.25 Hardware Security */
 			printf("Hardware Security\n");
 			if (h->length < 0x05) break;
 			printf("\tPower-On Password Status: %s\n",
@@ -3618,7 +3618,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_hardware_security_status(data[0x04] & 0x3));
 			break;
 
-		case 25: /* 3.3.26 System Power Controls */
+		case 25: /* 7.26 System Power Controls */
 			printf("\tSystem Power Controls\n");
 			if (h->length < 0x09) break;
 			printf("\tNext Scheduled Power-on:");
@@ -3626,7 +3626,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\n");
 			break;
 
-		case 26: /* 3.3.27 Voltage Probe */
+		case 26: /* 7.27 Voltage Probe */
 			printf("Voltage Probe\n");
 			if (h->length < 0x14) break;
 			printf("\tDescription: %s\n",
@@ -3658,7 +3658,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\n");
 			break;
 
-		case 27: /* 3.3.28 Cooling Device */
+		case 27: /* 7.28 Cooling Device */
 			printf("Cooling Device\n");
 			if (h->length < 0x0C) break;
 			if (!(opt.flags & FLAG_QUIET) && WORD(data + 0x04) != 0xFFFF)
@@ -3679,7 +3679,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\n");
 			break;
 
-		case 28: /* 3.3.29 Temperature Probe */
+		case 28: /* 7.29 Temperature Probe */
 			printf("Temperature Probe\n");
 			if (h->length < 0x14) break;
 			printf("\tDescription: %s\n",
@@ -3711,7 +3711,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\n");
 			break;
 
-		case 29: /* 3.3.30 Electrical Current Probe */
+		case 29: /* 7.30 Electrical Current Probe */
 			printf("Electrical Current Probe\n");
 			if (h->length < 0x14) break;
 			printf("\tDescription: %s\n",
@@ -3743,7 +3743,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\n");
 			break;
 
-		case 30: /* 3.3.31 Out-of-band Remote Access */
+		case 30: /* 7.31 Out-of-band Remote Access */
 			printf("Out-of-band Remote Access\n");
 			if (h->length < 0x06) break;
 			printf("\tManufacturer Name: %s\n",
@@ -3754,7 +3754,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				data[0x05] & (1 << 1) ? "Enabled" : "Disabled");
 			break;
 
-		case 31: /* 3.3.32 Boot Integrity Services Entry Point */
+		case 31: /* 7.32 Boot Integrity Services Entry Point */
 			printf("Boot Integrity Services Entry Point\n");
 			if (h->length < 0x1C) break;
 			printf("\tChecksum: %s\n",
@@ -3766,14 +3766,14 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				DWORD(data + 0x0C));
 			break;
 
-		case 32: /* 3.3.33 System Boot Information */
+		case 32: /* 7.33 System Boot Information */
 			printf("System Boot Information\n");
 			if (h->length < 0x0B) break;
 			printf("\tStatus: %s\n",
 				dmi_system_boot_status(data[0x0A]));
 			break;
 
-		case 33: /* 3.3.34 64-bit Memory Error Information */
+		case 33: /* 7.34 64-bit Memory Error Information */
 			if (h->length < 0x1F) break;
 			printf("64-bit Memory Error Information\n");
 			printf("\tType: %s\n",
@@ -3796,7 +3796,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\n");
 			break;
 
-		case 34: /* 3.3.35 Management Device */
+		case 34: /* 7.35 Management Device */
 			printf("Management Device\n");
 			if (h->length < 0x0B) break;
 			printf("\tDescription: %s\n",
@@ -3809,7 +3809,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_management_device_address_type(data[0x0A]));
 			break;
 
-		case 35: /* 3.3.36 Management Device Component */
+		case 35: /* 7.36 Management Device Component */
 			printf("Management Device Component\n");
 			if (h->length < 0x0B) break;
 			printf("\tDescription: %s\n",
@@ -3826,7 +3826,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			}
 			break;
 
-		case 36: /* 3.3.37 Management Device Threshold Data */
+		case 36: /* 7.37 Management Device Threshold Data */
 			printf("Management Device Threshold Data\n");
 			if (h->length < 0x10) break;
 			if (WORD(data + 0x04) != 0x8000)
@@ -3849,7 +3849,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					(i16)WORD(data + 0x0E));
 			break;
 
-		case 37: /* 3.3.38 Memory Channel */
+		case 37: /* 7.38 Memory Channel */
 			printf("Memory Channel\n");
 			if (h->length < 0x07) break;
 			printf("\tType: %s\n",
@@ -3862,7 +3862,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_memory_channel_devices(data[0x06], data + 0x07, "\t");
 			break;
 
-		case 38: /* 3.3.39 IPMI Device Information */
+		case 38: /* 7.39 IPMI Device Information */
 			/*
 			 * We use the word "Version" instead of "Revision", conforming to
 			 * the IPMI specification.
@@ -3904,7 +3904,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			}
 			break;
 
-		case 39: /* 3.3.40 System Power Supply */
+		case 39: /* 7.40 System Power Supply */
 			printf("System Power Supply\n");
 			if (h->length < 0x10) break;
 			if (data[0x04] != 0x00)
@@ -3957,13 +3957,13 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			}
 			break;
 
-		case 40: /* 3.3.41 Additional Information */
+		case 40: /* 7.41 Additional Information */
 			if (h->length < 0x0B) break;
 			if (!(opt.flags & FLAG_QUIET))
 				dmi_additional_info(h, "");
 			break;
 
-		case 41: /* 3.3.42 Onboard Device Extended Information */
+		case 41: /* 7.42 Onboard Device Extended Information */
 			printf("Onboard Device\n");
 			if (h->length < 0x0B) break;
 			printf("\tReference Designation: %s\n", dmi_string(h, data[0x04]));
@@ -3975,11 +3975,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_slot_segment_bus_func(WORD(data + 0x07), data[0x09], data[0x0A], "\t");
 			break;
 
-		case 126: /* 3.3.43 Inactive */
+		case 126: /* 7.44 Inactive */
 			printf("Inactive\n");
 			break;
 
-		case 127: /* 3.3.44 End Of Table */
+		case 127: /* 7.45 End Of Table */
 			printf("End Of Table\n");
 			break;
 
