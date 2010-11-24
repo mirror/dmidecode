@@ -1655,12 +1655,12 @@ static const char *dmi_slot_type(u8 code)
 		"PCI Express x4",
 		"PCI Express x8",
 		"PCI Express x16",
-		"PCI Express Gen 2",
-		"PCI Express Gen 2 x1",
-		"PCI Express Gen 2 x2",
-		"PCI Express Gen 2 x4",
-		"PCI Express Gen 2 x8",
-		"PCI Express Gen 2 x16", /* 0xB0 */
+		"PCI Express 2",
+		"PCI Express 2 x1",
+		"PCI Express 2 x2",
+		"PCI Express 2 x4",
+		"PCI Express 2 x8",
+		"PCI Express 2 x16", /* 0xB0 */
 	};
 
 	if (code >= 0x01 && code <= 0x13)
@@ -1744,6 +1744,17 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
 		case 0x12: /* PCI-X */
 		case 0x13: /* AGP */
 		case 0xA5: /* PCI Express */
+		case 0xA6: /* PCI Express */
+		case 0xA7: /* PCI Express */
+		case 0xA8: /* PCI Express */
+		case 0xA9: /* PCI Express */
+		case 0xAA: /* PCI Express */
+		case 0xAB: /* PCI Express 2 */
+		case 0xAC: /* PCI Express 2 */
+		case 0xAD: /* PCI Express 2 */
+		case 0xAE: /* PCI Express 2 */
+		case 0xAF: /* PCI Express 2 */
+		case 0xB0: /* PCI Express 2 */
 			printf("%sID: %u\n", prefix, code1);
 			break;
 		case 0x07: /* PCMCIA */
