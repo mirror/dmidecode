@@ -2948,7 +2948,7 @@ static void dmi_power_supply_power(u16 code)
 	if (code == 0x8000)
 		printf(" Unknown");
 	else
-		printf(" %.3f W", (float)code / 1000);
+		printf(" %u W", (unsigned int)code);
 }
 
 static const char *dmi_power_supply_type(u8 code)
