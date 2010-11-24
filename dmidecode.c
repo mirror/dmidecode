@@ -47,6 +47,9 @@
  *    http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/25481.pdf
  *  - BIOS Integrity Services Application Programming Interface version 1.0
  *    http://www.intel.com/design/archives/wfm/downloads/bisspec.htm
+ *  - DMTF DSP0239 version 1.1.0
+ *    "Management Component Transport Protocol (MCTP) IDs and Codes"
+ *    http://www.dmtf.org/standards/pmci
  */
 
 #include <stdio.h>
@@ -66,7 +69,7 @@
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
-#define SUPPORTED_SMBIOS_VER 0x0206
+#define SUPPORTED_SMBIOS_VER 0x0207
 
 /*
  * Type-independant Stuff
@@ -147,10 +150,11 @@ static const char *dmi_smbios_structure_type(u8 code)
 		"IPMI Device",
 		"Power Supply",
 		"Additional Information",
-		"Onboard Device", /* 41 */
+		"Onboard Device",
+		"Management Controller Host Interface", /* 42 */
 	};
 
-	if (code <= 41)
+	if (code <= 42)
 		return type[code];
 	return out_of_spec;
 }
@@ -3054,6 +3058,30 @@ static void dmi_additional_info(const struct dmi_header *h, const char *prefix)
 }
 
 /*
+ * 7.43 Management Controller Host Interface (Type 42)
+ */
+
+static const char *dmi_management_controller_host_type(u8 code)
+{
+	/* DMTF DSP0239 (MCTP) version 1.1.0 */
+	static const char *type[] = {
+		"KCS: Keyboard Controller Style", /* 0x02 */
+		"8250 UART Register Compatible",
+		"16450 UART Register Compatible",
+		"16550/16550A UART Register Compatible",
+		"16650/16650A UART Register Compatible",
+		"16750/16750A UART Register Compatible",
+		"16850/16850A UART Register Compatible" /* 0x08 */
+	};
+
+	if (code >= 0x02 && code <= 0x08)
+		return type[code - 0x02];
+	if (code == 0xF0)
+		return "OEM";
+	return out_of_spec;
+}
+
+/*
  * Main
  */
 
@@ -3820,6 +3848,8 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tNominal Speed:");
 			dmi_cooling_device_speed(WORD(data + 0x0C));
 			printf("\n");
+			if (h->length < 0x0F) break;
+			printf("\tDescription: %s\n", dmi_string(h, data[0x0E]));
 			break;
 
 		case 28: /* 7.29 Temperature Probe */
@@ -4116,6 +4146,26 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				data[0x05] & 0x80 ? "Enabled" : "Disabled");
 			printf("\tType Instance: %u\n", data[0x06]);
 			dmi_slot_segment_bus_func(WORD(data + 0x07), data[0x09], data[0x0A], "\t");
+			break;
+
+		case 42: /* 7.43 Management Controller Host Interface */
+			printf("Management Controller Host Interface\n");
+			if (h->length < 0x05) break;
+			printf("\tInterface Type: %s\n",
+				dmi_management_controller_host_type(data[0x04]));
+			/*
+			 * There you have a type-dependent, variable-length
+			 * part in the middle of the structure, with no
+			 * length specifier, so no easy way to decode the
+			 * common, final part of the structure. What a pity.
+			 */
+			if (h->length < 0x09) break;
+			if (data[0x04] == 0xF0)		/* OEM */
+			{
+				printf("\tVendor ID: 0x%02X%02X%02X%02X\n",
+					data[0x05], data[0x06], data[0x07],
+					data[0x08]);
+			}
 			break;
 
 		case 126: /* 7.44 Inactive */
