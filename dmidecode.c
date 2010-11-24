@@ -305,11 +305,13 @@ static void dmi_bios_characteristics_x2(u8 code, const char *prefix)
 	static const char *characteristics[] = {
 		"BIOS boot specification is supported", /* 0 */
 		"Function key-initiated network boot is supported",
-		"Targeted content distribution is supported" /* 2 */
+		"Targeted content distribution is supported",
+		"UEFI is supported",
+		"System is a virtual machine" /* 4 */
 	};
 	int i;
 
-	for (i = 0; i <= 2; i++)
+	for (i = 0; i <= 4; i++)
 		if (code & (1 << i))
 			printf("%s%s\n",
 				prefix, characteristics[i]);
@@ -652,6 +654,11 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x35, "Alpha 21164a" },
 		{ 0x36, "Alpha 21264" },
 		{ 0x37, "Alpha 21364" },
+		{ 0x38, "Turion II Ultra Dual-Core Mobile M" },
+		{ 0x39, "Turion II Dual-Core Mobile M" },
+		{ 0x3A, "Athlon II Dual-Core M" },
+		{ 0x3B, "Opteron 6100" },
+		{ 0x3C, "Opteron 4100" },
 
 		{ 0x40, "MIPS" },
 		{ 0x41, "MIPS R4000" },
@@ -752,6 +759,8 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0xCA, "G5" },
 		{ 0xCB, "ESA/390 G6" },
 		{ 0xCC, "z/Architectur" },
+		{ 0xCD, "Core i5" },
+		{ 0xCE, "Core i3" },
 
 		{ 0xD2, "C7-M" },
 		{ 0xD3, "C7-D" },
@@ -760,13 +769,14 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0xD6, "Multi-Core Xeon" },
 		{ 0xD7, "Dual-Core Xeon 3xxx" },
 		{ 0xD8, "Quad-Core Xeon 3xxx" },
-
+		{ 0xD9, "Nano" },
 		{ 0xDA, "Dual-Core Xeon 5xxx" },
 		{ 0xDB, "Quad-Core Xeon 5xxx" },
 
 		{ 0xDD, "Dual-Core Xeon 7xxx" },
 		{ 0xDE, "Quad-Core Xeon 7xxx" },
 		{ 0xDF, "Multi-Core Xeon 7xxx" },
+		{ 0xE0, "Multi-Core Xeon 3400" },
 
 		{ 0xE6, "Embedded Opteron Quad-Core" },
 		{ 0xE7, "Phenom Triple-Core" },
@@ -774,6 +784,10 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0xE9, "Turion Dual-Core Mobile" },
 		{ 0xEA, "Athlon Dual-Core" },
 		{ 0xEB, "Sempron SI" },
+		{ 0xEC, "Phenom II" },
+		{ 0xED, "Athlon II" },
+		{ 0xEE, "Six-Core Opteron" },
+		{ 0xEF, "Sempron M" },
 
 		{ 0xFA, "i860" },
 		{ 0xFB, "i960" },
@@ -929,15 +943,16 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 	      || (type >= 0xA1 && type <= 0xB3) /* Intel */
 	      || type == 0xB5 /* Intel */
 	      || (type >= 0xB9 && type <= 0xC7) /* Intel */
-	      || (type >= 0xD2 && type <= 0xD8) /* VIA, Intel */
-	      || (type >= 0xDA && type <= 0xDB) /* Intel */
-	      || (type >= 0xDD && type <= 0xDF)) /* Intel */
+	      || (type >= 0xCD && type <= 0xCE) /* Intel */
+	      || (type >= 0xD2 && type <= 0xDB) /* VIA, Intel */
+	      || (type >= 0xDD && type <= 0xE0)) /* Intel */
 		sig = 1;
 	else if ((type >= 0x18 && type <= 0x1D) /* AMD */
 	      || type == 0x1F /* AMD */
+	      || (type >= 0x38 && type <= 0x3C) /* AMD */
 	      || (type >= 0x83 && type <= 0x8F) /* AMD */
 	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
-	      || (type >= 0xE6 && type <= 0xEB)) /* AMD */
+	      || (type >= 0xE6 && type <= 0xEF)) /* AMD */
 		sig = 2;
 	else if (type == 0x01 || type == 0x02)
 	{
@@ -1073,10 +1088,17 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket S1",
 		"Socket AM2",
 		"Socket F (1207)",
-		"Socket LGA1366" /* 0x19 */
+		"Socket LGA1366",
+		"Socket G34",
+		"Socket AM3",
+		"Socket C32",
+		"Socket LGA1156",
+		"Socket LGA1567",
+		"Socket PGA988A",
+		"Socket BGA1288" /* 0x20 */
 	};
 
-	if (code >= 0x01 && code <= 0x19)
+	if (code >= 0x01 && code <= 0x20)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }
@@ -1098,17 +1120,22 @@ static void dmi_processor_characteristics(u16 code, const char *prefix)
 {
 	/* 7.5.9 */
 	static const char *characteristics[] = {
-		"64-bit capable" /* 2 */
+		"64-bit capable", /* 2 */
+		"Multi-Core",
+		"Hardware Thread",
+		"Execute Protection",
+		"Enhanced Virtualization",
+		"Power/Performance Control" /* 7 */
 	};
 
-	if ((code & 0x0004) == 0)
+	if ((code & 0x00FC) == 0)
 		printf(" None\n");
 	else
 	{
 		int i;
 
 		printf("\n");
-		for (i = 2; i <= 2; i++)
+		for (i = 2; i <= 7; i++)
 			if (code & (1 << i))
 				printf("%s%s\n", prefix, characteristics[i - 2]);
 	}
@@ -3116,6 +3143,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x15) break;
 			if (h->length < 0x15 + data[0x13] * data[0x14]) break;
 			dmi_chassis_elements(data[0x13], data[0x14], data + 0x15, "\t");
+			if (h->length < 0x16 + data[0x13] * data[0x14]) break;
+			printf("\tSKU Number: %s\n",
+				dmi_string(h, data[0x15 + data[0x13] * data[0x14]]));
 			break;
 
 		case 4: /* 7.5 Processor Information */
