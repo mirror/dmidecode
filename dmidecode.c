@@ -1046,7 +1046,7 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 
 	edx = DWORD(p + 4);
 	printf("%sFlags:", prefix);
-	if ((edx & 0xFFEFFBFF) == 0)
+	if ((edx & 0xBFEFFBFF) == 0)
 		printf(" None\n");
 	else
 	{
