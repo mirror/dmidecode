@@ -2,7 +2,7 @@
  * Common "util" functions
  * This file is part of the dmidecode project.
  *
- *   Copyright (C) 2002-2008 Jean Delvare <khali@linux-fr>
+ *   Copyright (C) 2002-2010 Jean Delvare <khali@linux-fr>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
