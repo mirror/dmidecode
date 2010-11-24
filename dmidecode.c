@@ -3241,7 +3241,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_processor_family(h, ver));
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x07]));
-			dmi_processor_id(data[0x06], data + 8, dmi_string(h, data[0x10]), "\t");
+			dmi_processor_id(data[0x06], data + 0x08, dmi_string(h, data[0x10]), "\t");
 			printf("\tVersion: %s\n",
 				dmi_string(h, data[0x10]));
 			printf("\tVoltage:");
