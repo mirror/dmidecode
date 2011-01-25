@@ -2100,7 +2100,7 @@ static const char *dmi_memory_array_location(u8 code)
 
 	if (code >= 0x01 && code <= 0x0A)
 		return location[code - 0x01];
-	if (code >= 0xA0 && code <= 0xA4)
+	if (code >= 0xA0 && code <= 0xA3)
 		return location_0xA0[code - 0xA0];
 	return out_of_spec;
 }

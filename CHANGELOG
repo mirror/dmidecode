@@ -1,3 +1,8 @@
+2011-01-25  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Fix boundary checks of memory array location codes
+	  (DMI type 16). Reported by Andrey Matveyev.
+
 2010-11-24  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Assume that the max power capacity is expressed in
