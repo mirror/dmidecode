@@ -1,3 +1,12 @@
+2011-04-20  Jean Delvare  <khali@linux-fr.org>
+
+	Update to support SMBIOS specification version 2.7.1.
+
+	* dmidecode.c: Add 6 AMD processor families (DMI type 4).
+	* dmidecode.c: Add cache associativity value
+	  "20-way Set-associative" (DMI type 7).
+	* dmidecode.c: Add PCI Express 3 slot types (DMI type 9).
+
 2011-01-25  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Fix boundary checks of memory array location codes
