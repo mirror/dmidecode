@@ -1,3 +1,8 @@
+2011-11-14  Anton Arapov  <anton@redhat.com>
+
+	* Haiku dropped the _BEOS_ definition in favor of its own platform
+	  identification _HAIKU_. Patch from Francois Revol.
+
 2011-04-20  Jean Delvare  <khali@linux-fr.org>
 
 	Update to support SMBIOS specification version 2.7.1.
