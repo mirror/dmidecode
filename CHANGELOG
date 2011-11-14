@@ -1,7 +1,9 @@
 2011-11-14  Anton Arapov  <anton@redhat.com>
 
-	* Haiku dropped the _BEOS_ definition in favor of its own platform
-	  identification _HAIKU_. Patch from Francois Revol.
+	* dmidecode.c: Make dmi_chassis_type aware of the lock bit.
+	  Patch from Stefan Tauner.
+	* config.h: Haiku dropped the _BEOS_ definition in favor of its own
+	  platform identification _HAIKU_. Patch from Francois Revol.
 
 2011-04-20  Jean Delvare  <khali@linux-fr.org>
 
