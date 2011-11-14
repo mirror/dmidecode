@@ -532,6 +532,8 @@ static const char *dmi_chassis_type(u8 code)
 		"Blade Enclosing" /* 0x1D */
 	};
 
+	code &= 0x7F; /* bits 6:0 are chassis type, 7th bit is the lock bit */
+
 	if (code >= 0x01 && code <= 0x1D)
 		return type[code - 0x01];
 	return out_of_spec;
@@ -3237,7 +3239,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x04]));
 			printf("\tType: %s\n",
-				dmi_chassis_type(data[0x05] & 0x7F));
+				dmi_chassis_type(data[0x05]));
 			printf("\tLock: %s\n",
 				dmi_chassis_lock(data[0x05] >> 7));
 			printf("\tVersion: %s\n",
