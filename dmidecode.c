@@ -197,7 +197,7 @@ static void dmi_dump(const struct dmi_header *h, const char *prefix)
 					printf("%s\t", prefix);
 					for (j = 0; j < 16 && j < l - (row << 4); j++)
 						printf("%s%02X", j ? " " : "",
-						       s[(row << 4) + j]);
+						       (unsigned char)s[(row << 4) + j]);
 					printf("\n");
 				}
 				/* String isn't filtered yet so do it now */

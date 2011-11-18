@@ -1,3 +1,8 @@
+2011-11-18  Jean Delvare  <khali@linux-fr.org>
+
+	* dmidecode.c: Properly print the hexadecimal value of invalid
+	  string characters.
+
 2011-11-14  Anton Arapov  <anton@redhat.com>
 
 	* dmidecode.c: Make dmi_chassis_type aware of the lock bit.
