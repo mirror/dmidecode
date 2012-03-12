@@ -1,3 +1,8 @@
+2012-03-12  Anton Arapov  <anton@redhat.com>
+
+	* dmioem.c: Add "PXE" to the HP OEM Type 209 output so it is similar to
+	  the "iSCSI" description in HP OEM Type 221. Patch from Naga Chumbalkar.
+
 2011-11-18  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Properly print the hexadecimal value of invalid
