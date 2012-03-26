@@ -1,3 +1,9 @@
+2012-03-26  Anton Arapov  <anton@redhat.com>
+
+	* man/dmidecode.8: Add missing DMI type introduced with SMBIOS 2.7+, and
+	  include the information about the extra output when dmidecode is run
+	  on a hardware that has non-supported SMBIOS version.
+
 2012-03-12  Anton Arapov  <anton@redhat.com>
 
 	* dmioem.c: Add "PXE" to the HP OEM Type 209 output so it is similar to

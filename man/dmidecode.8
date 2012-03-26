@@ -1,4 +1,4 @@
-.TH DMIDECODE 8 "November 2008" "dmidecode"
+.TH DMIDECODE 8 "March 2012" "dmidecode"
 .SH NAME
 dmidecode \- \s-1DMI\s0 table decoder
 .SH SYNOPSIS
@@ -127,6 +127,13 @@ Display the version and exit
 .P
 Options --string, --type and --dump-bin
 determine the output format and are mutually exclusive.
+.P
+Please note in case of
+.B dmidecode
+is run on a system with BIOS that boasts new SMBIOS specification, which
+is not supported by the tool yet, it will print out relevant message in
+addition to requested data on the very top of the output. Thus informs the
+output data is not reliable.
 
 .SH "DMI TYPES"
 The \s-1SMBIOS\s0 specification defines the following \s-1DMI\s0 types:
@@ -138,7 +145,7 @@ r l.
 Type	Information
 0	BIOS
 1	System
-2	Base Board
+2	Baseboard
 3	Chassis
 4	Processor
 5	Memory Controller
@@ -177,7 +184,8 @@ Type	Information
 38	IPMI Device
 39	Power Supply
 40	Additional Information
-41	Onboard Device
+41	Onboard Devices Extended Information
+42	Management Controller Host Interface
 .TE
 
 Additionally, type 126 is used for disabled entries and type 127 is an
