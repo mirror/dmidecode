@@ -25,7 +25,7 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 2.7.0" document,
+ * Management BIOS Reference Specification, Version 2.8.0" document,
  * available from http://www.dmtf.org/standards/smbios.
  *
  * Note to contributors:
@@ -711,6 +711,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x3C, "Opteron 4100" },
 		{ 0x3D, "Opteron 6200" },
 		{ 0x3E, "Opteron 4200" },
+		{ 0x3F, "FX" },
 
 		{ 0x40, "MIPS" },
 		{ 0x41, "MIPS R4000" },
@@ -720,8 +721,14 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x45, "MIPS R10000" },
 		{ 0x46, "C-Series" },
 		{ 0x47, "E-Series" },
-		{ 0x48, "S-Series" },
+		{ 0x48, "A-Series" },
 		{ 0x49, "G-Series" },
+		{ 0x4A, "Z-Series" },
+		{ 0x4B, "R-Series" },
+		{ 0x4C, "Opteron 4300" },
+		{ 0x4D, "Opteron 6300" },
+		{ 0x4E, "Opteron 3300" },
+		{ 0x4F, "FirePro" },
 
 		{ 0x50, "SPARC" },
 		{ 0x51, "SuperSPARC" },
@@ -834,6 +841,8 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0xDF, "Multi-Core Xeon 7xxx" },
 		{ 0xE0, "Multi-Core Xeon 3400" },
 
+		{ 0xE4, "Opteron 3000" },
+		{ 0xE5, "Sempron II" },
 		{ 0xE6, "Embedded Opteron Quad-Core" },
 		{ 0xE7, "Phenom Triple-Core" },
 		{ 0xE8, "Turion Ultra Dual-Core Mobile" },
@@ -1155,14 +1164,16 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket BGA1288",
 		"Socket rPGA988B",
 		"Socket BGA1023",
-		"Socket BGA1024",
+		"Socket BGA1224",
 		"Socket BGA1155",
 		"Socket LGA1356",
 		"Socket LGA2011",
 		"Socket FS1",
 		"Socket FS2",
 		"Socket FM1",
-		"Socket FM2" /* 0x2A */
+		"Socket FM2",
+		"Socket LGA2011-3",
+		"Socket LGA1356-3" /* 0x2C */
 	};
 
 	if (code >= 0x01 && code <= 0x2A)
@@ -2220,6 +2231,14 @@ static void dmi_memory_device_extended_size(u32 code)
 		printf(" %lu TB", (unsigned long)code >> 20);
 }
 
+static void dmi_memory_voltage_value(u16 code)
+{
+	if (code == 0)
+		printf(" Unknown");
+	else
+		printf(" %.3f V", (float)(i16)code / 1000);
+}
+
 static const char *dmi_memory_device_form_factor(u8 code)
 {
 	/* 7.18.1 */
@@ -2309,7 +2328,8 @@ static void dmi_memory_device_type_detail(u16 code)
 		"Cache DRAM",
 		"Non-Volatile",
 		"Registered (Buffered)",
-		"Unbuffered (Unregistered)"  /* 14 */
+		"Unbuffered (Unregistered)",
+		"LRDIMM"  /* 15 */
 	};
 
 	if ((code & 0x7FFE) == 0)
@@ -3635,6 +3655,16 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x22) break;
 			printf("\tConfigured Clock Speed:");
 			dmi_memory_device_speed(WORD(data + 0x20));
+			printf("\n");
+			if (h->length < 0x28) break;
+			printf("\tMinimum voltage: ");
+			dmi_memory_voltage_value(WORD(data + 0x22));
+			printf("\n");
+			printf("\tMaximum voltage: ");
+			dmi_memory_voltage_value(WORD(data + 0x24));
+			printf("\n");
+			printf("\tConfigured voltage: ");
+			dmi_memory_voltage_value(WORD(data + 0x26));
 			printf("\n");
 			break;
 
