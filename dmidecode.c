@@ -2236,7 +2236,7 @@ static void dmi_memory_voltage_value(u16 code)
 	if (code == 0)
 		printf(" Unknown");
 	else
-		printf(" %.3f V", (float)(i16)code / 1000);
+		printf(" %.3f V", (float)code / 1000);
 }
 
 static const char *dmi_memory_device_form_factor(u8 code)

@@ -20,7 +20,7 @@ CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
 
 # When debugging, disable -O2 and enable -g.
 CFLAGS += -O2
-#CFLAGS += -g
+CFLAGS += -g
 
 # Pass linker flags here
 LDFLAGS =
