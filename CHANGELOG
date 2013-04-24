@@ -2,6 +2,8 @@
 
 	* dmidecode.c: Strip trailig zeroes from memory voltage values
 	  (DMI type 17).
+	* dmidecode.c: Fix support for new processor upgrade types (DMI
+	  type 4) and new memory device type (DMI type 17.)
 
 2013-04-17  Anton Arapov  <anton@redhat.com>
 

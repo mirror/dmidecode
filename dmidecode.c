@@ -712,7 +712,6 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x3D, "Opteron 6200" },
 		{ 0x3E, "Opteron 4200" },
 		{ 0x3F, "FX" },
-
 		{ 0x40, "MIPS" },
 		{ 0x41, "MIPS R4000" },
 		{ 0x42, "MIPS R4200" },
@@ -729,7 +728,6 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x4D, "Opteron 6300" },
 		{ 0x4E, "Opteron 3300" },
 		{ 0x4F, "FirePro" },
-
 		{ 0x50, "SPARC" },
 		{ 0x51, "SuperSPARC" },
 		{ 0x52, "MicroSPARC II" },
@@ -1176,7 +1174,7 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket LGA1356-3" /* 0x2C */
 	};
 
-	if (code >= 0x01 && code <= 0x2A)
+	if (code >= 0x01 && code <= 0x2C)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }
@@ -2338,7 +2336,7 @@ static void dmi_memory_device_type_detail(u16 code)
 	{
 		int i;
 
-		for (i = 1; i <= 14; i++)
+		for (i = 1; i <= 15; i++)
 			if (code & (1 << i))
 				printf(" %s", detail[i - 1]);
 	}
