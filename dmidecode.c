@@ -69,7 +69,7 @@
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
-#define SUPPORTED_SMBIOS_VER 0x0207
+#define SUPPORTED_SMBIOS_VER 0x0208
 
 /*
  * Type-independant Stuff
