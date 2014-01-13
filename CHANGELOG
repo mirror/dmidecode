@@ -1,3 +1,8 @@
+2014-01-13  Jean Delvare  <jdelvare@suse.de>
+
+	* LICENSE: Update to the latest upstream version. Amongst other
+	  things, this fixes the FSF address.
+
 2013-04-24  Jean Delvare  <khali@linux-fr.org>
 
 	* dmidecode.c: Strip trailig zeroes from memory voltage values
