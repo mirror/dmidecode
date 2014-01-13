@@ -1,5 +1,11 @@
 2014-01-13  Jean Delvare  <jdelvare@suse.de>
 
+	* dmidecode.c: Decode ID of PCI Express 3 slots (DMI type 9).
+	  This fixes Savannah bug #40178:
+	  https://savannah.nongnu.org/bugs/?40178
+
+2014-01-13  Jean Delvare  <jdelvare@suse.de>
+
 	* LICENSE: Update to the latest upstream version. Amongst other
 	  things, this fixes the FSF address.
 

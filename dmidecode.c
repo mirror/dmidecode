@@ -2,7 +2,7 @@
  * DMI Decode
  *
  *   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   Copyright (C) 2002-2010 Jean Delvare <khali@linux-fr.org>
+ *   Copyright (C) 2002-2014 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -1697,6 +1697,10 @@ static const char *dmi_slot_type(u8 code)
 		"PCI Express 3 x8",
 		"PCI Express 3 x16" /* 0xB6 */
 	};
+	/*
+	 * Note to developers: when adding entries to these lists, check if
+	 * function dmi_slot_id below needs updating too.
+	 */
 
 	if (code >= 0x01 && code <= 0x13)
 		return type[code - 0x01];
@@ -1790,6 +1794,12 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
 		case 0xAE: /* PCI Express 2 */
 		case 0xAF: /* PCI Express 2 */
 		case 0xB0: /* PCI Express 2 */
+		case 0xB1: /* PCI Express 3 */
+		case 0xB2: /* PCI Express 3 */
+		case 0xB3: /* PCI Express 3 */
+		case 0xB4: /* PCI Express 3 */
+		case 0xB5: /* PCI Express 3 */
+		case 0xB6: /* PCI Express 3 */
 			printf("%sID: %u\n", prefix, code1);
 			break;
 		case 0x07: /* PCMCIA */
