@@ -4,7 +4,7 @@
 #   VPD Decode
 #
 #   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
-#   Copyright (C) 2002-2007 Jean Delvare <khali@linux-fr.org>
+#   Copyright (C) 2002-2007 Jean Delvare <jdelvare@suse.de>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by

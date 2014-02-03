@@ -2,7 +2,7 @@
  * Command line handling of vpddecode
  * This file is part of the dmidecode project.
  *
- *   Copyright (C) 2005-2007 Jean Delvare <khali@linux-fr.org>
+ *   Copyright (C) 2005-2007 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
