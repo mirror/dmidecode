@@ -3665,13 +3665,13 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_memory_device_speed(WORD(data + 0x20));
 			printf("\n");
 			if (h->length < 0x28) break;
-			printf("\tMinimum Voltage: ");
+			printf("\tMinimum Voltage:");
 			dmi_memory_voltage_value(WORD(data + 0x22));
 			printf("\n");
-			printf("\tMaximum Voltage: ");
+			printf("\tMaximum Voltage:");
 			dmi_memory_voltage_value(WORD(data + 0x24));
 			printf("\n");
-			printf("\tConfigured Voltage: ");
+			printf("\tConfigured Voltage:");
 			dmi_memory_voltage_value(WORD(data + 0x26));
 			printf("\n");
 			break;

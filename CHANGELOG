@@ -1,3 +1,8 @@
+2014-02-25  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.c: Fix spacing of memory module voltage attributes
+	  (DMI type 17).
+
 2014-01-13  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Decode ID of PCI Express 3 slots (DMI type 9).
