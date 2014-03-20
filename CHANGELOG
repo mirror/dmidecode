@@ -1,6 +1,8 @@
 2014-03-20  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Let legacy_decode be quiet in dump mode too.
+	* dmidecode.c: Skip the SMBIOS version comparison in quiet mode.
+	  Patch from Jens Rosenboom.
 
 2014-02-25  Jean Delvare  <jdelvare@suse.de>
 

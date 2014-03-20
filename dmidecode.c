@@ -4336,7 +4336,7 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 	u8 *data;
 	int i = 0;
 
-	if (ver > SUPPORTED_SMBIOS_VER)
+	if (ver > SUPPORTED_SMBIOS_VER && !(opt.flags & FLAG_QUIET))
 	{
 		printf("# SMBIOS implementations newer than version %u.%u are not\n"
 		       "# fully supported by this version of dmidecode.\n",
