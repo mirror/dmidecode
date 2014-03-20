@@ -4536,7 +4536,9 @@ static int legacy_decode(u8 *buf, const char *devmem)
 		memcpy(crafted, buf, 16);
 		overwrite_dmi_address(crafted);
 
-		printf("# Writing %d bytes to %s.\n", 0x0F, opt.dumpfile);
+		if (!(opt.flags & FLAG_QUIET))
+			printf("# Writing %d bytes to %s.\n", 0x0F,
+				opt.dumpfile);
 		write_dump(0, 0x0F, crafted, opt.dumpfile, 1);
 	}
 

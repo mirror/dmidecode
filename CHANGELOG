@@ -1,3 +1,7 @@
+2014-03-20  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.c: Let legacy_decode be quiet in dump mode too.
+
 2014-02-25  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Fix spacing of memory module voltage attributes
