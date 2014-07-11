@@ -1012,11 +1012,11 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 		sig = 1;
 	else if ((type >= 0x18 && type <= 0x1D) /* AMD */
 	      || type == 0x1F /* AMD */
-	      || (type >= 0x38 && type <= 0x3E) /* AMD */
-	      || (type >= 0x46 && type <= 0x49) /* AMD */
+	      || (type >= 0x38 && type <= 0x3F) /* AMD */
+	      || (type >= 0x46 && type <= 0x4F) /* AMD */
 	      || (type >= 0x83 && type <= 0x8F) /* AMD */
 	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
-	      || (type >= 0xE6 && type <= 0xEF)) /* AMD */
+	      || (type >= 0xE4 && type <= 0xEF)) /* AMD */
 		sig = 2;
 	else if (type == 0x01 || type == 0x02)
 	{
