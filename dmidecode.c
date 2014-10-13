@@ -2311,10 +2311,11 @@ static const char *dmi_memory_device_type(u8 code)
 		"Reserved",
 		"Reserved",
 		"DDR3",
-		"FBD2", /* 0x19 */
+		"FBD2",
+		"DDR4" /* 0x1A */
 	};
 
-	if (code >= 0x01 && code <= 0x19)
+	if (code >= 0x01 && code <= 0x1A)
 		return type[code - 0x01];
 	return out_of_spec;
 }
