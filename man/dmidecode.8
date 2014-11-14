@@ -89,6 +89,13 @@ keywords is printed and
 .B dmidecode
 exits with an error.
 This option cannot be used more than once.
+
+Note: on Linux, most of these strings can alternatively be read directly
+from
+.BR sysfs ,
+typically from files under
+.IR /sys/devices/virtual/dmi/id .
+Most of these files are even readable by regular users.
 .TP
 .BR "-t" ", " "--type TYPE"
 Only display the entries of type \fBTYPE\fR. \fBTYPE\fR can be either a

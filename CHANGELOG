@@ -1,3 +1,8 @@
+2014-11-14  Jean Delvare  <jdelvare@suse.de>
+
+	* man/dmidecode.8: Add a note about DMI strings available from sysfs
+	  on Linux.
+
 2014-10-13  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Add support for DDR4 (DMI type 17). Patch from Tomohiro
