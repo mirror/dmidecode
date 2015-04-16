@@ -28,7 +28,7 @@
  *  - DMTF "System Management BIOS Reference Specification"
  *    Version 2.3.4
  *    http://www.dmtf.org/standards/smbios
- *	- Intel "Preboot Execution Environment (PXE) Specification"
+ *  - Intel "Preboot Execution Environment (PXE) Specification"
  *    Version 2.1
  *    http://www.intel.com/labs/manage/wfm/wfmspecs.htm
  *  - ACPI "Advanced Configuration and Power Interface Specification"
