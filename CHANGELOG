@@ -1,3 +1,8 @@
+2015-04-20  Jean Delvare  <jdelvare@suse.de>
+
+	* biosdecode.c: Add support for the _SM3_ entry point, as defined in
+	  the SMBIOS 3.0.0 specification.
+
 2014-11-14  Jean Delvare  <jdelvare@suse.de>
 
 	* man/dmidecode.8: Add a note about DMI strings available from sysfs

@@ -2,7 +2,7 @@
  * BIOS Decode
  *
  *   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   Copyright (C) 2002-2008 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2002-2015 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@
  *   are deemed to be part of the source code.
  *
  * References:
- *  - DMTF "System Management BIOS Reference Specification"
- *    Version 2.3.4
+ *  - DMTF "System Management BIOS (SMBIOS) Reference Specification"
+ *    Version 3.0.0
  *    http://www.dmtf.org/standards/smbios
  *  - Intel "Preboot Execution Environment (PXE) Specification"
  *    Version 2.1
@@ -89,6 +89,26 @@ struct bios_entry {
 /*
  * SMBIOS
  */
+
+static size_t smbios3_length(const u8 *p)
+{
+	return p[0x06];
+}
+
+static int smbios3_decode(const u8 *p, size_t len)
+{
+	if (len < 0x18 || !checksum(p, p[0x06]))
+		return 0;
+
+	printf("SMBIOS %u.%u.%u present.\n",
+		p[0x07], p[0x08], p[0x09]);
+	printf("\tStructure Table Maximum Length: %u bytes\n",
+		DWORD(p+0x0C));
+	printf("\tStructure Table 64-bit Address: 0x%08X%08X\n",
+		QWORD(p + 0x10).h, QWORD(p + 0x10).l);
+
+	return 1;
+}
 
 static size_t smbios_length(const u8 *p)
 {
@@ -530,6 +550,7 @@ static int fjkeyinf_decode(const u8 *p, size_t len)
  */
 
 static struct bios_entry bios_entries[] = {
+	{ "_SM3_", 0, 0xF0000, 0xFFFFF, smbios3_length, smbios3_decode },
 	{ "_SM_", 0, 0xF0000, 0xFFFFF, smbios_length, smbios_decode },
 	{ "_DMI_", 0, 0xF0000, 0xFFFFF, dmi_length, dmi_decode },
 	{ "_SYSID_", 0, 0xE0000, 0xFFFFF, sysid_length, sysid_decode },
