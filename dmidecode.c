@@ -71,6 +71,8 @@ static const char *bad_index = "<BAD INDEX>";
 
 #define SUPPORTED_SMBIOS_VER 0x0208
 
+#define FLAG_NO_FILE_OFFSET     (1 << 0)
+
 /*
  * Type-independant Stuff
  */
@@ -4331,7 +4333,8 @@ static void dmi_table_dump(u32 base, u16 len, const char *devmem)
 	free(buf);
 }
 
-static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
+static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem,
+		      u32 flags)
 {
 	u8 *buf;
 	u8 *data;
@@ -4361,6 +4364,15 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem)
 		}
 		printf("\n");
 	}
+
+	/*
+	 * When we are reading the DMI table from sysfs, we want to print
+	 * the address of the table (done above), but the offset of the
+	 * data in the file is 0.  When reading from /dev/mem, the offset
+	 * in the file is the address.
+	 */
+	if (flags & FLAG_NO_FILE_OFFSET)
+		base = 0;
 
 	if ((buf = mem_chunk(base, len, devmem)) == NULL)
 	{
@@ -4468,7 +4480,7 @@ static void overwrite_dmi_address(u8 *buf)
 	buf[0x0B] = 0;
 }
 
-static int smbios_decode(u8 *buf, const char *devmem)
+static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
 {
 	u16 ver;
 
@@ -4500,7 +4512,7 @@ static int smbios_decode(u8 *buf, const char *devmem)
 			ver >> 8, ver & 0xFF);
 
 	dmi_table(DWORD(buf + 0x18), WORD(buf + 0x16), WORD(buf + 0x1C),
-		ver, devmem);
+		ver, devmem, flags);
 
 	if (opt.flags & FLAG_DUMP_BIN)
 	{
@@ -4518,7 +4530,7 @@ static int smbios_decode(u8 *buf, const char *devmem)
 	return 1;
 }
 
-static int legacy_decode(u8 *buf, const char *devmem)
+static int legacy_decode(u8 *buf, const char *devmem, u32 flags)
 {
 	if (!checksum(buf, 0x0F))
 		return 0;
@@ -4528,7 +4540,7 @@ static int legacy_decode(u8 *buf, const char *devmem)
 			buf[0x0E] >> 4, buf[0x0E] & 0x0F);
 
 	dmi_table(DWORD(buf + 0x08), WORD(buf + 0x06), WORD(buf + 0x0C),
-		((buf[0x0E] & 0xF0) << 4) + (buf[0x0E] & 0x0F), devmem);
+		((buf[0x0E] & 0xF0) << 4) + (buf[0x0E] & 0x0F), devmem, flags);
 
 	if (opt.flags & FLAG_DUMP_BIN)
 	{
@@ -4646,12 +4658,12 @@ int main(int argc, char * const argv[])
 
 		if (memcmp(buf, "_SM_", 4) == 0)
 		{
-			if (smbios_decode(buf, opt.dumpfile))
+			if (smbios_decode(buf, opt.dumpfile, 0))
 				found++;
 		}
 		else if (memcmp(buf, "_DMI_", 5) == 0)
 		{
-			if (legacy_decode(buf, opt.dumpfile))
+			if (legacy_decode(buf, opt.dumpfile, 0))
 				found++;
 		}
 		goto done;
@@ -4674,7 +4686,7 @@ int main(int argc, char * const argv[])
 		goto exit_free;
 	}
 
-	if (smbios_decode(buf, opt.devmem))
+	if (smbios_decode(buf, opt.devmem, 0))
 		found++;
 	goto done;
 
@@ -4690,7 +4702,7 @@ memory_scan:
 	{
 		if (memcmp(buf + fp, "_SM_", 4) == 0 && fp <= 0xFFE0)
 		{
-			if (smbios_decode(buf+fp, opt.devmem))
+			if (smbios_decode(buf+fp, opt.devmem, 0))
 			{
 				found++;
 				fp += 16;
@@ -4698,7 +4710,7 @@ memory_scan:
 		}
 		else if (memcmp(buf + fp, "_DMI_", 5) == 0)
 		{
-			if (legacy_decode(buf + fp, opt.devmem))
+			if (legacy_decode(buf + fp, opt.devmem, 0))
 				found++;
 		}
 	}
