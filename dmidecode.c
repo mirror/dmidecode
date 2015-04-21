@@ -73,6 +73,9 @@ static const char *bad_index = "<BAD INDEX>";
 
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
 
+#define SYS_ENTRY_FILE "/sys/firmware/dmi/tables/smbios_entry_point"
+#define SYS_TABLE_FILE "/sys/firmware/dmi/tables/DMI"
+
 /*
  * Type-independant Stuff
  */
@@ -4669,7 +4672,38 @@ int main(int argc, char * const argv[])
 		goto done;
 	}
 
-	/* First try EFI (ia64, Intel-based Mac) */
+	/*
+	 * First try reading from sysfs tables.  The entry point file could
+	 * contain one of several types of entry points, so read enough for
+	 * the largest one, then determine what type it contains.
+	 */
+	if ((buf = read_file(0x20, SYS_ENTRY_FILE)) != NULL)
+	{
+		if (!(opt.flags & FLAG_QUIET))
+			printf("Getting SMBIOS data from sysfs.\n");
+		if (memcmp(buf, "_SM3_", 5) == 0)
+		{
+			if (!(opt.flags & FLAG_QUIET))
+				printf("SMBIOS v3 64-bit entry point found, but not supported.\n");
+		}
+		else if (memcmp(buf, "_SM_", 4) == 0)
+		{
+			if (smbios_decode(buf, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
+				found++;
+		}
+		else if (memcmp(buf, "_DMI_", 5) == 0)
+		{
+			if (legacy_decode(buf, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
+				found++;
+		}
+
+		if (found)
+			goto done;
+		if (!(opt.flags & FLAG_QUIET))
+			printf("Failed to get SMBIOS data from sysfs.\n");
+	}
+
+	/* Next try EFI (ia64, Intel-based Mac) */
 	efi = address_from_efi(&fp);
 	switch (efi)
 	{
@@ -4680,6 +4714,9 @@ int main(int argc, char * const argv[])
 			goto exit_free;
 	}
 
+	if (!(opt.flags & FLAG_QUIET))
+		printf("Found SMBIOS entry point in EFI, reading table from %s.\n",
+		       opt.devmem);
 	if ((buf = mem_chunk(fp, 0x20, opt.devmem)) == NULL)
 	{
 		ret = 1;
@@ -4691,6 +4728,8 @@ int main(int argc, char * const argv[])
 	goto done;
 
 memory_scan:
+	if (!(opt.flags & FLAG_QUIET))
+		printf("Scanning %s for entry point.\n", opt.devmem);
 	/* Fallback to memory scan (x86, x86_64) */
 	if ((buf = mem_chunk(0xF0000, 0x10000, opt.devmem)) == NULL)
 	{

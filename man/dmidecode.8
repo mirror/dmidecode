@@ -25,8 +25,12 @@ and developed by the \s-1DMTF\s0 (Desktop Management Task Force).
 
 As you run it,
 .B dmidecode
-will try to locate the \s-1DMI\s0 table. If it succeeds, it will then parse
-this table and display a list of records like this one:
+will try to locate the \s-1DMI\s0 table. It will first try to read the DMI table
+from sysfs, and next try reading directly from memory if sysfs access failed.
+If
+.B dmidecode
+succeeds in locating a valid DMI table, it will then parse this table
+and display a list of records like this one:
 
 Handle 0x0002, DMI type 2, 8 bytes.
 Base Board Information
@@ -241,6 +245,8 @@ The DMI table is located at offset 0x20.
 
 .SH FILES
 .I /dev/mem
+.I /sys/firmware/dmi/tables/smbios_entry_point (Linux only)
+.I /sys/firmware/dmi/tables/DMI (Linux only)
 .SH BUGS
 More often than not, information contained in the \s-1DMI\s0 tables is inaccurate,
 incomplete or simply wrong.
