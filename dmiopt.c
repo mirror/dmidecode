@@ -225,6 +225,7 @@ int parse_command_line(int argc, char * const argv[])
 		{ "dump", no_argument, NULL, 'u' },
 		{ "dump-bin", required_argument, NULL, 'B' },
 		{ "from-dump", required_argument, NULL, 'F' },
+		{ "no-sysfs", no_argument, NULL, 'S' },
 		{ "version", no_argument, NULL, 'V' },
 		{ 0, 0, 0, 0 }
 	};
@@ -261,6 +262,9 @@ int parse_command_line(int argc, char * const argv[])
 				break;
 			case 'u':
 				opt.flags |= FLAG_DUMP;
+				break;
+			case 'S':
+				opt.flags |= FLAG_NO_SYSFS;
 				break;
 			case 'V':
 				opt.flags |= FLAG_VERSION;

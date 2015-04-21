@@ -4677,7 +4677,8 @@ int main(int argc, char * const argv[])
 	 * contain one of several types of entry points, so read enough for
 	 * the largest one, then determine what type it contains.
 	 */
-	if ((buf = read_file(0x20, SYS_ENTRY_FILE)) != NULL)
+	if (!(opt.flags & FLAG_NO_SYSFS)
+	 && (buf = read_file(0x20, SYS_ENTRY_FILE)) != NULL)
 	{
 		if (!(opt.flags & FLAG_QUIET))
 			printf("Getting SMBIOS data from sysfs.\n");

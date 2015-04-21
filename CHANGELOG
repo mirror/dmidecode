@@ -4,6 +4,9 @@
 	  entire binary file into a buffer.
 	* dmidecode.c: Add passing of flags parameter to dmi_table.
 	* dmidecode.c: Add reading of SMBIOS tables from sysfs.
+	* dmidecode.c, dmiopt.c, dmiopt.h: Add --no-sysfs option to disable
+	  use of sysfs.
+	* dmidecode.8: Document the changes above.
 
 2015-04-20  Jean Delvare  <jdelvare@suse.de>
 
