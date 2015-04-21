@@ -89,6 +89,61 @@ int checksum(const u8 *buf, size_t len)
 }
 
 /*
+ * Reads all of file, up to max_len bytes.
+ * A buffer of max_len bytes is allocated by this function, and
+ * needs to be freed by the caller.
+ * This provides a similar usage model to mem_chunk()
+ *
+ * Returns pointer to buffer of max_len bytes, or NULL on error
+ *
+ */
+void *read_file(size_t max_len, const char *filename)
+{
+	int fd;
+	size_t r2 = 0;
+	ssize_t r;
+	u8 *p;
+
+	/*
+	 * Don't print error message on missing file, as we will try to read
+	 * files that may or may not be present.
+	 */
+	if ((fd = open(filename, O_RDONLY)) == -1)
+	{
+		if (errno != ENOENT)
+			perror(filename);
+		return(NULL);
+	}
+
+	if ((p = malloc(max_len)) == NULL)
+	{
+		perror("malloc");
+		return NULL;
+	}
+
+	do
+	{
+		r = read(fd, p + r2, max_len - r2);
+		if (r == -1)
+		{
+			if (errno != EINTR)
+			{
+				close(fd);
+				perror(filename);
+				free(p);
+				return NULL;
+			}
+		}
+		else
+			r2 += r;
+	}
+	while (r != 0);
+
+	close(fd);
+	return p;
+}
+
+/*
  * Copy a physical memory chunk into a memory buffer.
  * This function allocates memory.
  */

@@ -1,3 +1,8 @@
+2015-04-21  Roy Franz  <roy.franz@linaro.org>
+
+	* util.c, util.h: Add utility function read_file, which reads an
+	  entire binary file into a buffer.
+
 2015-04-20  Jean Delvare  <jdelvare@suse.de>
 
 	* biosdecode.c: Add support for the _SM3_ entry point, as defined in
