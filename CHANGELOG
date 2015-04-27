@@ -2,8 +2,9 @@
 
 	Update to support SMBIOS specification version 3.0.0.
 
-	* dmidecode.c: Add preliminary support for the new _SM3_ 64-bit
-	  entry point defined in the SMBIOS specification version 3.0.0.
+	* dmidecode.c: Add support for the new _SM3_ 64-bit entry point
+	  defined in the SMBIOS specification version 3.0.0, including
+	  support of 64-bit addresses and 32-bit table lengths.
 	* dmidecode.c: Add 3 new chassis types (DMI type 3).
 	* dmidecode.c: Add 4 new processor families (DMI type 4).
 	* dmidecode.c: Add 4 new Intel socket types (DMI type 4).

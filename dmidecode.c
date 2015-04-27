@@ -4356,7 +4356,7 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 	}
 }
 
-static void dmi_table_dump(u32 base, u16 len, const char *devmem)
+static void dmi_table_dump(off_t base, u32 len, const char *devmem)
 {
 	u8 *buf;
 
@@ -4372,7 +4372,7 @@ static void dmi_table_dump(u32 base, u16 len, const char *devmem)
 	free(buf);
 }
 
-static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem,
+static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 		      u32 flags)
 {
 	u8 *buf;
@@ -4400,7 +4400,8 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem,
 				printf("%u structures occupying %u bytes.\n",
 				       num, len);
 			if (!(opt.flags & FLAG_FROM_DUMP))
-				printf("Table at 0x%08X.\n", base);
+				printf("Table at 0x%08llX.\n",
+				       (unsigned long long)base);
 		}
 		printf("\n");
 	}
@@ -4555,13 +4556,14 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 		       buf[0x07], buf[0x08], buf[0x09]);
 
 	offset = QWORD(buf + 0x10);
-	if (!(flags & FLAG_NO_FILE_OFFSET) && offset.h)
+	if (!(flags & FLAG_NO_FILE_OFFSET) && offset.h && sizeof(off_t) < 8)
 	{
 		fprintf(stderr, "64-bit addresses not supported, sorry.\n");
 		return 0;
 	}
 
-	dmi_table(offset.l, WORD(buf + 0x0C), 0, ver, devmem, flags);
+	dmi_table(((off_t)offset.h << 32) | offset.l,
+		  WORD(buf + 0x0C), 0, ver, devmem, flags);
 
 	if (opt.flags & FLAG_DUMP_BIN)
 	{

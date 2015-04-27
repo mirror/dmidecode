@@ -2,7 +2,7 @@
  * Common "util" functions
  * This file is part of the dmidecode project.
  *
- *   Copyright (C) 2002-2010 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2002-2015 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -147,12 +147,12 @@ void *read_file(size_t max_len, const char *filename)
  * Copy a physical memory chunk into a memory buffer.
  * This function allocates memory.
  */
-void *mem_chunk(size_t base, size_t len, const char *devmem)
+void *mem_chunk(off_t base, size_t len, const char *devmem)
 {
 	void *p;
 	int fd;
 #ifdef USE_MMAP
-	size_t mmoffset;
+	off_t mmoffset;
 	void *mmp;
 #endif
 
