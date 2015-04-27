@@ -1,3 +1,8 @@
+2015-04-27  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.c: Add preliminary support for the new _SM3_ 64-bit
+	  entry point defined in the SMBIOS specification version 3.0.0.
+
 2015-04-21  Roy Franz  <roy.franz@linaro.org>
 
 	* util.c, util.h: Add utility function read_file, which reads an

@@ -2,7 +2,7 @@
  * DMI Decode
  *
  *   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   Copyright (C) 2002-2014 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2002-2015 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -4360,8 +4360,9 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem,
 	{
 		if (opt.type == NULL)
 		{
-			printf("%u structures occupying %u bytes.\n",
-				num, len);
+			if (num)
+				printf("%u structures occupying %u bytes.\n",
+				       num, len);
 			if (!(opt.flags & FLAG_FROM_DUMP))
 				printf("Table at 0x%08X.\n", base);
 		}
@@ -4388,7 +4389,8 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem,
 	}
 
 	data = buf;
-	while (i < num && data+4 <= buf + len) /* 4 is the length of an SMBIOS structure header */
+	while ((i < num || !num)
+	    && data + 4 <= buf + len) /* 4 is the length of an SMBIOS structure header */
 	{
 		u8 *next;
 		struct dmi_header h;
@@ -4454,12 +4456,17 @@ static void dmi_table(u32 base, u16 len, u16 num, u16 ver, const char *devmem,
 		i++;
 	}
 
+	/*
+	 * SMBIOS v3 64-bit entry points do not announce a structures count,
+	 * and only indicate a maximum size for the table.
+	 */
 	if (!(opt.flags & FLAG_QUIET))
 	{
-		if (i != num)
+		if (num && i != num)
 			printf("Wrong DMI structures count: %d announced, "
 				"only %d decoded.\n", num, i);
-		if (data - buf != len)
+		if (data - buf > len
+		 || (num && data - buf < len))
 			printf("Wrong DMI structures length: %d bytes "
 				"announced, structures occupy %d bytes.\n",
 				len, (unsigned int)(data - buf));
@@ -4481,6 +4488,59 @@ static void overwrite_dmi_address(u8 *buf)
 	buf[0x09] = 0;
 	buf[0x0A] = 0;
 	buf[0x0B] = 0;
+}
+
+/* Same thing for SMBIOS3 entry points */
+static void overwrite_smbios3_address(u8 *buf)
+{
+	buf[0x05] += buf[0x10] + buf[0x11] + buf[0x12] + buf[0x13]
+		   + buf[0x14] + buf[0x15] + buf[0x16] + buf[0x17] - 32;
+	buf[0x10] = 32;
+	buf[0x11] = 0;
+	buf[0x12] = 0;
+	buf[0x13] = 0;
+	buf[0x14] = 0;
+	buf[0x15] = 0;
+	buf[0x16] = 0;
+	buf[0x17] = 0;
+}
+
+static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
+{
+	u16 ver;
+	u64 offset;
+
+	if (!checksum(buf, buf[0x06]))
+		return 0;
+
+	ver = (buf[0x07] << 8) + buf[0x08];
+	if (!(opt.flags & FLAG_QUIET))
+		printf("SMBIOS %u.%u.%u present.\n",
+		       buf[0x07], buf[0x08], buf[0x09]);
+
+	offset = QWORD(buf + 0x10);
+	if (!(flags & FLAG_NO_FILE_OFFSET) && offset.h)
+	{
+		fprintf(stderr, "64-bit addresses not supported, sorry.\n");
+		return 0;
+	}
+
+	dmi_table(offset.l, WORD(buf + 0x0C), 0, ver, devmem, flags);
+
+	if (opt.flags & FLAG_DUMP_BIN)
+	{
+		u8 crafted[32];
+
+		memcpy(crafted, buf, 32);
+		overwrite_smbios3_address(crafted);
+
+		if (!(opt.flags & FLAG_QUIET))
+			printf("# Writing %d bytes to %s.\n", crafted[0x06],
+			       opt.dumpfile);
+		write_dump(0, crafted[0x06], crafted, opt.dumpfile, 1);
+	}
+
+	return 1;
 }
 
 static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
@@ -4659,7 +4719,12 @@ int main(int argc, char * const argv[])
 			goto exit_free;
 		}
 
-		if (memcmp(buf, "_SM_", 4) == 0)
+		if (memcmp(buf, "_SM3_", 5) == 0)
+		{
+			if (smbios3_decode(buf, opt.dumpfile, 0))
+				found++;
+		}
+		else if (memcmp(buf, "_SM_", 4) == 0)
 		{
 			if (smbios_decode(buf, opt.dumpfile, 0))
 				found++;
@@ -4684,8 +4749,8 @@ int main(int argc, char * const argv[])
 			printf("Getting SMBIOS data from sysfs.\n");
 		if (memcmp(buf, "_SM3_", 5) == 0)
 		{
-			if (!(opt.flags & FLAG_QUIET))
-				printf("SMBIOS v3 64-bit entry point found, but not supported.\n");
+			if (smbios3_decode(buf, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
+				found++;
 		}
 		else if (memcmp(buf, "_SM_", 4) == 0)
 		{
@@ -4740,7 +4805,15 @@ memory_scan:
 
 	for (fp = 0; fp <= 0xFFF0; fp += 16)
 	{
-		if (memcmp(buf + fp, "_SM_", 4) == 0 && fp <= 0xFFE0)
+		if (memcmp(buf + fp, "_SM3_", 5) == 0 && fp <= 0xFFE0)
+		{
+			if (smbios3_decode(buf + fp, opt.devmem, 0))
+			{
+				found++;
+				fp += 16;
+			}
+		}
+		else if (memcmp(buf + fp, "_SM_", 4) == 0 && fp <= 0xFFE0)
 		{
 			if (smbios_decode(buf+fp, opt.devmem, 0))
 			{
