@@ -2,6 +2,11 @@
 
 	* dmidecode.c: Add preliminary support for the new _SM3_ 64-bit
 	  entry point defined in the SMBIOS specification version 3.0.0.
+	* dmidecode.c: Add 3 new chassis types (DMI type 3).
+	* dmidecode.c: Add 4 new processor families (DMI type 4).
+	* dmidecode.c: Add 4 new Intel socket types (DMI type 4).
+	* dmidecode.c: Add 13 new slot types (DMI type 9).
+	* dmidecode.c: Add 4 new memory device types (DMI type 17).
 
 2015-04-21  Roy Franz  <roy.franz@linaro.org>
 

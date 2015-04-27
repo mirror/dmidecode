@@ -534,12 +534,15 @@ static const char *dmi_chassis_type(u8 code)
 		"CompactPCI",
 		"AdvancedTCA",
 		"Blade",
-		"Blade Enclosing" /* 0x1D */
+		"Blade Enclosing",
+		"Tablet",
+		"Convertible",
+		"Detachable" /* 0x20 */
 	};
 
 	code &= 0x7F; /* bits 6:0 are chassis type, 7th bit is the lock bit */
 
-	if (code >= 0x01 && code <= 0x1D)
+	if (code >= 0x01 && code <= 0x20)
 		return type[code - 0x01];
 	return out_of_spec;
 }
@@ -700,6 +703,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x29, "Core Duo Mobile" },
 		{ 0x2A, "Core Solo Mobile" },
 		{ 0x2B, "Atom" },
+		{ 0x2C, "Core M" },
 
 		{ 0x30, "Alpha" },
 		{ 0x31, "Alpha 21064" },
@@ -749,6 +753,9 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x63, "68010" },
 		{ 0x64, "68020" },
 		{ 0x65, "68030" },
+		{ 0x66, "Athlon X4" },
+		{ 0x67, "Opteron X1000" },
+		{ 0x68, "Opteron X2000" },
 
 		{ 0x70, "Hobbit" },
 
@@ -1176,10 +1183,14 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket FM1",
 		"Socket FM2",
 		"Socket LGA2011-3",
-		"Socket LGA1356-3" /* 0x2C */
+		"Socket LGA1356-3",
+		"Socket LGA1150",
+		"Socket BGA1168",
+		"Socket BGA1234",
+		"Socket BGA1364" /* 0x30 */
 	};
 
-	if (code >= 0x01 && code <= 0x2C)
+	if (code >= 0x01 && code <= 0x30)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }
@@ -1675,7 +1686,20 @@ static const char *dmi_slot_type(u8 code)
 		"AGP 2x",
 		"AGP 4x",
 		"PCI-X",
-		"AGP 8x" /* 0x13 */
+		"AGP 8x",
+		"M.2 Socket 1-DP",
+		"M.2 Socket 1-SD",
+		"M.2 Socket 2",
+		"M.2 Socket 3",
+		"MXM Type I",
+		"MXM Type II",
+		"MXM Type III",
+		"MXM Type III-HE",
+		"MXM Type IV",
+		"MXM 3.0 Type A",
+		"MXM 3.0 Type B",
+		"PCI Express 2 SFF-8639",
+		"PCI Express 3 SFF-8639" /* 0x20 */
 	};
 	static const char *type_0xA0[] = {
 		"PC-98/C20", /* 0xA0 */
@@ -1707,7 +1731,7 @@ static const char *dmi_slot_type(u8 code)
 	 * function dmi_slot_id below needs updating too.
 	 */
 
-	if (code >= 0x01 && code <= 0x13)
+	if (code >= 0x01 && code <= 0x20)
 		return type[code - 0x01];
 	if (code >= 0xA0 && code <= 0xB6)
 		return type_0xA0[code - 0xA0];
@@ -1787,6 +1811,8 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
 		case 0x11: /* AGP */
 		case 0x12: /* PCI-X */
 		case 0x13: /* AGP */
+		case 0x1F: /* PCI Express 2 */
+		case 0x20: /* PCI Express 3 */
 		case 0xA5: /* PCI Express */
 		case 0xA6: /* PCI Express */
 		case 0xA7: /* PCI Express */
@@ -2317,10 +2343,14 @@ static const char *dmi_memory_device_type(u8 code)
 		"Reserved",
 		"DDR3",
 		"FBD2",
-		"DDR4" /* 0x1A */
+		"DDR4",
+		"LPDDR",
+		"LPDDR2",
+		"LPDDR3",
+		"LPDDR4" /* 0x1E */
 	};
 
-	if (code >= 0x01 && code <= 0x1A)
+	if (code >= 0x01 && code <= 0x1E)
 		return type[code - 0x01];
 	return out_of_spec;
 }
