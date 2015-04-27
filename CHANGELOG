@@ -1,5 +1,9 @@
 2015-04-27  Jean Delvare  <jdelvare@suse.de>
 
+	* dmidecode.c: Fix --dump-bin when reading from sysfs.
+
+2015-04-27  Jean Delvare  <jdelvare@suse.de>
+
 	Update to support SMBIOS specification version 3.0.0.
 
 	* dmidecode.c: Add support for the new _SM3_ 64-bit entry point

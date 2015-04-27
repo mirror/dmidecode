@@ -4387,12 +4387,6 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 		       SUPPORTED_SMBIOS_VER >> 8, SUPPORTED_SMBIOS_VER & 0xFF);
 	}
 
-	if (opt.flags & FLAG_DUMP_BIN)
-	{
-		dmi_table_dump(base, len, devmem);
-		return;
-	}
-
 	if (!(opt.flags & FLAG_QUIET))
 	{
 		if (opt.type == NULL)
@@ -4415,6 +4409,12 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 	 */
 	if (flags & FLAG_NO_FILE_OFFSET)
 		base = 0;
+
+	if (opt.flags & FLAG_DUMP_BIN)
+	{
+		dmi_table_dump(base, len, devmem);
+		return;
+	}
 
 	if ((buf = mem_chunk(base, len, devmem)) == NULL)
 	{
