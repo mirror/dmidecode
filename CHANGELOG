@@ -12,6 +12,7 @@
 	* dmidecode.c: Add 4 new memory device types (DMI type 17).
 	* dmidecode.c: Add support for processors with more than 255 cores
 	  or threads (DMI type 4).
+	* dmidecode.c: Stop decoding v3 tables at End-of-Table marker.
 
 2015-04-21  Roy Franz  <roy.franz@linaro.org>
 

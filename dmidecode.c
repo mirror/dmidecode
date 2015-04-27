@@ -72,6 +72,7 @@ static const char *bad_index = "<BAD INDEX>";
 #define SUPPORTED_SMBIOS_VER 0x0300
 
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
+#define FLAG_STOP_AT_EOT        (1 << 1)
 
 #define SYS_ENTRY_FILE "/sys/firmware/dmi/tables/smbios_entry_point"
 #define SYS_TABLE_FILE "/sys/firmware/dmi/tables/DMI"
@@ -4491,6 +4492,10 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 
 		data = next;
 		i++;
+
+		/* SMBIOS v3 requires stopping at this marker */
+		if (h.type == 127 && (flags & FLAG_STOP_AT_EOT))
+			break;
 	}
 
 	/*
@@ -4563,7 +4568,7 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 	}
 
 	dmi_table(((off_t)offset.h << 32) | offset.l,
-		  WORD(buf + 0x0C), 0, ver, devmem, flags);
+		  WORD(buf + 0x0C), 0, ver, devmem, flags | FLAG_STOP_AT_EOT);
 
 	if (opt.flags & FLAG_DUMP_BIN)
 	{
