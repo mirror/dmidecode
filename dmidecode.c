@@ -25,7 +25,7 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 2.8.0" document,
+ * Management BIOS Reference Specification, Version 3.0.0" document,
  * available from http://www.dmtf.org/standards/smbios.
  *
  * Note to contributors:
@@ -69,7 +69,7 @@
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
-#define SUPPORTED_SMBIOS_VER 0x0208
+#define SUPPORTED_SMBIOS_VER 0x0300
 
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
 
@@ -3394,11 +3394,17 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_string(h, data[0x22]));
 			if (h->length < 0x28) break;
 			if (data[0x23] != 0)
-				printf("\tCore Count: %u\n", data[0x23]);
+				printf("\tCore Count: %u\n",
+					h->length >= 0x2C && data[0x23] == 0xFF ?
+					WORD(data + 0x2A) : data[0x23]);
 			if (data[0x24] != 0)
-				printf("\tCore Enabled: %u\n", data[0x24]);
+				printf("\tCore Enabled: %u\n",
+					h->length >= 0x2E && data[0x24] == 0xFF ?
+					WORD(data + 0x2C) : data[0x24]);
 			if (data[0x25] != 0)
-				printf("\tThread Count: %u\n", data[0x25]);
+				printf("\tThread Count: %u\n",
+					h->length >= 0x30 && data[0x25] == 0xFF ?
+					WORD(data + 0x2E) : data[0x25]);
 			printf("\tCharacteristics:");
 			dmi_processor_characteristics(WORD(data + 0x26), "\t\t");
 			break;
