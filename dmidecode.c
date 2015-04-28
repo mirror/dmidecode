@@ -3200,7 +3200,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 	const u8 *data = h->data;
 
 	/*
-	 * Note: DMI types 37, 39 and 40 are untested
+	 * Note: DMI types 37 and 42 are untested
 	 */
 	switch (h->type)
 	{
