@@ -1,3 +1,7 @@
+2015-04-28  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.h, dmiopt.h: Fix sparse errors.
+
 2015-04-27  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Fix --dump-bin when reading from sysfs.
