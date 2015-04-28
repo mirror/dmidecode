@@ -586,7 +586,7 @@ static int parse_command_line(int argc, char * const argv[])
 		{ "dev-mem", required_argument, NULL, 'd' },
 		{ "help", no_argument, NULL, 'h' },
 		{ "version", no_argument, NULL, 'V' },
-		{ 0, 0, 0, 0 }
+		{ NULL, 0, NULL, 0 }
 	};
 
 	while ((option = getopt_long(argc, argv, optstring, longopts, NULL)) != -1)
