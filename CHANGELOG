@@ -2,6 +2,7 @@
 
 	* dmidecode.h, dmiopt.h: Fix sparse errors.
 	* biosdecode.c, dmiopt.c, ownership.c, vpdopt.c: Fix sparse warnings.
+	* util.c: Fix sparse warning.
 
 2015-04-27  Jean Delvare  <jdelvare@suse.de>
 
