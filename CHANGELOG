@@ -87,6 +87,10 @@
 
 2013-04-17  Anton Arapov  <anton@redhat.com>
 
+	* version.h: Set version to 2.12.
+
+2013-04-17  Anton Arapov  <anton@redhat.com>
+
 	Update to support SMBIOS specification version 2.8.0.
 
 	* dmidecode.c: Correct processor family name (DMI type 4).
@@ -132,6 +136,10 @@
 
 	* dmidecode.c: Fix boundary checks of memory array location codes
 	  (DMI type 16). Reported by Andrey Matveyev.
+
+2011-01-19  Anton Arapov  <anton@redhat.com>
+
+	* version.h: Set version to 2.11.
 
 2010-11-24  Jean Delvare  <jdelvare@suse.de>
 
