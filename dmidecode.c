@@ -4357,20 +4357,11 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 	}
 }
 
-static void dmi_table_dump(off_t base, u32 len, const char *devmem)
+static void dmi_table_dump(const u8 *buf, u32 len)
 {
-	u8 *buf;
-
-	if ((buf = mem_chunk(base, len, devmem)) == NULL)
-	{
-		fprintf(stderr, "Failed to read table, sorry.\n");
-		return;
-	}
-
 	if (!(opt.flags & FLAG_QUIET))
 		printf("# Writing %d bytes to %s.\n", len, opt.dumpfile);
 	write_dump(32, len, buf, opt.dumpfile, 0);
-	free(buf);
 }
 
 static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
@@ -4502,12 +4493,6 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 	if (flags & FLAG_NO_FILE_OFFSET)
 		base = 0;
 
-	if (opt.flags & FLAG_DUMP_BIN)
-	{
-		dmi_table_dump(base, len, devmem);
-		return;
-	}
-
 	if ((buf = mem_chunk(base, len, devmem)) == NULL)
 	{
 		fprintf(stderr, "Table is unreachable, sorry."
@@ -4518,7 +4503,10 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 		return;
 	}
 
-	dmi_table_decode(buf, len, num, ver, flags);
+	if (opt.flags & FLAG_DUMP_BIN)
+		dmi_table_dump(buf, len);
+	else
+		dmi_table_decode(buf, len, num, ver, flags);
 
 	free(buf);
 }
