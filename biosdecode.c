@@ -103,7 +103,7 @@ static int smbios3_decode(const u8 *p, size_t len)
 	printf("SMBIOS %u.%u.%u present.\n",
 		p[0x07], p[0x08], p[0x09]);
 	printf("\tStructure Table Maximum Length: %u bytes\n",
-		DWORD(p+0x0C));
+		DWORD(p + 0x0C));
 	printf("\tStructure Table 64-bit Address: 0x%08X%08X\n",
 		QWORD(p + 0x10).h, QWORD(p + 0x10).l);
 
@@ -125,7 +125,7 @@ static int smbios_decode(const u8 *p, size_t len)
 	printf("SMBIOS %u.%u present.\n",
 		p[0x06], p[0x07]);
 	printf("\tStructure Table Length: %u bytes\n",
-		WORD(p+0x16));
+		WORD(p + 0x16));
 	printf("\tStructure Table Address: 0x%08X\n",
 		DWORD(p + 0x18));
 	printf("\tNumber Of Structures: %u\n",
@@ -536,7 +536,7 @@ static int fjkeyinf_decode(const u8 *p, size_t len)
 			return 1;
 		printf("\tDevice %d: type %u, chip %u", i + 1,
 		       *(p + 8 + i * 4), *(p + 8 + i * 4 + 2));
-		if (*(p+8+i*4+1)) /* Access method */
+		if (*(p + 8 + i * 4 + 1)) /* Access method */
 			printf(", SMBus address 0x%x",
 				*(p + 8 + i * 4 + 3) >> 1);
 		printf("\n");

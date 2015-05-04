@@ -4852,7 +4852,7 @@ memory_scan:
 		}
 		else if (memcmp(buf + fp, "_SM_", 4) == 0 && fp <= 0xFFE0)
 		{
-			if (smbios_decode(buf+fp, opt.devmem, 0))
+			if (smbios_decode(buf + fp, opt.devmem, 0))
 			{
 				found++;
 				fp += 16;
