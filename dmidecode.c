@@ -4406,7 +4406,7 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 				h.handle, h.type, h.length);
 
 		/* assign vendor for vendor-specific decodes later */
-		if (h.type == 0 && h.length >= 5)
+		if (h.type == 1 && h.length >= 5)
 			dmi_set_vendor(dmi_string(&h, data[0x04]));
 
 		/* look for the next handle */
