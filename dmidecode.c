@@ -4373,58 +4373,10 @@ static void dmi_table_dump(off_t base, u32 len, const char *devmem)
 	free(buf);
 }
 
-static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
-		      u32 flags)
+static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 {
-	u8 *buf;
 	u8 *data;
 	int i = 0;
-
-	if (ver > SUPPORTED_SMBIOS_VER && !(opt.flags & FLAG_QUIET))
-	{
-		printf("# SMBIOS implementations newer than version %u.%u are not\n"
-		       "# fully supported by this version of dmidecode.\n",
-		       SUPPORTED_SMBIOS_VER >> 8, SUPPORTED_SMBIOS_VER & 0xFF);
-	}
-
-	if (!(opt.flags & FLAG_QUIET))
-	{
-		if (opt.type == NULL)
-		{
-			if (num)
-				printf("%u structures occupying %u bytes.\n",
-				       num, len);
-			if (!(opt.flags & FLAG_FROM_DUMP))
-				printf("Table at 0x%08llX.\n",
-				       (unsigned long long)base);
-		}
-		printf("\n");
-	}
-
-	/*
-	 * When we are reading the DMI table from sysfs, we want to print
-	 * the address of the table (done above), but the offset of the
-	 * data in the file is 0.  When reading from /dev/mem, the offset
-	 * in the file is the address.
-	 */
-	if (flags & FLAG_NO_FILE_OFFSET)
-		base = 0;
-
-	if (opt.flags & FLAG_DUMP_BIN)
-	{
-		dmi_table_dump(base, len, devmem);
-		return;
-	}
-
-	if ((buf = mem_chunk(base, len, devmem)) == NULL)
-	{
-		fprintf(stderr, "Table is unreachable, sorry."
-#ifndef USE_MMAP
-			" Try compiling dmidecode with -DUSE_MMAP."
-#endif
-			"\n");
-		return;
-	}
 
 	data = buf;
 	while ((i < num || !num)
@@ -4513,6 +4465,60 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 				"announced, structures occupy %d bytes.\n",
 				len, (unsigned int)(data - buf));
 	}
+}
+
+static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
+		      u32 flags)
+{
+	u8 *buf;
+
+	if (ver > SUPPORTED_SMBIOS_VER && !(opt.flags & FLAG_QUIET))
+	{
+		printf("# SMBIOS implementations newer than version %u.%u are not\n"
+		       "# fully supported by this version of dmidecode.\n",
+		       SUPPORTED_SMBIOS_VER >> 8, SUPPORTED_SMBIOS_VER & 0xFF);
+	}
+
+	if (!(opt.flags & FLAG_QUIET))
+	{
+		if (opt.type == NULL)
+		{
+			if (num)
+				printf("%u structures occupying %u bytes.\n",
+				       num, len);
+			if (!(opt.flags & FLAG_FROM_DUMP))
+				printf("Table at 0x%08llX.\n",
+				       (unsigned long long)base);
+		}
+		printf("\n");
+	}
+
+	/*
+	 * When we are reading the DMI table from sysfs, we want to print
+	 * the address of the table (done above), but the offset of the
+	 * data in the file is 0.  When reading from /dev/mem, the offset
+	 * in the file is the address.
+	 */
+	if (flags & FLAG_NO_FILE_OFFSET)
+		base = 0;
+
+	if (opt.flags & FLAG_DUMP_BIN)
+	{
+		dmi_table_dump(base, len, devmem);
+		return;
+	}
+
+	if ((buf = mem_chunk(base, len, devmem)) == NULL)
+	{
+		fprintf(stderr, "Table is unreachable, sorry."
+#ifndef USE_MMAP
+			" Try compiling dmidecode with -DUSE_MMAP."
+#endif
+			"\n");
+		return;
+	}
+
+	dmi_table_decode(buf, len, num, ver, flags);
 
 	free(buf);
 }

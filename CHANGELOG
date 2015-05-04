@@ -1,3 +1,7 @@
+2015-05-04  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.c: Move table decoding to a separate function.
+
 2015-04-28  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.h, dmiopt.h: Fix sparse errors.
