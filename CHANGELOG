@@ -2,6 +2,7 @@
 
 	* dmidecode.c: Move table decoding to a separate function.
 	* dmidecode.c: Simplify function dmi_table_dump.
+	* dmidecode.c: Display types 41 and 42 in quiet mode too.
 
 2015-04-28  Jean Delvare  <jdelvare@suse.de>
 

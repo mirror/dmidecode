@@ -4379,7 +4379,7 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 
 		to_dmi_header(&h, data);
 		display = ((opt.type == NULL || opt.type[h.type])
-			&& !((opt.flags & FLAG_QUIET) && (h.type > 39 && h.type <= 127))
+			&& !((opt.flags & FLAG_QUIET) && (h.type == 126 || h.type == 127))
 			&& !opt.string);
 
 		/*
