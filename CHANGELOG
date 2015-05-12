@@ -1,3 +1,8 @@
+2015-05-12  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.c: Remove extra blank line after hidden DMI type 40
+	  structure.
+
 2015-05-04  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Move table decoding to a separate function.

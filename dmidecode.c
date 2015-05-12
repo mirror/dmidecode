@@ -4263,8 +4263,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 
 		case 40: /* 7.41 Additional Information */
 			if (h->length < 0x0B) break;
-			if (!(opt.flags & FLAG_QUIET))
-				dmi_additional_info(h, "");
+			if (opt.flags & FLAG_QUIET)
+				return;
+			dmi_additional_info(h, "");
 			break;
 
 		case 41: /* 7.42 Onboard Device Extended Information */
