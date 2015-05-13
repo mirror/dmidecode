@@ -4664,7 +4664,7 @@ static int legacy_decode(u8 *buf, const char *devmem, u32 flags)
  */
 #define EFI_NOT_FOUND   (-1)
 #define EFI_NO_SMBIOS   (-2)
-static int address_from_efi(size_t *address)
+static int address_from_efi(off_t *address)
 {
 	FILE *efi_systab;
 	const char *filename;
@@ -4688,12 +4688,13 @@ static int address_from_efi(size_t *address)
 	{
 		char *addrp = strchr(linebuf, '=');
 		*(addrp++) = '\0';
-		if (strcmp(linebuf, "SMBIOS") == 0)
+		if (strcmp(linebuf, "SMBIOS3") == 0
+		 || strcmp(linebuf, "SMBIOS") == 0)
 		{
-			*address = strtoul(addrp, NULL, 0);
+			*address = strtoull(addrp, NULL, 0);
 			if (!(opt.flags & FLAG_QUIET))
-				printf("# SMBIOS entry point at 0x%08lx\n",
-				       (unsigned long)*address);
+				printf("# %s entry point at 0x%08llx\n",
+				       linebuf, (unsigned long long)*address);
 			ret = 0;
 			break;
 		}
@@ -4710,7 +4711,7 @@ int main(int argc, char * const argv[])
 {
 	int ret = 0;                /* Returned value */
 	int found = 0;
-	size_t fp;
+	off_t fp;
 	int efi;
 	u8 *buf;
 
