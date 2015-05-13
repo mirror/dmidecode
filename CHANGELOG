@@ -1,6 +1,8 @@
 2015-05-13  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Add support for SMBIOS3 EFI table.
+	* dmidecode.c: Fix warnings about comparison between signed and
+	  unsigned integers.
 
 2015-05-12  Jean Delvare  <jdelvare@suse.de>
 

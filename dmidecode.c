@@ -4412,12 +4412,13 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 
 		/* look for the next handle */
 		next = data + h.length;
-		while (next - buf + 1 < len && (next[0] != 0 || next[1] != 0))
+		while ((unsigned long)(next - buf + 1) < len
+		    && (next[0] != 0 || next[1] != 0))
 			next++;
 		next += 2;
 		if (display)
 		{
-			if (next - buf <= len)
+			if ((unsigned long)(next - buf) <= len)
 			{
 				if (opt.flags & FLAG_DUMP)
 				{
@@ -4451,11 +4452,11 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 		if (num && i != num)
 			printf("Wrong DMI structures count: %d announced, "
 				"only %d decoded.\n", num, i);
-		if (data - buf > len
-		 || (num && data - buf < len))
-			printf("Wrong DMI structures length: %d bytes "
-				"announced, structures occupy %d bytes.\n",
-				len, (unsigned int)(data - buf));
+		if ((unsigned long)(data - buf) > len
+		 || (num && (unsigned long)(data - buf) < len))
+			printf("Wrong DMI structures length: %u bytes "
+				"announced, structures occupy %lu bytes.\n",
+				len, (unsigned long)(data - buf));
 	}
 }
 
