@@ -6,6 +6,7 @@
 	* util.c: Fix warnings about unused labels when building without
 	  -DUSE_MMAP.
 	* dmioem.c: Strip spaces at the end of vendor names.
+	* dmioem.c: Decode Acer-specific DMI type 170.
 
 2015-05-12  Jean Delvare  <jdelvare@suse.de>
 
