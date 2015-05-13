@@ -41,7 +41,17 @@ static enum DMI_VENDORS dmi_vendor = VENDOR_UNKNOWN;
  */
 void dmi_set_vendor(const char *s)
 {
-	if (strcmp(s, "HP") == 0 || strcmp(s, "Hewlett-Packard") == 0)
+	int len;
+
+	/*
+	 * Often DMI strings have trailing spaces. Ignore these
+	 * when checking for known vendor names.
+	 */
+	len = strlen(s);
+	while (len && s[len - 1] == ' ')
+		len--;
+
+	if (strncmp(s, "HP", len) == 0 || strncmp(s, "Hewlett-Packard", len) == 0)
 		dmi_vendor = VENDOR_HP;
 }
 
