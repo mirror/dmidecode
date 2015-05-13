@@ -193,9 +193,8 @@ void *mem_chunk(off_t base, size_t len, const char *devmem)
 
 	goto out;
 
-#endif /* USE_MMAP */
-
 try_read:
+#endif /* USE_MMAP */
 	if (lseek(fd, base, SEEK_SET) == -1)
 	{
 		fprintf(stderr, "%s: ", devmem);
@@ -210,7 +209,9 @@ try_read:
 		return NULL;
 	}
 
+#ifdef USE_MMAP
 out:
+#endif
 	if (close(fd) == -1)
 		perror(devmem);
 

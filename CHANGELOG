@@ -3,6 +3,8 @@
 	* dmidecode.c: Add support for SMBIOS3 EFI table.
 	* dmidecode.c: Fix warnings about comparison between signed and
 	  unsigned integers.
+	* util.c: Fix warnings about unused labels when building without
+	  -DUSE_MMAP.
 
 2015-05-12  Jean Delvare  <jdelvare@suse.de>
 
