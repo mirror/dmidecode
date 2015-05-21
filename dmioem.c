@@ -62,17 +62,6 @@ void dmi_set_vendor(const char *s)
 		dmi_vendor = VENDOR_ACER;
 }
 
-static int is_printable(const u8 *data, int len)
-{
-	int i;
-
-	for (i = 0; i < len; i++)
-		if (data[i] < 32 || data[i] >= 127)
-			return 0;
-
-	return 1;
-}
-
 /*
  * HP-specific data structures are decoded here.
  *

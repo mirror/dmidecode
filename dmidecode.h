@@ -28,4 +28,5 @@ struct dmi_header
 	u8 *data;
 };
 
+int is_printable(const u8 *data, int len);
 const char *dmi_string(const struct dmi_header *dm, u8 s);

@@ -2,6 +2,7 @@
 
 	* dmidecode.c: Fix up invalid DMI type 34 structure length.
 	* dmioem.c: Decode HP-specific DMI types 212 and 219.
+	* dmioem.c: Move function is_printable to dmidecode.c.
 
 2015-05-13  Jean Delvare  <jdelvare@suse.de>
 

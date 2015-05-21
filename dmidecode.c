@@ -81,6 +81,18 @@ static const char *bad_index = "<BAD INDEX>";
  * Type-independant Stuff
  */
 
+/* Returns 1 if the buffer contains only printable ASCII characters */
+int is_printable(const u8 *data, int len)
+{
+	int i;
+
+	for (i = 0; i < len; i++)
+		if (data[i] < 32 || data[i] >= 127)
+			return 0;
+
+	return 1;
+}
+
 const char *dmi_string(const struct dmi_header *dm, u8 s)
 {
 	char *bp = (char *)dm->data;
@@ -2937,18 +2949,14 @@ static void dmi_64bit_memory_error_address(u64 code)
 static void dmi_fixup_type_34(struct dmi_header *h)
 {
 	u8 *p = h->data;
-	int i;
-
- 	if (h->length != 0x10)
-		return;
 
  	/* Make sure the hidden data is ASCII only */
-	for (i = 0x0B; i < 0x10; i++)
-		if (p[i] < 32 || p[i] >= 127)
-			return;
-
-	printf("Invalid entry length (%u). Fixed up to %u.\n", 0x10, 0x0B);
-	h->length = 0x0B;
+	if (h->length == 0x10
+	 && is_printable(p + 0x0B, 0x10 - 0x0B))
+	{
+		printf("Invalid entry length (%u). Fixed up to %u.\n", 0x10, 0x0B);
+		h->length = 0x0B;
+	}
 }
 
 static const char *dmi_management_device_type(u8 code)
