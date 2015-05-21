@@ -2928,6 +2928,29 @@ static void dmi_64bit_memory_error_address(u64 code)
  * 7.35 Management Device (Type 34)
  */
 
+/*
+ * Several boards have a bug where some type 34 structures have their
+ * length incorrectly set to 0x10 instead of 0x0B. This causes the
+ * first 5 characters of the device name to be trimmed. It's easy to
+ * check and fix, so do it, but warn.
+ */
+static void dmi_fixup_type_34(struct dmi_header *h)
+{
+	u8 *p = h->data;
+	int i;
+
+ 	if (h->length != 0x10)
+		return;
+
+ 	/* Make sure the hidden data is ASCII only */
+	for (i = 0x0B; i < 0x10; i++)
+		if (p[i] < 32 || p[i] >= 127)
+			return;
+
+	printf("Invalid entry length (%u). Fixed up to %u.\n", 0x10, 0x0B);
+	h->length = 0x0B;
+}
+
 static const char *dmi_management_device_type(u8 code)
 {
 	/* 7.35.1 */
@@ -4409,6 +4432,10 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 		/* assign vendor for vendor-specific decodes later */
 		if (h.type == 1 && h.length >= 5)
 			dmi_set_vendor(dmi_string(&h, data[0x04]));
+
+		/* Fixup a common mistake */
+		if (h.type == 34)
+			dmi_fixup_type_34(&h);
 
 		/* look for the next handle */
 		next = data + h.length;

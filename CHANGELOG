@@ -1,3 +1,7 @@
+2015-05-21  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.c: Fix up invalid DMI type 34 structure length.
+
 2015-05-13  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Add support for SMBIOS3 EFI table.
