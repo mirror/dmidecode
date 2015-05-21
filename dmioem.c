@@ -62,6 +62,17 @@ void dmi_set_vendor(const char *s)
 		dmi_vendor = VENDOR_ACER;
 }
 
+static int is_printable(const u8 *data, int len)
+{
+	int i;
+
+	for (i = 0; i < len; i++)
+		if (data[i] < 32 || data[i] >= 127)
+			return 0;
+
+	return 1;
+}
+
 /*
  * HP-specific data structures are decoded here.
  *
@@ -72,6 +83,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 {
 	u8 *data = h->data;
 	int nic, ptr;
+	u32 feat;
 
 	switch (h->type)
 	{
@@ -122,6 +134,49 @@ static int dmi_decode_hp(const struct dmi_header *h)
 				nic++;
 				ptr += 8;
 			}
+			break;
+
+		case 212:
+			/*
+			 * Vendor Specific: HP 64-bit CRU Information
+			 *
+			 * Source: hpwdt kernel driver
+			 */
+			printf("HP 64-bit CRU Information\n");
+			if (h->length < 0x18) break;
+			printf("\tSignature: 0x%08x", DWORD(data + 0x04));
+			if (is_printable(data + 0x04, 4))
+				printf(" (%c%c%c%c)", data[0x04], data[0x05],
+					data[0x06], data[0x07]);
+			printf("\n");
+			if (DWORD(data + 0x04) == 0x55524324)
+			{
+				u64 paddr = QWORD(data + 0x08);
+				paddr.l += DWORD(data + 0x14);
+				if (paddr.l < DWORD(data + 0x14))
+					paddr.h++;
+				printf("\tPhysical Address: 0x%08x%08x\n",
+					paddr.h, paddr.l);
+				printf("\tLength: 0x%08x\n", DWORD(data + 0x10));
+			}
+			break;
+
+		case 219:
+			/*
+			 * Vendor Specific: HP ProLiant Information
+			 *
+			 * Source: hpwdt kernel driver
+			 */
+			printf("HP ProLiant Information\n");
+			if (h->length < 0x08) break;
+			printf("\tPower Features: 0x%08x\n", DWORD(data + 0x04));
+			if (h->length < 0x0C) break;
+			printf("\tOmega Features: 0x%08x\n", DWORD(data + 0x08));
+			if (h->length < 0x14) break;
+			feat = DWORD(data + 0x10);
+			printf("\tMisc. Features: 0x%08x\n", feat);
+			printf("\t\tiCRU: %s\n", feat & 0x0001 ? "Yes" : "No");
+			printf("\t\tUEFI: %s\n", feat & 0x0408 ? "Yes" : "No");
 			break;
 
 		default:
