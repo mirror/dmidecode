@@ -1,3 +1,9 @@
+2015-08-04  Tyler Bell  <tyler.bell@hp.com>
+
+	* dmioem.c: Decode HP-specific DMI type 233
+	* dmioem.c: Refactored HP-specific types 209 and 221 to use common code
+	* dmioem.c: Documented spec for HP-specific types 209, 221 and 233
+
 2015-05-21  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Fix up invalid DMI type 34 structure length.
