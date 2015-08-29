@@ -844,7 +844,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0xC9, "G4" },
 		{ 0xCA, "G5" },
 		{ 0xCB, "ESA/390 G6" },
-		{ 0xCC, "z/Architectur" },
+		{ 0xCC, "z/Architecture" },
 		{ 0xCD, "Core i5" },
 		{ 0xCE, "Core i3" },
 
