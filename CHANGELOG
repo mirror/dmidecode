@@ -1,3 +1,7 @@
+2015-09-03  Jean Delvare  <jdelvare@suse.de>
+
+	* version.h: Set version to 3.0.
+
 2015-08-04  Tyler Bell  <tyler.bell@hp.com>
 
 	* dmioem.c: Decode HP-specific DMI type 233
