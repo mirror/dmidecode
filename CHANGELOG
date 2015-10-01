@@ -1,3 +1,7 @@
+2015-10-01  Roy Franz  <roy.franz@linaro.org>
+
+	* dmiopt.c: Add "--no-sysfs" option description to -h output.
+
 2015-09-03  Jean Delvare  <jdelvare@suse.de>
 
 	* version.h: Set version to 3.0.
