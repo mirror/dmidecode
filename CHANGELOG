@@ -3,6 +3,7 @@
 	* util.c: Avoid SIGBUS on mmap failure.
 	  This fixes Savannah bug #46066:
 	  https://savannah.nongnu.org/bugs/?46066
+	* util.c: Fix error paths in mem_chunk.
 
 2015-10-01  Roy Franz  <roy.franz@linaro.org>
 

@@ -166,7 +166,7 @@ void *mem_chunk(off_t base, size_t len, const char *devmem)
 	if ((p = malloc(len)) == NULL)
 	{
 		perror("malloc");
-		return NULL;
+		goto out;
 	}
 
 #ifdef USE_MMAP
@@ -174,8 +174,7 @@ void *mem_chunk(off_t base, size_t len, const char *devmem)
 	{
 		fprintf(stderr, "%s: ", devmem);
 		perror("stat");
-		free(p);
-		return NULL;
+		goto err_free;
 	}
 
 	/*
@@ -186,8 +185,7 @@ void *mem_chunk(off_t base, size_t len, const char *devmem)
 	{
 		fprintf(stderr, "mmap: Can't map beyond end of file %s\n",
 			devmem);
-		free(p);
-		return NULL;
+		goto err_free;
 	}
 
 #ifdef _SC_PAGESIZE
@@ -220,19 +218,17 @@ try_read:
 	{
 		fprintf(stderr, "%s: ", devmem);
 		perror("lseek");
-		free(p);
-		return NULL;
+		goto err_free;
 	}
 
-	if (myread(fd, p, len, devmem) == -1)
-	{
-		free(p);
-		return NULL;
-	}
+	if (myread(fd, p, len, devmem) == 0)
+		goto out;
 
-#ifdef USE_MMAP
+err_free:
+	free(p);
+	p = NULL;
+
 out:
-#endif
 	if (close(fd) == -1)
 		perror(devmem);
 
