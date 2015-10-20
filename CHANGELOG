@@ -1,3 +1,8 @@
+2015-10-20  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.c: Handle OEM-specific types in group associations
+	  (DMI type 14).
+
 2015-10-14  Jean Delvare  <jdelvare@suse.de>
 
 	* util.c: Avoid SIGBUS on mmap failure.

@@ -172,6 +172,8 @@ static const char *dmi_smbios_structure_type(u8 code)
 		"Management Controller Host Interface", /* 42 */
 	};
 
+	if (code >= 128)
+		return "OEM-specific";
 	if (code <= 42)
 		return type[code];
 	return out_of_spec;
