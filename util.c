@@ -94,10 +94,11 @@ int checksum(const u8 *buf, size_t len)
  * needs to be freed by the caller.
  * This provides a similar usage model to mem_chunk()
  *
- * Returns pointer to buffer of max_len bytes, or NULL on error
+ * Returns pointer to buffer of max_len bytes, or NULL on error, and
+ * sets max_len to the length actually read.
  *
  */
-void *read_file(size_t max_len, const char *filename)
+void *read_file(size_t *max_len, const char *filename)
 {
 	int fd;
 	size_t r2 = 0;
@@ -115,7 +116,7 @@ void *read_file(size_t max_len, const char *filename)
 		return(NULL);
 	}
 
-	if ((p = malloc(max_len)) == NULL)
+	if ((p = malloc(*max_len)) == NULL)
 	{
 		perror("malloc");
 		return NULL;
@@ -123,7 +124,7 @@ void *read_file(size_t max_len, const char *filename)
 
 	do
 	{
-		r = read(fd, p + r2, max_len - r2);
+		r = read(fd, p + r2, *max_len - r2);
 		if (r == -1)
 		{
 			if (errno != EINTR)
@@ -140,6 +141,8 @@ void *read_file(size_t max_len, const char *filename)
 	while (r != 0);
 
 	close(fd);
+	*max_len = r2;
+
 	return p;
 }
 
