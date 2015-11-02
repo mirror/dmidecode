@@ -2,6 +2,9 @@
 
 	* dmidecode.c, util.c, util.h: Let read_file return the actual data
 	  size.
+	* dmidecode.c: Use read_file to read the DMI table from sysfs.
+	  This fixes Savannah bug #46176:
+	  https://savannah.nongnu.org/bugs/?46176
 
 2015-10-21  Xie XiuQi  <xiexiuqi@huawei.com>
 
