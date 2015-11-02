@@ -74,8 +74,9 @@ static const char *bad_index = "<BAD INDEX>";
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
 #define FLAG_STOP_AT_EOT        (1 << 1)
 
-#define SYS_ENTRY_FILE "/sys/firmware/dmi/tables/smbios_entry_point"
-#define SYS_TABLE_FILE "/sys/firmware/dmi/tables/DMI"
+#define SYS_FIRMWARE_DIR "/sys/firmware/dmi/tables"
+#define SYS_ENTRY_FILE SYS_FIRMWARE_DIR "/smbios_entry_point"
+#define SYS_TABLE_FILE SYS_FIRMWARE_DIR "/DMI"
 
 /*
  * Type-independant Stuff
