@@ -4840,17 +4840,17 @@ int main(int argc, char * const argv[])
 	{
 		if (!(opt.flags & FLAG_QUIET))
 			printf("Getting SMBIOS data from sysfs.\n");
-		if (memcmp(buf, "_SM3_", 5) == 0)
+		if (size >= 24 && memcmp(buf, "_SM3_", 5) == 0)
 		{
 			if (smbios3_decode(buf, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
 				found++;
 		}
-		else if (memcmp(buf, "_SM_", 4) == 0)
+		else if (size >= 31 && memcmp(buf, "_SM_", 4) == 0)
 		{
 			if (smbios_decode(buf, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
 				found++;
 		}
-		else if (memcmp(buf, "_DMI_", 5) == 0)
+		else if (size >= 15 && memcmp(buf, "_DMI_", 5) == 0)
 		{
 			if (legacy_decode(buf, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
 				found++;

@@ -5,6 +5,7 @@
 	* dmidecode.c: Use read_file to read the DMI table from sysfs.
 	  This fixes Savannah bug #46176:
 	  https://savannah.nongnu.org/bugs/?46176
+	* dmidecode.c: Check the sysfs entry point length.
 
 2015-10-21  Xie XiuQi  <xiexiuqi@huawei.com>
 
