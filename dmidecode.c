@@ -4615,7 +4615,7 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 	}
 
 	dmi_table(((off_t)offset.h << 32) | offset.l,
-		  WORD(buf + 0x0C), 0, ver, devmem, flags | FLAG_STOP_AT_EOT);
+		  DWORD(buf + 0x0C), 0, ver, devmem, flags | FLAG_STOP_AT_EOT);
 
 	if (opt.flags & FLAG_DUMP_BIN)
 	{
