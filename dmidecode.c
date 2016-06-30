@@ -2392,7 +2392,7 @@ static void dmi_memory_device_type_detail(u16 code)
 		"LRDIMM"  /* 15 */
 	};
 
-	if ((code & 0x7FFE) == 0)
+	if ((code & 0xFFFE) == 0)
 		printf(" None");
 	else
 	{
