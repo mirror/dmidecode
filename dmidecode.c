@@ -4550,11 +4550,12 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 
 	if (buf == NULL)
 	{
-		fprintf(stderr, "Table is unreachable, sorry."
+		fprintf(stderr, "Failed to read table, sorry.\n");
 #ifndef USE_MMAP
-			" Try compiling dmidecode with -DUSE_MMAP."
+		if (!(flags & FLAG_NO_FILE_OFFSET))
+			fprintf(stderr,
+				"Try compiling dmidecode with -DUSE_MMAP.\n");
 #endif
-			"\n");
 		return;
 	}
 
