@@ -2283,7 +2283,7 @@ static void dmi_memory_device_extended_size(u32 code)
 	 */
 	if (code & 0x3FFUL)
 		printf(" %lu MB", (unsigned long)code);
-	else if (code & 0xFFFFFUL)
+	else if (code & 0xFFC00UL)
 		printf(" %lu GB", (unsigned long)code >> 10);
 	else
 		printf(" %lu TB", (unsigned long)code >> 20);
