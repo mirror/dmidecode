@@ -1,3 +1,7 @@
+2016-09-22  Jean Delvare  <jdelvare@suse.de>
+
+	* README: Explain that we can no longer support Cygwin.
+
 2016-06-30  Petr Oros  <poros@redhat.com>
 
 	* dmidecode.c: Unmask LRDIMM in memory type detail (DMI type 17).
