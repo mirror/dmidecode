@@ -1,3 +1,9 @@
+2017-01-20  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.c: Only decode one DMI table.
+	  This fixes Savannah bug #50022:
+	  https://savannah.nongnu.org/bugs/?50022
+
 2016-09-22  Jean Delvare  <jdelvare@suse.de>
 
 	* README: Explain that we can no longer support Cygwin.
