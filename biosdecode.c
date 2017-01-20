@@ -2,7 +2,7 @@
  * BIOS Decode
  *
  *   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   Copyright (C) 2002-2015 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2002-2017 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -52,6 +52,9 @@
  *  - Fujitsu application panel technical details
  *    As of July 23rd, 2004
  *    http://apanel.sourceforge.net/tech.php
+ *  - Intel Multiprocessor Specification
+ *    Version 1.4
+ *    http://www.intel.com/design/archives/processors/pro/docs/242016.htm
  */
 
 #include <stdio.h>
@@ -546,6 +549,34 @@ static int fjkeyinf_decode(const u8 *p, size_t len)
 }
 
 /*
+ * Intel Multiprocessor
+ */
+
+static size_t mp_length(const u8 *p)
+{
+	return 16 * p[8];
+}
+
+static int mp_decode(const u8 *p, size_t len)
+{
+	if (!checksum(p, len))
+		return 0;
+
+	printf("Intel Multiprocessor present.\n");
+	printf("\tSpecification Revision: %s\n",
+		p[9] == 0x01 ? "1.1" : p[9] == 0x04 ? "1.4" : "Invalid");
+	if (p[11])
+		printf("\tDefault Configuration: #%d\n", p[11]);
+	else
+		printf("\tConfiguration Table Address: 0x%08X\n",
+			DWORD(p + 4));
+	printf("\tMode: %s\n", p[12] & (1 << 7) ?
+		"IMCR and PIC" : "Virtual Wire");
+
+	return 1;
+}
+
+/*
  * Main
  */
 
@@ -562,6 +593,7 @@ static struct bios_entry bios_entries[] = {
 	{ "32OS", 0, 0xE0000, 0xFFFFF, compaq_length, compaq_decode },
 	{ "\252\125VPD", 0, 0xF0000, 0xFFFFF, vpd_length, vpd_decode },
 	{ "FJKEYINF", 0, 0xF0000, 0xFFFFF, fjkeyinf_length, fjkeyinf_decode },
+	{ "_MP_", 0, 0xE0000, 0xFFFFF, mp_length, mp_decode },
 	{ NULL, 0, 0, 0, NULL, NULL }
 };
 
