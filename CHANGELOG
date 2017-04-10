@@ -2,6 +2,8 @@
 
 	* dmidecode.c: Decode the processor ID of the Intel Core M, AMD
 	  Athlon X4 and AMD Opteron X1000/X2000 processors (DMI type 4).
+	* dmidecode.c: Display the IPMI interrupt number as a decimal
+	  number (DMI type 38).
 
 2017-01-20  Jean Delvare  <jdelvare@suse.de>
 

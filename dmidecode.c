@@ -4248,7 +4248,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			}
 			if (data[0x11] != 0x00)
 			{
-				printf("\tInterrupt Number: %x\n",
+				printf("\tInterrupt Number: %u\n",
 					data[0x11]);
 			}
 			break;
