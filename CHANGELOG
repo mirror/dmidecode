@@ -1,3 +1,8 @@
+2017-04-10  Jean Delvare  <jdelvare@suse.de>
+
+	* dmidecode.c: Decode the processor ID of the Intel Core M, AMD
+	  Athlon X4 and AMD Opteron X1000/X2000 processors (DMI type 4).
+
 2017-01-20  Jean Delvare  <jdelvare@suse.de>
 
 	* biosdecode.c: Decode the entry point defined in the Intel

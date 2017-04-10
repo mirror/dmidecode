@@ -894,6 +894,10 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x15E, "DSP" },
 		{ 0x1F4, "Video Processor" },
 	};
+	/*
+	 * Note to developers: when adding entries to this list, check if
+	 * function dmi_processor_id below needs updating too.
+	 */
 
 	/* Special case for ambiguous value 0x30 (SMBIOS 2.0 only) */
 	if (ver == 0x0200 && data[0x06] == 0x30 && h->length >= 0x08)
@@ -1030,7 +1034,7 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 		}
 	}
 	else if ((type >= 0x0B && type <= 0x15) /* Intel, Cyrix */
-	      || (type >= 0x28 && type <= 0x2B) /* Intel */
+	      || (type >= 0x28 && type <= 0x2C) /* Intel */
 	      || (type >= 0xA1 && type <= 0xB3) /* Intel */
 	      || type == 0xB5 /* Intel */
 	      || (type >= 0xB9 && type <= 0xC7) /* Intel */
@@ -1042,6 +1046,7 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 	      || type == 0x1F /* AMD */
 	      || (type >= 0x38 && type <= 0x3F) /* AMD */
 	      || (type >= 0x46 && type <= 0x4F) /* AMD */
+	      || (type >= 0x66 && type <= 0x68) /* AMD */
 	      || (type >= 0x83 && type <= 0x8F) /* AMD */
 	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
 	      || (type >= 0xE4 && type <= 0xEF)) /* AMD */
