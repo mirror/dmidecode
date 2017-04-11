@@ -4540,17 +4540,19 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 		printf("\n");
 	}
 
-	if (flags & FLAG_NO_FILE_OFFSET)
+	if ((flags & FLAG_NO_FILE_OFFSET) || (opt.flags & FLAG_FROM_DUMP))
 	{
 		/*
-		 * When reading from sysfs, the file may be shorter than
-		 * announced. For SMBIOS v3 this is expcted, as we only know
-		 * the maximum table size, not the actual table size. For older
-		 * implementations (and for SMBIOS v3 too), this would be the
-		 * result of the kernel truncating the table on parse error.
+		 * When reading from sysfs or from a dump file, the file may be
+		 * shorter than announced. For SMBIOS v3 this is expcted, as we
+		 * only know the maximum table size, not the actual table size.
+		 * For older implementations (and for SMBIOS v3 too), this
+		 * would be the result of the kernel truncating the table on
+		 * parse error.
 		 */
 		size_t size = len;
-		buf = read_file(0, &size, devmem);
+		buf = read_file(flags & FLAG_NO_FILE_OFFSET ? 0 : base,
+			&size, devmem);
 		if (!(opt.flags & FLAG_QUIET) && num && size != (size_t)len)
 		{
 			fprintf(stderr, "Wrong DMI structures length: %u bytes "
