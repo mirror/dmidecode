@@ -1,3 +1,7 @@
+2017-04-11  Jean Delvare  <jdelvare@suse.de>
+
+	* util.c: Don't leak a file descriptor in function read_file.
+
 2017-04-10  Jean Delvare  <jdelvare@suse.de>
 
 	* dmidecode.c: Decode the processor ID of the Intel Core M, AMD

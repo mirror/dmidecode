@@ -113,13 +113,13 @@ void *read_file(size_t *max_len, const char *filename)
 	{
 		if (errno != ENOENT)
 			perror(filename);
-		return(NULL);
+		return NULL;
 	}
 
 	if ((p = malloc(*max_len)) == NULL)
 	{
 		perror("malloc");
-		return NULL;
+		goto out;
 	}
 
 	do
@@ -129,10 +129,10 @@ void *read_file(size_t *max_len, const char *filename)
 		{
 			if (errno != EINTR)
 			{
-				close(fd);
 				perror(filename);
 				free(p);
-				return NULL;
+				p = NULL;
+				goto out;
 			}
 		}
 		else
@@ -140,8 +140,9 @@ void *read_file(size_t *max_len, const char *filename)
 	}
 	while (r != 0);
 
-	close(fd);
 	*max_len = r2;
+out:
+	close(fd);
 
 	return p;
 }
