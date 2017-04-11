@@ -4550,7 +4550,7 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 		 * result of the kernel truncating the table on parse error.
 		 */
 		size_t size = len;
-		buf = read_file(&size, devmem);
+		buf = read_file(0, &size, devmem);
 		if (!(opt.flags & FLAG_QUIET) && num && size != (size_t)len)
 		{
 			fprintf(stderr, "Wrong DMI structures length: %u bytes "
@@ -4862,7 +4862,7 @@ int main(int argc, char * const argv[])
 	 */
 	size = 0x20;
 	if (!(opt.flags & FLAG_NO_SYSFS)
-	 && (buf = read_file(&size, SYS_ENTRY_FILE)) != NULL)
+	 && (buf = read_file(0, &size, SYS_ENTRY_FILE)) != NULL)
 	{
 		if (!(opt.flags & FLAG_QUIET))
 			printf("Getting SMBIOS data from sysfs.\n");

@@ -1,6 +1,8 @@
 2017-04-11  Jean Delvare  <jdelvare@suse.de>
 
 	* util.c: Don't leak a file descriptor in function read_file.
+	* util.c, util.c, dmidecode.c: Let callers pass an offset to function
+	  read_file.
 
 2017-04-10  Jean Delvare  <jdelvare@suse.de>
 
