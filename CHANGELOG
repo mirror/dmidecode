@@ -6,6 +6,8 @@
 	* dmidecode.c: Add new enumerated values for chassis types
 	  (DMI type 3).
 	* dmidecode.c: Add new enumerated values for processors (DMI type 4).
+	* dmidecode.c: Don't assume 8-bit processor family in dmi_processor_id
+	  (DMI type 4).
 
 2017-04-11  Jean Delvare  <jdelvare@suse.de>
 

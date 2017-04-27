@@ -972,7 +972,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 	}
 }
 
-static void dmi_processor_id(u8 type, const u8 *p, const char *version, const char *prefix)
+static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 {
 	/* Intel AP-485 revision 36, table 2-4 */
 	static const char *flags[32] = {
@@ -1009,13 +1009,14 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 		NULL, /* 30 */
 		"PBE (Pending break enabled)" /* 31 */
 	};
-	/*
-	 * Extra flags are now returned in the ECX register when one calls
-	 * the CPUID instruction. Their meaning is explained in table 3-5, but
-	 * DMI doesn't support this yet.
-	 */
+	const u8 *data = h->data;
+	const u8 *p = data + 0x08;
 	u32 eax, edx;
 	int sig = 0;
+	u16 type;
+
+	type = (data[0x06] == 0xFE && h->length >= 0x2A) ?
+		WORD(data + 0x28) : data[0x06];
 
 	/*
 	 * This might help learn about new processors supporting the
@@ -1075,6 +1076,7 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 		sig = 2;
 	else if (type == 0x01 || type == 0x02)
 	{
+		const char *version = dmi_string(h, data[0x10]);
 		/*
 		 * Some X86-class CPU have family "Other" or "Unknown". In this case,
 		 * we use the version string to determine if they are known to
@@ -1095,6 +1097,11 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 	else /* not X86-class */
 		return;
 
+	/*
+	 * Extra flags are now returned in the ECX register when one calls
+	 * the CPUID instruction. Their meaning is explained in table 3-5, but
+	 * DMI doesn't support this yet.
+	 */
 	eax = DWORD(p);
 	edx = DWORD(p + 4);
 	switch (sig)
@@ -3426,7 +3433,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_processor_family(h, ver));
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x07]));
-			dmi_processor_id(data[0x06], data + 0x08, dmi_string(h, data[0x10]), "\t");
+			dmi_processor_id(h, "\t");
 			printf("\tVersion: %s\n",
 				dmi_string(h, data[0x10]));
 			printf("\tVoltage:");
