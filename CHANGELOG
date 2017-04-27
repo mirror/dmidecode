@@ -1,3 +1,9 @@
+2017-04-27  Jean Delvare  <jdelvare@suse.de>
+
+	Update to support SMBIOS specification version 3.1.0.
+
+	* dmidecode.c: Add support for extended BIOS ROM size (DMI type 0).
+
 2017-04-11  Jean Delvare  <jdelvare@suse.de>
 
 	* util.c: Don't leak a file descriptor in function read_file.

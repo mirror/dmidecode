@@ -295,6 +295,18 @@ static void dmi_bios_runtime_size(u32 code)
 		printf(" %u kB", code >> 10);
 }
 
+static void dmi_bios_rom_size(u8 code1, u16 code2)
+{
+	static const char *unit[4] = {
+		"MB", "GB", out_of_spec, out_of_spec
+	};
+
+	if (code1 != 0xFF)
+		printf(" %u kB", (code1 + 1) << 6);
+	else
+		printf(" %u %s", code2 & 0x3FFF, unit[code2 >> 14]);
+}
+
 static void dmi_bios_characteristics(u64 code, const char *prefix)
 {
 	/* 7.1.1 */
@@ -3271,8 +3283,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_bios_runtime_size((0x10000 - WORD(data + 0x06)) << 4);
 				printf("\n");
 			}
-			printf("\tROM Size: %u kB\n",
-				(data[0x09] + 1) << 6);
+			printf("\tROM Size:");
+			dmi_bios_rom_size(data[0x09], h->length < 0x1A ? 16 : WORD(data + 0x18));
+			printf("\n");
 			printf("\tCharacteristics:\n");
 			dmi_bios_characteristics(QWORD(data + 0x0A), "\t\t");
 			if (h->length < 0x13) break;
