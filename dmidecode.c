@@ -2490,7 +2490,7 @@ static void dmi_memory_device_speed(u16 code)
 	if (code == 0)
 		printf(" Unknown");
 	else
-		printf(" %u MHz", code);
+		printf(" %u MT/s", code);
 }
 
 /*

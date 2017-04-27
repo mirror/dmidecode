@@ -13,6 +13,7 @@
 	* dmidecode.c: Add support for large cache sizes (DMI type 7).
 	* dmidecode.c: Add Mini PCIe system slot enumerated values
 	  (DMI type 9).
+	* dmidecode.c: Clarify the memory speed unit (DMI type 17).
 
 2017-04-11  Jean Delvare  <jdelvare@suse.de>
 
