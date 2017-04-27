@@ -75,7 +75,7 @@
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
-#define SUPPORTED_SMBIOS_VER 0x0301
+#define SUPPORTED_SMBIOS_VER 0x030100
 
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
 #define FLAG_STOP_AT_EOT        (1 << 1)
@@ -4689,16 +4689,18 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 	}
 }
 
-static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
+static void dmi_table(off_t base, u32 len, u16 num, u32 ver, const char *devmem,
 		      u32 flags)
 {
 	u8 *buf;
 
 	if (ver > SUPPORTED_SMBIOS_VER && !(opt.flags & FLAG_QUIET))
 	{
-		printf("# SMBIOS implementations newer than version %u.%u are not\n"
+		printf("# SMBIOS implementations newer than version %u.%u.%u are not\n"
 		       "# fully supported by this version of dmidecode.\n",
-		       SUPPORTED_SMBIOS_VER >> 8, SUPPORTED_SMBIOS_VER & 0xFF);
+		       SUPPORTED_SMBIOS_VER >> 16,
+		       (SUPPORTED_SMBIOS_VER >> 8) & 0xFF,
+		       SUPPORTED_SMBIOS_VER & 0xFF);
 	}
 
 	if (!(opt.flags & FLAG_QUIET))
@@ -4753,7 +4755,7 @@ static void dmi_table(off_t base, u32 len, u16 num, u16 ver, const char *devmem,
 	if (opt.flags & FLAG_DUMP_BIN)
 		dmi_table_dump(buf, len);
 	else
-		dmi_table_decode(buf, len, num, ver, flags);
+		dmi_table_decode(buf, len, num, ver >> 8, flags);
 
 	free(buf);
 }
@@ -4790,13 +4792,13 @@ static void overwrite_smbios3_address(u8 *buf)
 
 static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 {
-	u16 ver;
+	u32 ver;
 	u64 offset;
 
 	if (!checksum(buf, buf[0x06]))
 		return 0;
 
-	ver = (buf[0x07] << 8) + buf[0x08];
+	ver = (buf[0x07] << 16) + (buf[0x08] << 8) + buf[0x09];
 	if (!(opt.flags & FLAG_QUIET))
 		printf("SMBIOS %u.%u.%u present.\n",
 		       buf[0x07], buf[0x08], buf[0x09]);
@@ -4861,7 +4863,7 @@ static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
 			ver >> 8, ver & 0xFF);
 
 	dmi_table(DWORD(buf + 0x18), WORD(buf + 0x16), WORD(buf + 0x1C),
-		ver, devmem, flags);
+		ver << 8, devmem, flags);
 
 	if (opt.flags & FLAG_DUMP_BIN)
 	{
@@ -4889,7 +4891,8 @@ static int legacy_decode(u8 *buf, const char *devmem, u32 flags)
 			buf[0x0E] >> 4, buf[0x0E] & 0x0F);
 
 	dmi_table(DWORD(buf + 0x08), WORD(buf + 0x06), WORD(buf + 0x0C),
-		((buf[0x0E] & 0xF0) << 4) + (buf[0x0E] & 0x0F), devmem, flags);
+		((buf[0x0E] & 0xF0) << 12) + ((buf[0x0E] & 0x0F) << 8),
+		devmem, flags);
 
 	if (opt.flags & FLAG_DUMP_BIN)
 	{
