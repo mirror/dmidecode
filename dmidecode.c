@@ -1056,6 +1056,22 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 			return;
 		}
 	}
+	else if ((type >= 0x100 && type <= 0x101) /* ARM */
+	      || (type >= 0x118 && type <= 0x119)) /* ARM */
+	{
+		u32 midr = DWORD(p);
+		/*
+		 * The format of this field was not defined for ARM processors
+		 * before version 3.1.0 of the SMBIOS specification, so we
+		 * silently skip it if it reads all zeroes.
+		 */
+		if (midr == 0)
+			return;
+		printf("%sSignature: Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u\n",
+			prefix, midr >> 24, (midr >> 20) & 0xF,
+			(midr >> 16) & 0xF, (midr >> 4) & 0xFFF, midr & 0xF);
+		return;
+	}
 	else if ((type >= 0x0B && type <= 0x15) /* Intel, Cyrix */
 	      || (type >= 0x28 && type <= 0x2F) /* Intel */
 	      || (type >= 0xA1 && type <= 0xB3) /* Intel */
@@ -1094,7 +1110,7 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 		else
 			return;
 	}
-	else /* not X86-class */
+	else /* neither X86 nor ARM */
 		return;
 
 	/*
