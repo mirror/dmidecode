@@ -1787,7 +1787,10 @@ static const char *dmi_slot_type(u8 code)
 		"MXM 3.0 Type A",
 		"MXM 3.0 Type B",
 		"PCI Express 2 SFF-8639",
-		"PCI Express 3 SFF-8639" /* 0x20 */
+		"PCI Express 3 SFF-8639",
+		"PCI Express Mini 52-pin with bottom-side keep-outs",
+		"PCI Express Mini 52-pin without bottom-side keep-outs",
+		"PCI Express Mini 76-pin" /* 0x23 */
 	};
 	static const char *type_0xA0[] = {
 		"PC-98/C20", /* 0xA0 */
@@ -1819,7 +1822,7 @@ static const char *dmi_slot_type(u8 code)
 	 * function dmi_slot_id below needs updating too.
 	 */
 
-	if (code >= 0x01 && code <= 0x20)
+	if (code >= 0x01 && code <= 0x23)
 		return type[code - 0x01];
 	if (code >= 0xA0 && code <= 0xB6)
 		return type_0xA0[code - 0xA0];
@@ -1901,6 +1904,9 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
 		case 0x13: /* AGP */
 		case 0x1F: /* PCI Express 2 */
 		case 0x20: /* PCI Express 3 */
+		case 0x21: /* PCI Express Mini */
+		case 0x22: /* PCI Express Mini */
+		case 0x23: /* PCI Express Mini */
 		case 0xA5: /* PCI Express */
 		case 0xA6: /* PCI Express */
 		case 0xA7: /* PCI Express */

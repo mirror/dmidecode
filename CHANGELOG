@@ -11,6 +11,8 @@
 	* dmidecode.c: Decode the MIDR register on ARM processors
 	  (DMI type 4).
 	* dmidecode.c: Add support for large cache sizes (DMI type 7).
+	* dmidecode.c: Add Mini PCIe system slot enumerated values
+	  (DMI type 9).
 
 2017-04-11  Jean Delvare  <jdelvare@suse.de>
 
