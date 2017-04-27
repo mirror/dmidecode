@@ -2,7 +2,7 @@
  * DMI Decode
  *
  *   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   Copyright (C) 2002-2015 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2002-2017 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -50,6 +50,12 @@
  *  - DMTF DSP0239 version 1.1.0
  *    "Management Component Transport Protocol (MCTP) IDs and Codes"
  *    http://www.dmtf.org/standards/pmci
+ *  - "TPM Main, Part 2 TPM Structures"
+ *    Specification version 1.2, level 2, revision 116
+ *    https://trustedcomputinggroup.org/tpm-main-specification/
+ *  - "PC Client Platform TPM Profile (PTP) Specification"
+ *    Family "2.0", Level 00, Revision 00.43, January 26, 2015
+ *    https://trustedcomputinggroup.org/pc-client-platform-tpm-profile-ptp-specification/
  */
 
 #include <stdio.h>
@@ -170,12 +176,13 @@ static const char *dmi_smbios_structure_type(u8 code)
 		"Power Supply",
 		"Additional Information",
 		"Onboard Device",
-		"Management Controller Host Interface", /* 42 */
+		"Management Controller Host Interface",
+		"TPM Device", /* 43 */
 	};
 
 	if (code >= 128)
 		return "OEM-specific";
-	if (code <= 42)
+	if (code <= 43)
 		return type[code];
 	return out_of_spec;
 }
@@ -3310,6 +3317,57 @@ static const char *dmi_management_controller_host_type(u8 code)
 }
 
 /*
+ * 7.44 TPM Device (Type 43)
+ */
+
+static void dmi_tpm_vendor_id(const u8 *p)
+{
+	char vendor_id[5];
+	int i;
+
+	/* ASCII filtering */
+	for (i = 0; i < 4 && p[i] != 0; i++)
+	{
+		if (p[i] < 32 || p[i] >= 127)
+			vendor_id[i] = '.';
+		else
+			vendor_id[i] = p[i];
+	}
+
+	/* Terminate the string */
+	vendor_id[i] = '\0';
+
+	printf(" %s", vendor_id);
+}
+
+static void dmi_tpm_characteristics(u64 code, const char *prefix)
+{
+	/* 7.1.1 */
+	static const char *characteristics[] = {
+		"TPM Device characteristics not supported", /* 2 */
+		"Family configurable via firmware update",
+		"Family configurable via platform software support",
+		"Family configurable via OEM proprietary mechanism" /* 5 */
+	};
+	int i;
+
+	/*
+	 * This isn't very clear what this bit is supposed to mean
+	 */
+	if (code.l & (1 << 2))
+	{
+		printf("%s%s\n",
+			prefix, characteristics[0]);
+		return;
+	}
+
+	for (i = 3; i <= 5; i++)
+		if (code.l & (1 << i))
+			printf("%s%s\n",
+				prefix, characteristics[i - 2]);
+}
+
+/*
  * Main
  */
 
@@ -4423,6 +4481,43 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					data[0x05], data[0x06], data[0x07],
 					data[0x08]);
 			}
+			break;
+
+		case 43: /* 7.44 TPM Device */
+			printf("TPM Device\n");
+			if (h->length < 0x1B) break;
+			printf("\tVendor ID:");
+			dmi_tpm_vendor_id(data + 0x04);
+			printf("\n");
+			printf("\tSpecification Version: %d.%d", data[0x08], data[0x09]);
+			switch (data[0x08])
+			{
+				case 0x01:
+					/*
+					 * We skip the first 2 bytes, which are
+					 * redundant with the above, and uncoded
+					 * in a silly way.
+					 */
+					printf("\tFirmware Revision: %u.%u\n",
+						data[0x0C], data[0x0D]);
+					break;
+				case 0x02:
+					printf("\tFirmware Revision: %u.%u\n",
+						DWORD(data + 0x0A) >> 16,
+						DWORD(data + 0x0A) && 0xFF);
+					/*
+					 * We skip the next 4 bytes, as their
+					 * format is not standardized and their
+					 * usefulness seems limited anyway.
+					 */
+					break;
+			}
+			printf("\tDescription: %s", dmi_string(h, data[0x12]));
+			printf("\tCharacteristics:\n");
+			dmi_tpm_characteristics(QWORD(data + 0x13), "\t\t");
+			if (h->length < 0x1F) break;
+			printf("\tOEM-specific Information: 0x%08X\n",
+				DWORD(data + 0x1B));
 			break;
 
 		case 126: /* 7.44 Inactive */

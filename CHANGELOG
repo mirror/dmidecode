@@ -14,6 +14,7 @@
 	* dmidecode.c: Add Mini PCIe system slot enumerated values
 	  (DMI type 9).
 	* dmidecode.c: Clarify the memory speed unit (DMI type 17).
+	* dmidecode.c: Add support for structure type 43 (TPM Device).
 
 2017-04-11  Jean Delvare  <jdelvare@suse.de>
 
