@@ -565,12 +565,16 @@ static const char *dmi_chassis_type(u8 code)
 		"Blade Enclosing",
 		"Tablet",
 		"Convertible",
-		"Detachable" /* 0x20 */
+		"Detachable",
+		"IoT Gateway",
+		"Embedded PC",
+		"Mini PC",
+		"Stick PC" /* 0x24 */
 	};
 
 	code &= 0x7F; /* bits 6:0 are chassis type, 7th bit is the lock bit */
 
-	if (code >= 0x01 && code <= 0x20)
+	if (code >= 0x01 && code <= 0x24)
 		return type[code - 0x01];
 	return out_of_spec;
 }

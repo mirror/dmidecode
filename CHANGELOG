@@ -3,6 +3,8 @@
 	Update to support SMBIOS specification version 3.1.0.
 
 	* dmidecode.c: Add support for extended BIOS ROM size (DMI type 0).
+	* dmidecode.c: Add new enumerated values for chassis types
+	  (DMI type 3).
 
 2017-04-11  Jean Delvare  <jdelvare@suse.de>
 
