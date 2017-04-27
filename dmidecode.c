@@ -736,7 +736,9 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x2A, "Core Solo Mobile" },
 		{ 0x2B, "Atom" },
 		{ 0x2C, "Core M" },
-
+		{ 0x2D, "Core m3" },
+		{ 0x2E, "Core m5" },
+		{ 0x2F, "Core m7" },
 		{ 0x30, "Alpha" },
 		{ 0x31, "Alpha 21064" },
 		{ 0x32, "Alpha 21066" },
@@ -788,6 +790,8 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x66, "Athlon X4" },
 		{ 0x67, "Opteron X1000" },
 		{ 0x68, "Opteron X2000" },
+		{ 0x69, "Opteron A-Series" },
+		{ 0x6A, "Opteron X3000" },
 
 		{ 0x70, "Hobbit" },
 
@@ -899,6 +903,8 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0xFA, "i860" },
 		{ 0xFB, "i960" },
 
+		{ 0x100, "ARMv7" },
+		{ 0x101, "ARMv8" },
 		{ 0x104, "SH-3" },
 		{ 0x105, "SH-4" },
 		{ 0x118, "ARM" },
@@ -1050,7 +1056,7 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 		}
 	}
 	else if ((type >= 0x0B && type <= 0x15) /* Intel, Cyrix */
-	      || (type >= 0x28 && type <= 0x2C) /* Intel */
+	      || (type >= 0x28 && type <= 0x2F) /* Intel */
 	      || (type >= 0xA1 && type <= 0xB3) /* Intel */
 	      || type == 0xB5 /* Intel */
 	      || (type >= 0xB9 && type <= 0xC7) /* Intel */
@@ -1062,7 +1068,7 @@ static void dmi_processor_id(u8 type, const u8 *p, const char *version, const ch
 	      || type == 0x1F /* AMD */
 	      || (type >= 0x38 && type <= 0x3F) /* AMD */
 	      || (type >= 0x46 && type <= 0x4F) /* AMD */
-	      || (type >= 0x66 && type <= 0x68) /* AMD */
+	      || (type >= 0x66 && type <= 0x6A) /* AMD */
 	      || (type >= 0x83 && type <= 0x8F) /* AMD */
 	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
 	      || (type >= 0xE4 && type <= 0xEF)) /* AMD */
@@ -1224,10 +1230,17 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket LGA1150",
 		"Socket BGA1168",
 		"Socket BGA1234",
-		"Socket BGA1364" /* 0x30 */
+		"Socket BGA1364",
+		"Socket AM4",
+		"Socket LGA1151",
+		"Socket BGA1356",
+		"Socket BGA1440",
+		"Socket BGA1515",
+		"Socket LGA3647-1",
+		"Socket SP3" /* 0x37 */
 	};
 
-	if (code >= 0x01 && code <= 0x30)
+	if (code >= 0x01 && code <= 0x37)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }
