@@ -25,7 +25,7 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 3.1.0" document,
+ * Management BIOS Reference Specification, Version 3.1.1" document,
  * available from http://www.dmtf.org/standards/smbios.
  *
  * Note to contributors:
@@ -75,7 +75,7 @@
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
-#define SUPPORTED_SMBIOS_VER 0x030100
+#define SUPPORTED_SMBIOS_VER 0x030101
 
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
 #define FLAG_STOP_AT_EOT        (1 << 1)
@@ -799,6 +799,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x68, "Opteron X2000" },
 		{ 0x69, "Opteron A-Series" },
 		{ 0x6A, "Opteron X3000" },
+		{ 0x6B, "Zen" },
 
 		{ 0x70, "Hobbit" },
 
@@ -1092,7 +1093,7 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 	      || type == 0x1F /* AMD */
 	      || (type >= 0x38 && type <= 0x3F) /* AMD */
 	      || (type >= 0x46 && type <= 0x4F) /* AMD */
-	      || (type >= 0x66 && type <= 0x6A) /* AMD */
+	      || (type >= 0x66 && type <= 0x6B) /* AMD */
 	      || (type >= 0x83 && type <= 0x8F) /* AMD */
 	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
 	      || (type >= 0xE4 && type <= 0xEF)) /* AMD */
@@ -1267,10 +1268,11 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket BGA1440",
 		"Socket BGA1515",
 		"Socket LGA3647-1",
-		"Socket SP3" /* 0x37 */
+		"Socket SP3",
+		"Socket SP3r2" /* 0x38 */
 	};
 
-	if (code >= 0x01 && code <= 0x37)
+	if (code >= 0x01 && code <= 0x38)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }
