@@ -1536,6 +1536,21 @@ static void dmi_cache_size(u16 code)
 		printf(" %u kB", code);
 }
 
+static void dmi_cache_size_2(u32 code)
+{
+	if (code & 0x80000000)
+	{
+		code &= 0x7FFFFFFFLU;
+		/* Use a more convenient unit for large cache size */
+		if (code >= 0x8000)
+			printf(" %u MB", code >> 4);
+		else
+			printf(" %u kB", code << 6);
+	}
+	else
+		printf(" %u kB", code);
+}
+
 static void dmi_cache_types(u16 code, const char *sep)
 {
 	/* 7.8.2 */
@@ -3576,10 +3591,16 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tLocation: %s\n",
 				dmi_cache_location((WORD(data + 0x05) >> 5) & 0x0003));
 			printf("\tInstalled Size:");
-			dmi_cache_size(WORD(data + 0x09));
+			if (h->length >= 0x1B)
+				dmi_cache_size_2(DWORD(data + 0x17));
+			else
+				dmi_cache_size(WORD(data + 0x09));
 			printf("\n");
 			printf("\tMaximum Size:");
-			dmi_cache_size(WORD(data + 0x07));
+			if (h->length >= 0x17)
+				dmi_cache_size_2(DWORD(data + 0x13));
+			else
+				dmi_cache_size(WORD(data + 0x07));
 			printf("\n");
 			printf("\tSupported SRAM Types:");
 			dmi_cache_types(WORD(data + 0x0B), "\n\t\t");
