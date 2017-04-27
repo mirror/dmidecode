@@ -25,7 +25,7 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 3.0.0" document,
+ * Management BIOS Reference Specification, Version 3.1.0" document,
  * available from http://www.dmtf.org/standards/smbios.
  *
  * Note to contributors:
@@ -75,7 +75,7 @@
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
-#define SUPPORTED_SMBIOS_VER 0x0300
+#define SUPPORTED_SMBIOS_VER 0x0301
 
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
 #define FLAG_STOP_AT_EOT        (1 << 1)
