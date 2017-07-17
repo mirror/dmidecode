@@ -134,7 +134,7 @@ uninstall-man :
 install-doc :
 	$(INSTALL_DIR) $(DESTDIR)$(docdir)
 	$(INSTALL_DATA) README $(DESTDIR)$(docdir)
-	$(INSTALL_DATA) CHANGELOG $(DESTDIR)$(docdir)
+	$(INSTALL_DATA) NEWS $(DESTDIR)$(docdir)
 	$(INSTALL_DATA) AUTHORS $(DESTDIR)$(docdir)
 
 uninstall-doc :
