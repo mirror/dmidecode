@@ -375,7 +375,7 @@ static void pir_link_bitmap(char letter, const u8 *p)
 
 static int pir_decode(const u8 *p, size_t len)
 {
-	int i;
+	int i, n;
 
 	if (len < 32 || !checksum(p, WORD(p + 6)))
 		return 0;
@@ -394,18 +394,18 @@ static int pir_decode(const u8 *p, size_t len)
 		printf("\tMiniport Data: 0x%08X\n",
 			DWORD(p + 16));
 
-	for (i = 1; i <= (WORD(p + 6) - 32) / 16; i++)
+	n = (len - 32) / 16;
+	for (i = 1, p += 32; i <= n; i++, p += 16)
 	{
-		printf("\tDevice: %02x:%02x,",
-			p[(i + 1) * 16], p[(i + 1) * 16 + 1] >> 3);
-		pir_slot_number(p[(i + 1) * 16 + 14]);
+		printf("\tDevice: %02x:%02x,", p[0], p[1] >> 3);
+		pir_slot_number(p[14]);
 		printf("\n");
 		if (opt.pir == PIR_FULL)
 		{
-			pir_link_bitmap('A', p + (i + 1) * 16 + 2);
-			pir_link_bitmap('B', p + (i + 1) * 16 + 5);
-			pir_link_bitmap('C', p + (i + 1) * 16 + 8);
-			pir_link_bitmap('D', p + (i + 1) * 16 + 11);
+			pir_link_bitmap('A', p + 2);
+			pir_link_bitmap('B', p + 5);
+			pir_link_bitmap('C', p + 8);
+			pir_link_bitmap('D', p + 11);
 		}
 	}
 
