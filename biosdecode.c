@@ -73,11 +73,15 @@ struct opt
 {
 	const char *devmem;
 	unsigned int flags;
+	unsigned char pir;
 };
 static struct opt opt;
 
 #define FLAG_VERSION            (1 << 0)
 #define FLAG_HELP               (1 << 1)
+
+#define PIR_SHORT               0
+#define PIR_FULL                1
 
 struct bios_entry {
 	const char *anchor;
@@ -386,32 +390,29 @@ static int pir_decode(const u8 *p, size_t len)
 			i, p[(i + 1) * 16], p[(i + 1) * 16 + 1] >> 3);
 		pir_slot_number(p[(i + 1) * 16 + 14]);
 		printf("\n");
-/*		printf("\tSlot Entry %u\n", i);
-		printf("\t\tID: %02x:%02x\n",
-			p[(i + 1) * 16], p[(i + 1) * 16 + 1] >> 3);
-		printf("\t\tLink Value for INTA#: %u\n",
-			p[(i + 1) * 16 + 2]);
-		printf("\t\tIRQ Bitmap for INTA#:");
-		pir_irqs(WORD(p + (i + 1) * 16 + 3));
-		printf("\n");
-		printf("\t\tLink Value for INTB#: %u\n",
-			p[(i + 1) * 16 + 5]);
-		printf("\t\tIRQ Bitmap for INTB#:");
-		pir_irqs(WORD(p + (i + 1) * 16 + 6));
-		printf("\n");
-		printf("\t\tLink Value for INTC#: %u\n",
-			p[(i + 1) * 16 + 8]);
-		printf("\t\tIRQ Bitmap for INTC#:");
-		pir_irqs(WORD(p + (i + 1) * 16 + 9));
-		printf("\n");
-		printf("\t\tLink Value for INTD#: %u\n",
-			p[(i + 1) * 16 + 11]);
-		printf("\t\tIRQ Bitmap for INTD#:");
-		pir_irqs(WORD(p + (i + 1) * 16 + 12));
-		printf("\n");
-		printf("\t\tSlot Number:");
-		pir_slot_number(p[(i + 1) * 16 + 14]);
-		printf("\n");*/
+		if (opt.pir == PIR_FULL)
+		{
+			printf("\t\tLink Value for INTA#: %u\n",
+				p[(i + 1) * 16 + 2]);
+			printf("\t\tIRQ Bitmap for INTA#:");
+			pir_irqs(WORD(p + (i + 1) * 16 + 3));
+			printf("\n");
+			printf("\t\tLink Value for INTB#: %u\n",
+				p[(i + 1) * 16 + 5]);
+			printf("\t\tIRQ Bitmap for INTB#:");
+			pir_irqs(WORD(p + (i + 1) * 16 + 6));
+			printf("\n");
+			printf("\t\tLink Value for INTC#: %u\n",
+				p[(i + 1) * 16 + 8]);
+			printf("\t\tIRQ Bitmap for INTC#:");
+			pir_irqs(WORD(p + (i + 1) * 16 + 9));
+			printf("\n");
+			printf("\t\tLink Value for INTD#: %u\n",
+				p[(i + 1) * 16 + 11]);
+			printf("\t\tIRQ Bitmap for INTD#:");
+			pir_irqs(WORD(p + (i + 1) * 16 + 12));
+			printf("\n");
+		}
 	}
 
 	return 1;
@@ -616,6 +617,7 @@ static int parse_command_line(int argc, char * const argv[])
 	const char *optstring = "d:hV";
 	struct option longopts[] = {
 		{ "dev-mem", required_argument, NULL, 'd' },
+		{ "pir", required_argument, NULL, 'P' },
 		{ "help", no_argument, NULL, 'h' },
 		{ "version", no_argument, NULL, 'V' },
 		{ NULL, 0, NULL, 0 }
@@ -626,6 +628,10 @@ static int parse_command_line(int argc, char * const argv[])
 		{
 			case 'd':
 				opt.devmem = optarg;
+				break;
+			case 'P':
+				if (strcmp(optarg, "full") == 0)
+					opt.pir = PIR_FULL;
 				break;
 			case 'h':
 				opt.flags |= FLAG_HELP;
@@ -646,6 +652,7 @@ static void print_help(void)
 		"Usage: biosdecode [OPTIONS]\n"
 		"Options are:\n"
 		" -d, --dev-mem FILE     Read memory from device FILE (default: " DEFAULT_MEM_DEV ")\n"
+		"     --pir full         Decode the details of the PCI IRQ routing table\n"
 		" -h, --help             Display this help text and exit\n"
 		" -V, --version          Display the version and exit\n";
 
