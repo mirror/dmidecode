@@ -355,12 +355,22 @@ static void pir_slot_number(u8 code)
 	if (code == 0)
 		printf(" on-board");
 	else
-		printf(" slot number %u", code);
+		printf(" slot %u", code);
 }
 
 static size_t pir_length(const u8 *p)
 {
 	return WORD(p + 6);
+}
+
+static void pir_link_bitmap(char letter, const u8 *p)
+{
+	if (p[0] == 0) /* Not connected */
+		return;
+
+	printf("\t\tINT%c#: Link 0x%02x, IRQ Bitmap", letter, p[0]);
+	pir_irqs(WORD(p + 1));
+	printf("\n");
 }
 
 static int pir_decode(const u8 *p, size_t len)
@@ -372,7 +382,7 @@ static int pir_decode(const u8 *p, size_t len)
 
 	printf("PCI Interrupt Routing %u.%u present.\n",
 		p[5], p[4]);
-	printf("\tRouter ID: %02x:%02x.%1x\n",
+	printf("\tRouter Device: %02x:%02x.%1x\n",
 		p[8], p[9]>>3, p[9] & 0x07);
 	printf("\tExclusive IRQs:");
 	pir_irqs(WORD(p + 10));
@@ -386,32 +396,16 @@ static int pir_decode(const u8 *p, size_t len)
 
 	for (i = 1; i <= (WORD(p + 6) - 32) / 16; i++)
 	{
-		printf("\tSlot Entry %u: ID %02x:%02x,",
-			i, p[(i + 1) * 16], p[(i + 1) * 16 + 1] >> 3);
+		printf("\tDevice: %02x:%02x,",
+			p[(i + 1) * 16], p[(i + 1) * 16 + 1] >> 3);
 		pir_slot_number(p[(i + 1) * 16 + 14]);
 		printf("\n");
 		if (opt.pir == PIR_FULL)
 		{
-			printf("\t\tLink Value for INTA#: %u\n",
-				p[(i + 1) * 16 + 2]);
-			printf("\t\tIRQ Bitmap for INTA#:");
-			pir_irqs(WORD(p + (i + 1) * 16 + 3));
-			printf("\n");
-			printf("\t\tLink Value for INTB#: %u\n",
-				p[(i + 1) * 16 + 5]);
-			printf("\t\tIRQ Bitmap for INTB#:");
-			pir_irqs(WORD(p + (i + 1) * 16 + 6));
-			printf("\n");
-			printf("\t\tLink Value for INTC#: %u\n",
-				p[(i + 1) * 16 + 8]);
-			printf("\t\tIRQ Bitmap for INTC#:");
-			pir_irqs(WORD(p + (i + 1) * 16 + 9));
-			printf("\n");
-			printf("\t\tLink Value for INTD#: %u\n",
-				p[(i + 1) * 16 + 11]);
-			printf("\t\tIRQ Bitmap for INTD#:");
-			pir_irqs(WORD(p + (i + 1) * 16 + 12));
-			printf("\n");
+			pir_link_bitmap('A', p + (i + 1) * 16 + 2);
+			pir_link_bitmap('B', p + (i + 1) * 16 + 5);
+			pir_link_bitmap('C', p + (i + 1) * 16 + 8);
+			pir_link_bitmap('D', p + (i + 1) * 16 + 11);
 		}
 	}
 
