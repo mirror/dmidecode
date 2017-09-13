@@ -35,6 +35,7 @@ enum DMI_VENDORS
 	VENDOR_UNKNOWN,
 	VENDOR_HP,
 	VENDOR_ACER,
+	VENDOR_HPE,
 };
 
 static enum DMI_VENDORS dmi_vendor = VENDOR_UNKNOWN;
@@ -58,12 +59,14 @@ void dmi_set_vendor(const char *s)
 
 	if (strncmp(s, "HP", len) == 0 || strncmp(s, "Hewlett-Packard", len) == 0)
 		dmi_vendor = VENDOR_HP;
+	else if (strncmp(s, "HPE", len) == 0 || strncmp(s, "Hewlett Packard Enterprise", len) == 0)
+		dmi_vendor = VENDOR_HPE;
 	else if (strncmp(s, "Acer", len) == 0)
 		dmi_vendor = VENDOR_ACER;
 }
 
 /*
- * HP-specific data structures are decoded here.
+ * HPE-specific data structures are decoded here.
  *
  * Code contributed by John Cagle and Tyler Bell.
  */
@@ -98,14 +101,15 @@ static int dmi_decode_hp(const struct dmi_header *h)
 	u8 *data = h->data;
 	int nic, ptr;
 	u32 feat;
+	const char *company = (dmi_vendor == VENDOR_HP) ? "HP" : "HPE";
 
 	switch (h->type)
 	{
 		case 204:
 			/*
-			 * Vendor Specific: HP ProLiant System/Rack Locator
+			 * Vendor Specific: HPE ProLiant System/Rack Locator
 			 */
-			printf("HP ProLiant System/Rack Locator\n");
+			printf("%s ProLiant System/Rack Locator\n", company);
 			if (h->length < 0x0B) break;
 			printf("\tRack Name: %s\n", dmi_string(h, data[0x04]));
 			printf("\tEnclosure Name: %s\n", dmi_string(h, data[0x05]));
@@ -119,7 +123,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 		case 209:
 		case 221:
 			/*
-			 * Vendor Specific: HP ProLiant NIC MAC Information
+			 * Vendor Specific: HPE ProLiant NIC MAC Information
 			 *
 			 * This prints the BIOS NIC number,
 			 * PCI bus/device/function, and MAC address
@@ -137,9 +141,10 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *
 			 * Type 221: is deprecated in the latest docs
 			 */
-			printf(h->type == 221 ?
-				"HP BIOS iSCSI NIC PCI and MAC Information\n" :
-				"HP BIOS PXE NIC PCI and MAC Information\n");
+			printf("%s %s\n", company,
+				h->type == 221 ?
+					"BIOS iSCSI NIC PCI and MAC Information" :
+					"BIOS PXE NIC PCI and MAC Information");
 			nic = 1;
 			ptr = 4;
 			while (h->length >= ptr + 8)
@@ -155,7 +160,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 
 		case 233:
 			/*
-			 * Vendor Specific: HP ProLiant NIC MAC Information
+			 * Vendor Specific: HPE ProLiant NIC MAC Information
 			 *
 			 * This prints the BIOS NIC number,
 			 * PCI bus/device/function, and MAC address
@@ -171,7 +176,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *  0x08  |   MAC  | 32B   | MAC addr padded w/ 0s
 			 *  0x28  | Port No| BYTE  | Each NIC maps to a Port
 			 */
-			printf("HP BIOS PXE NIC PCI and MAC Information\n");
+			printf("%s BIOS PXE NIC PCI and MAC Information\n", company);
 			if (h->length < 0x0E) break;
 			/* If the record isn't long enough, we don't have an ID
 			 * use 0xFF to use the internal counter.
@@ -183,11 +188,11 @@ static int dmi_decode_hp(const struct dmi_header *h)
 
 		case 212:
 			/*
-			 * Vendor Specific: HP 64-bit CRU Information
+			 * Vendor Specific: HPE 64-bit CRU Information
 			 *
 			 * Source: hpwdt kernel driver
 			 */
-			printf("HP 64-bit CRU Information\n");
+			printf("%s 64-bit CRU Information\n", company);
 			if (h->length < 0x18) break;
 			printf("\tSignature: 0x%08x", DWORD(data + 0x04));
 			if (is_printable(data + 0x04, 4))
@@ -208,11 +213,11 @@ static int dmi_decode_hp(const struct dmi_header *h)
 
 		case 219:
 			/*
-			 * Vendor Specific: HP ProLiant Information
+			 * Vendor Specific: HPE ProLiant Information
 			 *
 			 * Source: hpwdt kernel driver
 			 */
-			printf("HP ProLiant Information\n");
+			printf("%s ProLiant Information\n", company);
 			if (h->length < 0x08) break;
 			printf("\tPower Features: 0x%08x\n", DWORD(data + 0x04));
 			if (h->length < 0x0C) break;
@@ -281,6 +286,7 @@ int dmi_decode_oem(const struct dmi_header *h)
 	switch (dmi_vendor)
 	{
 		case VENDOR_HP:
+		case VENDOR_HPE:
 			return dmi_decode_hp(h);
 		case VENDOR_ACER:
 			return dmi_decode_acer(h);
