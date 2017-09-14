@@ -33,8 +33,8 @@
 enum DMI_VENDORS
 {
 	VENDOR_UNKNOWN,
-	VENDOR_HP,
 	VENDOR_ACER,
+	VENDOR_HP,
 	VENDOR_HPE,
 };
 
@@ -57,12 +57,54 @@ void dmi_set_vendor(const char *s)
 	while (len && s[len - 1] == ' ')
 		len--;
 
-	if (strncmp(s, "HP", len) == 0 || strncmp(s, "Hewlett-Packard", len) == 0)
+	if (strncmp(s, "Acer", len) == 0)
+		dmi_vendor = VENDOR_ACER;
+	else if (strncmp(s, "HP", len) == 0 || strncmp(s, "Hewlett-Packard", len) == 0)
 		dmi_vendor = VENDOR_HP;
 	else if (strncmp(s, "HPE", len) == 0 || strncmp(s, "Hewlett Packard Enterprise", len) == 0)
 		dmi_vendor = VENDOR_HPE;
-	else if (strncmp(s, "Acer", len) == 0)
-		dmi_vendor = VENDOR_ACER;
+}
+
+/*
+ * Acer-specific data structures are decoded here.
+ */
+
+static int dmi_decode_acer(const struct dmi_header *h)
+{
+	u8 *data = h->data;
+	u16 cap;
+
+	switch (h->type)
+	{
+		case 170:
+			/*
+			 * Vendor Specific: Acer Hotkey Function
+			 *
+			 * Source: acer-wmi kernel driver
+			 *
+			 * Probably applies to some laptop models of other
+			 * brands, including Fujitsu-Siemens, Medion, Lenovo,
+			 * and eMachines.
+			 */
+			printf("Acer Hotkey Function\n");
+			if (h->length < 0x0F) break;
+			cap = WORD(data + 0x04);
+			printf("\tFunction bitmap for Communication Button: 0x%04hx\n", cap);
+			printf("\t\tWiFi: %s\n", cap & 0x0001 ? "Yes" : "No");
+			printf("\t\t3G: %s\n", cap & 0x0040 ? "Yes" : "No");
+			printf("\t\tWiMAX: %s\n", cap & 0x0080 ? "Yes" : "No");
+			printf("\t\tBluetooth: %s\n", cap & 0x0800 ? "Yes" : "No");
+			printf("\tFunction bitmap for Application Button: 0x%04hx\n", WORD(data + 0x06));
+			printf("\tFunction bitmap for Media Button: 0x%04hx\n", WORD(data + 0x08));
+			printf("\tFunction bitmap for Display Button: 0x%04hx\n", WORD(data + 0x0A));
+			printf("\tFunction bitmap for Others Button: 0x%04hx\n", WORD(data + 0x0C));
+			printf("\tCommunication Function Key Number: %d\n", data[0x0E]);
+			break;
+
+		default:
+			return 0;
+	}
+	return 1;
 }
 
 /*
@@ -227,48 +269,6 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			printf("\tMisc. Features: 0x%08x\n", feat);
 			printf("\t\tiCRU: %s\n", feat & 0x0001 ? "Yes" : "No");
 			printf("\t\tUEFI: %s\n", feat & 0x0408 ? "Yes" : "No");
-			break;
-
-		default:
-			return 0;
-	}
-	return 1;
-}
-
-/*
- * Acer-specific data structures are decoded here.
- */
-
-static int dmi_decode_acer(const struct dmi_header *h)
-{
-	u8 *data = h->data;
-	u16 cap;
-
-	switch (h->type)
-	{
-		case 170:
-			/*
-			 * Vendor Specific: Acer Hotkey Function
-			 *
-			 * Source: acer-wmi kernel driver
-			 *
-			 * Probably applies to some laptop models of other
-			 * brands, including Fujitsu-Siemens, Medion, Lenovo,
-			 * and eMachines.
-			 */
-			printf("Acer Hotkey Function\n");
-			if (h->length < 0x0F) break;
-			cap = WORD(data + 0x04);
-			printf("\tFunction bitmap for Communication Button: 0x%04hx\n", cap);
-			printf("\t\tWiFi: %s\n", cap & 0x0001 ? "Yes" : "No");
-			printf("\t\t3G: %s\n", cap & 0x0040 ? "Yes" : "No");
-			printf("\t\tWiMAX: %s\n", cap & 0x0080 ? "Yes" : "No");
-			printf("\t\tBluetooth: %s\n", cap & 0x0800 ? "Yes" : "No");
-			printf("\tFunction bitmap for Application Button: 0x%04hx\n", WORD(data + 0x06));
-			printf("\tFunction bitmap for Media Button: 0x%04hx\n", WORD(data + 0x08));
-			printf("\tFunction bitmap for Display Button: 0x%04hx\n", WORD(data + 0x0A));
-			printf("\tFunction bitmap for Others Button: 0x%04hx\n", WORD(data + 0x0C));
-			printf("\tCommunication Function Key Number: %d\n", data[0x0E]);
 			break;
 
 		default:
