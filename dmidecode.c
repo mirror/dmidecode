@@ -4946,6 +4946,7 @@ static int address_from_efi(off_t *address)
 #elif defined(__FreeBSD__)
 	char addrstr[KENV_MVALLEN + 1];
 #endif
+	const char *eptype;
 	int ret;
 
 	*address = 0; /* Prevent compiler warning */
@@ -4970,9 +4971,7 @@ static int address_from_efi(off_t *address)
 		 || strcmp(linebuf, "SMBIOS") == 0)
 		{
 			*address = strtoull(addrp, NULL, 0);
-			if (!(opt.flags & FLAG_QUIET))
-				printf("# %s entry point at 0x%08llx\n",
-				       linebuf, (unsigned long long)*address);
+			eptype = linebuf;
 			ret = 0;
 			break;
 		}
@@ -4997,14 +4996,16 @@ static int address_from_efi(off_t *address)
 	}
 
 	*address = strtoull(addrstr, NULL, 0);
-	if (!(opt.flags & FLAG_QUIET))
-		printf("# SMBIOS entry point at 0x%08llx\n",
-		    (unsigned long long)*address);
-
+	eptype = "SMBIOS";
 	ret = 0;
 #else
 	ret = EFI_NOT_FOUND;
 #endif
+
+	if (ret == 0 && !(opt.flags & FLAG_QUIET))
+		printf("# %s entry point at 0x%08llx\n",
+		       eptype, (unsigned long long)*address);
+
 	return ret;
 }
 
