@@ -445,11 +445,11 @@ static void dmi_system_uuid(const u8 *p, u16 ver)
 	 * for older versions.
 	 */
 	if (ver >= 0x0206)
-		printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+		printf("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 			p[3], p[2], p[1], p[0], p[5], p[4], p[7], p[6],
 			p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
 	else
-		printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+		printf("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 			p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
 			p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
 }
