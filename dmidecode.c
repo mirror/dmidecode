@@ -4732,6 +4732,7 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 
 		to_dmi_header(&h, data);
 		display = ((opt.type == NULL || opt.type[h.type])
+			&& (opt.handle == ~0U || opt.handle == h.handle)
 			&& !((opt.flags & FLAG_QUIET) && (h.type == 126 || h.type == 127))
 			&& !opt.string);
 
@@ -5144,6 +5145,7 @@ int main(int argc, char * const argv[])
 	/* Set default option values */
 	opt.devmem = DEFAULT_MEM_DEV;
 	opt.flags = 0;
+	opt.handle = ~0U;
 
 	if (parse_command_line(argc, argv)<0)
 	{
