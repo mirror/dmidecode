@@ -113,7 +113,7 @@ static u8 *parse_opt_type(u8 *p, const char *arg)
 		char *next;
 
 		val = strtoul(arg, &next, 0);
-		if (next == arg)
+		if (next == arg || (*next != '\0' && *next != ',' && *next != ' '))
 		{
 			fprintf(stderr, "Invalid type keyword: %s\n", arg);
 			print_opt_type_list();
@@ -228,7 +228,7 @@ static int parse_opt_oem_string(const char *arg)
 		goto done;
 
 	val = strtoul(arg, &next, 10);
-	if (next == arg || val == 0x00 || val > 0xff)
+	if (next == arg  || *next != '\0' || val == 0x00 || val > 0xff)
 	{
 		fprintf(stderr, "Invalid OEM string number: %s\n", arg);
 		return -1;
