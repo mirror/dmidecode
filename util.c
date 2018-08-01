@@ -90,16 +90,16 @@ int checksum(const u8 *buf, size_t len)
 
 /*
  * Reads all of file from given offset, up to max_len bytes.
- * A buffer of max_len bytes is allocated by this function, and
+ * A buffer of at most max_len bytes is allocated by this function, and
  * needs to be freed by the caller.
  * This provides a similar usage model to mem_chunk()
  *
- * Returns pointer to buffer of max_len bytes, or NULL on error, and
+ * Returns a pointer to the allocated buffer, or NULL on error, and
  * sets max_len to the length actually read.
- *
  */
 void *read_file(off_t base, size_t *max_len, const char *filename)
 {
+	struct stat statbuf;
 	int fd;
 	size_t r2 = 0;
 	ssize_t r;
@@ -122,6 +122,15 @@ void *read_file(off_t base, size_t *max_len, const char *filename)
 		perror("lseek");
 		p = NULL;
 		goto out;
+	}
+
+	/*
+	 * Check file size, don't allocate more than can be read.
+	 */
+	if (fstat(fd, &statbuf) == 0)
+	{
+		if (base + (off_t)*max_len > statbuf.st_size)
+			*max_len = statbuf.st_size - base;
 	}
 
 	if ((p = malloc(*max_len)) == NULL)
