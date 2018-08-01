@@ -4754,6 +4754,7 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 			}
 			break;
 		}
+		i++;
 
 		/* In quiet mode, stop decoding at end of table marker */
 		if ((opt.flags & FLAG_QUIET) && h.type == 127)
@@ -4764,6 +4765,22 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 			printf("Handle 0x%04X, DMI type %d, %d bytes\n",
 				h.handle, h.type, h.length);
 
+		/* Look for the next handle */
+		next = data + h.length;
+		while ((unsigned long)(next - buf + 1) < len
+		    && (next[0] != 0 || next[1] != 0))
+			next++;
+		next += 2;
+
+		/* Make sure the whole structure fits in the table */
+		if ((unsigned long)(next - buf) > len)
+		{
+			if (display && !(opt.flags & FLAG_QUIET))
+				printf("\t<TRUNCATED>\n\n");
+			data = next;
+			break;
+		}
+
 		/* assign vendor for vendor-specific decodes later */
 		if (h.type == 1 && h.length >= 5)
 			dmi_set_vendor(dmi_string(&h, data[0x04]));
@@ -4772,33 +4789,21 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 		if (h.type == 34)
 			dmi_fixup_type_34(&h, display);
 
-		/* look for the next handle */
-		next = data + h.length;
-		while ((unsigned long)(next - buf + 1) < len
-		    && (next[0] != 0 || next[1] != 0))
-			next++;
-		next += 2;
 		if (display)
 		{
-			if ((unsigned long)(next - buf) <= len)
+			if (opt.flags & FLAG_DUMP)
 			{
-				if (opt.flags & FLAG_DUMP)
-				{
-					dmi_dump(&h, "\t");
-					printf("\n");
-				}
-				else
-					dmi_decode(&h, ver);
+				dmi_dump(&h, "\t");
+				printf("\n");
 			}
-			else if (!(opt.flags & FLAG_QUIET))
-				printf("\t<TRUNCATED>\n\n");
+			else
+				dmi_decode(&h, ver);
 		}
 		else if (opt.string != NULL
 		      && opt.string->type == h.type)
 			dmi_table_string(&h, data, ver);
 
 		data = next;
-		i++;
 
 		/* SMBIOS v3 requires stopping at this marker */
 		if (h.type == 127 && (flags & FLAG_STOP_AT_EOT))
