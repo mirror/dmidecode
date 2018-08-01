@@ -4928,6 +4928,15 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 	u32 ver;
 	u64 offset;
 
+	/* Don't let checksum run beyond the buffer */
+	if (buf[0x06] > 0x20)
+	{
+		fprintf(stderr,
+			"Entry point length too large (%u bytes, expected %u).\n",
+			(unsigned int)buf[0x06], 0x18U);
+		return 0;
+	}
+
 	if (!checksum(buf, buf[0x06]))
 		return 0;
 
@@ -4965,6 +4974,15 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
 {
 	u16 ver;
+
+	/* Don't let checksum run beyond the buffer */
+	if (buf[0x05] > 0x20)
+	{
+		fprintf(stderr,
+			"Entry point length too large (%u bytes, expected %u).\n",
+			(unsigned int)buf[0x05], 0x1FU);
+		return 0;
+	}
 
 	if (!checksum(buf, buf[0x05])
 	 || memcmp(buf + 0x10, "_DMI_", 5) != 0
