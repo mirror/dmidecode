@@ -112,14 +112,6 @@ void *read_file(off_t base, size_t *max_len, const char *filename)
 		return NULL;
 	}
 
-	if (lseek(fd, base, SEEK_SET) == -1)
-	{
-		fprintf(stderr, "%s: ", filename);
-		perror("lseek");
-		p = NULL;
-		goto out;
-	}
-
 	/*
 	 * Check file size, don't allocate more than can be read.
 	 */
@@ -135,14 +127,23 @@ void *read_file(off_t base, size_t *max_len, const char *filename)
 		goto out;
 	}
 
+	if (lseek(fd, base, SEEK_SET) == -1)
+	{
+		fprintf(stderr, "%s: ", filename);
+		perror("lseek");
+		goto err_free;
+	}
+
 	if (myread(fd, p, *max_len, filename) == 0)
 		goto out;
 
+err_free:
 	free(p);
 	p = NULL;
 
 out:
-	close(fd);
+	if (close(fd) == -1)
+		perror(filename);
 
 	return p;
 }
