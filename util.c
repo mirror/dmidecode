@@ -99,8 +99,6 @@ void *read_file(off_t base, size_t *max_len, const char *filename)
 {
 	struct stat statbuf;
 	int fd;
-	size_t r2 = 0;
-	ssize_t r;
 	u8 *p;
 
 	/*
@@ -137,25 +135,12 @@ void *read_file(off_t base, size_t *max_len, const char *filename)
 		goto out;
 	}
 
-	do
-	{
-		r = read(fd, p + r2, *max_len - r2);
-		if (r == -1)
-		{
-			if (errno != EINTR)
-			{
-				perror(filename);
-				free(p);
-				p = NULL;
-				goto out;
-			}
-		}
-		else
-			r2 += r;
-	}
-	while (r != 0);
+	if (myread(fd, p, *max_len, filename) == 0)
+		goto out;
 
-	*max_len = r2;
+	free(p);
+	p = NULL;
+
 out:
 	close(fd);
 
