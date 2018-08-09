@@ -59,7 +59,6 @@ static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 		{
 			if (errno != EINTR)
 			{
-				close(fd);
 				perror(prefix);
 				return -1;
 			}
@@ -70,7 +69,6 @@ static int myread(int fd, u8 *buf, size_t count, const char *prefix)
 
 	if (r2 != count)
 	{
-		close(fd);
 		fprintf(stderr, "%s: Unexpected end of file\n", prefix);
 		return -1;
 	}
