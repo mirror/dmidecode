@@ -2,7 +2,7 @@
  * Common "util" functions
  * This file is part of the dmidecode project.
  *
- *   Copyright (C) 2002-2017 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2002-2018 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -117,7 +117,14 @@ void *read_file(off_t base, size_t *max_len, const char *filename)
 	 */
 	if (fstat(fd, &statbuf) == 0)
 	{
-		if (base + (off_t)*max_len > statbuf.st_size)
+		if (base >= statbuf.st_size)
+		{
+			fprintf(stderr, "%s: Can't read data beyond EOF\n",
+				filename);
+			p = NULL;
+			goto out;
+		}
+		if (*max_len > (size_t)statbuf.st_size - base)
 			*max_len = statbuf.st_size - base;
 	}
 
