@@ -2,7 +2,7 @@
  * DMI Decode
  *
  *   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   Copyright (C) 2002-2017 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2002-2018 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
  *   are deemed to be part of the source code.
  *
  * Unless specified otherwise, all references are aimed at the "System
- * Management BIOS Reference Specification, Version 3.1.1" document,
+ * Management BIOS Reference Specification, Version 3.2.0" document,
  * available from http://www.dmtf.org/standards/smbios.
  *
  * Note to contributors:
@@ -83,7 +83,7 @@
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
-#define SUPPORTED_SMBIOS_VER 0x030101
+#define SUPPORTED_SMBIOS_VER 0x030200
 
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
 #define FLAG_STOP_AT_EOT        (1 << 1)
@@ -886,6 +886,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0xCC, "z/Architecture" },
 		{ 0xCD, "Core i5" },
 		{ 0xCE, "Core i3" },
+		{ 0xCF, "Core i9" },
 
 		{ 0xD2, "C7-M" },
 		{ 0xD3, "C7-D" },
@@ -1093,7 +1094,7 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 	      || (type >= 0xA1 && type <= 0xB3) /* Intel */
 	      || type == 0xB5 /* Intel */
 	      || (type >= 0xB9 && type <= 0xC7) /* Intel */
-	      || (type >= 0xCD && type <= 0xCE) /* Intel */
+	      || (type >= 0xCD && type <= 0xCF) /* Intel */
 	      || (type >= 0xD2 && type <= 0xDB) /* VIA, Intel */
 	      || (type >= 0xDD && type <= 0xE0)) /* Intel */
 		sig = 1;
@@ -1277,10 +1278,14 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket BGA1515",
 		"Socket LGA3647-1",
 		"Socket SP3",
-		"Socket SP3r2" /* 0x38 */
+		"Socket SP3r2",
+		"Socket LGA2066",
+		"Socket BGA1392",
+		"Socket BGA1510",
+		"Socket BGA1528" /* 0x3C */
 	};
 
-	if (code >= 0x01 && code <= 0x38)
+	if (code >= 0x01 && code <= 0x3C)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }
@@ -1693,7 +1698,8 @@ static const char *dmi_port_connector_type(u8 code)
 		"Mini Jack (headphones)",
 		"BNC",
 		"IEEE 1394",
-		"SAS/SATA Plug Receptacle" /* 0x22 */
+		"SAS/SATA Plug Receptacle",
+		"USB Type-C Receptacle" /* 0x23 */
 	};
 	static const char *type_0xA0[] = {
 		"PC-98", /* 0xA0 */
@@ -1703,7 +1709,7 @@ static const char *dmi_port_connector_type(u8 code)
 		"PC-98 Full" /* 0xA4 */
 	};
 
-	if (code <= 0x22)
+	if (code <= 0x23)
 		return type[code];
 	if (code >= 0xA0 && code <= 0xA4)
 		return type_0xA0[code - 0xA0];
@@ -1878,10 +1884,11 @@ static const char *dmi_slot_current_usage(u8 code)
 		"Other", /* 0x01 */
 		"Unknown",
 		"Available",
-		"In Use" /* 0x04 */
+		"In Use",
+		"Unavailable" /* 0x05 */
 	};
 
-	if (code >= 0x01 && code <= 0x04)
+	if (code >= 0x01 && code <= 0x05)
 		return usage[code - 0x01];
 	return out_of_spec;
 }
@@ -1966,7 +1973,8 @@ static void dmi_slot_characteristics(u8 code1, u8 code2, const char *prefix)
 	static const char *characteristics2[] = {
 		"PME signal is supported", /* 0 */
 		"Hot-plug devices are supported",
-		"SMBus signal is supported" /* 2 */
+		"SMBus signal is supported",
+		"PCIe slot bifurcation is supported" /* 3 */
 	};
 
 	if (code1 & (1 << 0))
@@ -1981,7 +1989,7 @@ static void dmi_slot_characteristics(u8 code1, u8 code2, const char *prefix)
 		for (i = 1; i <= 7; i++)
 			if (code1 & (1 << i))
 				printf("%s%s\n", prefix, characteristics1[i - 1]);
-		for (i = 0; i <= 2; i++)
+		for (i = 0; i <= 3; i++)
 			if (code2 & (1 << i))
 				printf("%s%s\n", prefix, characteristics2[i]);
 	}
@@ -4338,7 +4346,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				printf("%u", data[0x1B] & 0x0F);
 			printf("\n");
 			if (h->length < 0x22) break;
-			printf("\tConfigured Clock Speed:");
+			printf("\tConfigured Memory Speed:");
 			dmi_memory_device_speed(WORD(data + 0x20));
 			printf("\n");
 			if (h->length < 0x28) break;
