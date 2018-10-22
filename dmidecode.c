@@ -3609,7 +3609,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 		hname = out_of_spec;
 		hlen = strlen(out_of_spec);
 	}
-	printf("%s\t\tRedfish Service Hostname: %*s\n", prefix, hlen, hname);
+	printf("%s\t\tRedfish Service Hostname: %.*s\n", prefix, hlen, hname);
 }
 
 /*
