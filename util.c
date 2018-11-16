@@ -155,6 +155,18 @@ out:
 	return p;
 }
 
+static void safe_memcpy(void *dest, const void *src, size_t n)
+{
+#ifdef USE_SLOW_MEMCPY
+	size_t i;
+
+	for (i = 0; i < n; i++)
+		*((u8 *)dest + i) = *((const u8 *)src + i);
+#else
+	memcpy(dest, src, n);
+#endif
+}
+
 /*
  * Copy a physical memory chunk into a memory buffer.
  * This function allocates memory.
@@ -214,7 +226,7 @@ void *mem_chunk(off_t base, size_t len, const char *devmem)
 	if (mmp == MAP_FAILED)
 		goto try_read;
 
-	memcpy(p, (u8 *)mmp + mmoffset, len);
+	safe_memcpy(p, (u8 *)mmp + mmoffset, len);
 
 	if (munmap(mmp, mmoffset + len) == -1)
 	{
