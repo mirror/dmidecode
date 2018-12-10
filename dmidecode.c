@@ -1569,6 +1569,8 @@ static void dmi_cache_size_2(u32 code)
 		else
 			printf(" %u kB", code << 6);
 	}
+	else if (code & 0x8000)
+                printf(" %u kB", (code & 0x7FFF) << 6);
 	else
 		printf(" %u kB", code);
 }
