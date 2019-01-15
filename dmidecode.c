@@ -1550,14 +1550,6 @@ static const char *dmi_cache_location(u8 code)
 	return location[code];
 }
 
-static void dmi_cache_size(u16 code)
-{
-	if (code & 0x8000)
-		printf(" %u kB", (code & 0x7FFF) << 6);
-	else
-		printf(" %u kB", code);
-}
-
 static void dmi_cache_size_2(u32 code)
 {
 	u64 size;
@@ -1576,6 +1568,11 @@ static void dmi_cache_size_2(u32 code)
 
 	/* Use a more convenient unit for large cache size */
 	dmi_print_memory_size(size, 1);
+}
+
+static void dmi_cache_size(u16 code)
+{
+	dmi_cache_size_2((((u32)code & 0x8000LU) << 16) | (code & 0x7FFFLU));
 }
 
 static void dmi_cache_types(u16 code, const char *sep)
