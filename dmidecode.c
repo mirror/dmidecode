@@ -1560,17 +1560,22 @@ static void dmi_cache_size(u16 code)
 
 static void dmi_cache_size_2(u32 code)
 {
+	u64 size;
+
 	if (code & 0x80000000)
 	{
 		code &= 0x7FFFFFFFLU;
-		/* Use a more convenient unit for large cache size */
-		if (code >= 0x8000)
-			printf(" %u MB", code >> 4);
-		else
-			printf(" %u kB", code << 6);
+		size.l = code << 6;
+		size.h = code >> 26;
 	}
 	else
-		printf(" %u kB", code);
+	{
+		size.l = code;
+		size.h = 0;
+	}
+
+	/* Use a more convenient unit for large cache size */
+	dmi_print_memory_size(size, 1);
 }
 
 static void dmi_cache_types(u16 code, const char *sep)
