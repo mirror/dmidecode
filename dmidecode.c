@@ -2471,10 +2471,11 @@ static const char *dmi_memory_device_type(u8 code)
 		"LPDDR",
 		"LPDDR2",
 		"LPDDR3",
-		"LPDDR4" /* 0x1E */
+		"LPDDR4",
+		"Logical non-volatile device" /* 0x1F */
 	};
 
-	if (code >= 0x01 && code <= 0x1E)
+	if (code >= 0x01 && code <= 0x1F)
 		return type[code - 0x01];
 	return out_of_spec;
 }
