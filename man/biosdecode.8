@@ -1,10 +1,12 @@
 .TH BIOSDECODE 8 "February 2007" "dmidecode"
+.\"
 .SH NAME
 biosdecode \- \s-1BIOS\s0 information decoder
+.\"
 .SH SYNOPSIS
 .B biosdecode
 .RB [ OPTIONS ]
-
+.\"
 .SH DESCRIPTION
 .B biosdecode
 parses the \s-1BIOS\s0 memory and prints information about all structures (or
@@ -54,7 +56,7 @@ started its life as a part of
 .B dmidecode
 but as more entry point types were added, it was moved to a different
 program.
-
+.\"
 .SH OPTIONS
 .TP
 .BR "-d" ", " "--dev-mem FILE"
@@ -68,17 +70,20 @@ Display usage information and exit
 .TP
 .BR "-V" ", " "--version"
 Display the version and exit
-
+.\"
 .SH FILES
 .I /dev/mem
+.\"
 .SH BUGS
 Most of the time,
 .B biosdecode
 prints too much information (you don't really care about addresses)
 or not enough (because it doesn't follow pointers and has no lookup
 tables).
+.\"
 .SH AUTHORS
 Alan Cox, Jean Delvare
+.\"
 .SH "SEE ALSO"
 .BR dmidecode (8),
 .BR mem (4),

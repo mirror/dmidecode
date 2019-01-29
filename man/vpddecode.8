@@ -1,10 +1,12 @@
 .TH VPDDECODE 8 "February 2007" "dmidecode"
+.\"
 .SH NAME
 vpddecode \- \s-1VPD\s0 structure decoder
+.\"
 .SH SYNOPSIS
 .B vpddecode
 .RB [ OPTIONS ]
-
+.\"
 .SH DESCRIPTION
 .B vpddecode
 prints the "vital product data" information that can be found in almost
@@ -17,19 +19,17 @@ Box Serial Number
 Motherboard Serial Number
 .IP \(bu
 Machine Type/Model
-
 .PP
 Some systems have these additional items:
 .IP \(bu "\w'\(bu'u+1n"
 BIOS Release Date
 .IP \(bu
 Default Flash Image File Name
-
 .PP
 Note that these additional items are not documented by IBM, so this is
 guess work, and as such should not be blindly trusted. Feedback about
 the accuracy of these labels is welcome.
-
+.\"
 .SH OPTIONS
 .TP
 .BR "-d" ", " "--dev-mem FILE"
@@ -62,11 +62,13 @@ Display usage information and exit
 .TP
 .BR "-V" ", " "--version"
 Display the version and exit
-
+.\"
 .SH FILES
 .I /dev/mem
+.\"
 .SH AUTHOR
 Jean Delvare
+.\"
 .SH "SEE ALSO"
 .BR biosdecode (8),
 .BR dmidecode (8),
