@@ -162,6 +162,7 @@ static const struct string_keyword opt_string_keyword[] = {
 	{ "baseboard-version", 2, 0x06 },
 	{ "baseboard-serial-number", 2, 0x07 },
 	{ "baseboard-asset-tag", 2, 0x08 },
+	{ "baseboard-location-in-chassis", 2, 0x0A },
 	{ "chassis-manufacturer", 3, 0x04 },
 	{ "chassis-type", 3, 0x05 },            /* dmi_chassis_type() */
 	{ "chassis-version", 3, 0x06 },
