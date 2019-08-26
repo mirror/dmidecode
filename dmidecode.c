@@ -2,7 +2,7 @@
  * DMI Decode
  *
  *   Copyright (C) 2000-2002 Alan Cox <alan@redhat.com>
- *   Copyright (C) 2002-2018 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2002-2019 Jean Delvare <jdelvare@suse.de>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -5538,7 +5538,7 @@ int main(int argc, char * const argv[])
 	off_t fp;
 	size_t size;
 	int efi;
-	u8 *buf;
+	u8 *buf = NULL;
 
 	/*
 	 * We don't want stdout and stderr to be mixed up if both are
@@ -5642,7 +5642,7 @@ int main(int argc, char * const argv[])
 			printf("Failed to get SMBIOS data from sysfs.\n");
 	}
 
-	/* Next try EFI (ia64, Intel-based Mac) */
+	/* Next try EFI (ia64, Intel-based Mac, arm64) */
 	efi = address_from_efi(&fp);
 	switch (efi)
 	{
@@ -5675,6 +5675,7 @@ int main(int argc, char * const argv[])
 	goto done;
 
 memory_scan:
+#if defined __i386__ || defined __x86_64__
 	if (!(opt.flags & FLAG_QUIET))
 		printf("Scanning %s for entry point.\n", opt.devmem);
 	/* Fallback to memory scan (x86, x86_64) */
@@ -5717,6 +5718,7 @@ memory_scan:
 			}
 		}
 	}
+#endif
 
 done:
 	if (!found && !(opt.flags & FLAG_QUIET))
