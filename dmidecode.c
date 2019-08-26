@@ -4997,7 +4997,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			printf("\tVendor ID:");
 			dmi_tpm_vendor_id(data + 0x04);
 			printf("\n");
-			printf("\tSpecification Version: %d.%d", data[0x08], data[0x09]);
+			printf("\tSpecification Version: %d.%d\n", data[0x08], data[0x09]);
 			switch (data[0x08])
 			{
 				case 0x01:
@@ -5020,7 +5020,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					 */
 					break;
 			}
-			printf("\tDescription: %s", dmi_string(h, data[0x12]));
+			printf("\tDescription: %s\n", dmi_string(h, data[0x12]));
 			printf("\tCharacteristics:\n");
 			dmi_tpm_characteristics(QWORD(data + 0x13), "\t\t");
 			if (h->length < 0x1F) break;
