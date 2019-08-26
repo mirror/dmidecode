@@ -318,7 +318,10 @@ static void dmi_bios_rom_size(u8 code1, u16 code2)
 	};
 
 	if (code1 != 0xFF)
-		printf(" %u kB", (code1 + 1) << 6);
+	{
+		u64 s = { .l = (code1 + 1) << 6 };
+		dmi_print_memory_size(s, 1);
+	}
 	else
 		printf(" %u %s", code2 & 0x3FFF, unit[code2 >> 14]);
 }
@@ -2372,10 +2375,10 @@ static void dmi_memory_device_size(u16 code)
 		printf(" Unknown");
 	else
 	{
-		if (code & 0x8000)
-			printf(" %u kB", code & 0x7FFF);
-		else
-			printf(" %u MB", code);
+		u64 s = { .l = code & 0x7FFF };
+		if (!(code & 0x8000))
+			s.l <<= 10;
+		dmi_print_memory_size(s, 1);
 	}
 }
 
