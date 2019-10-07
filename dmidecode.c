@@ -5086,6 +5086,10 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 			if (data[key - 1] != 0xFF && data[key] != 0xFF)
 				printf("%u.%u\n", data[key - 1], data[key]);
 			break;
+		case 0x017: /* -s firmware-revision */
+			if (data[key - 1] != 0xFF && data[key] != 0xFF)
+				printf("%u.%u\n", data[key - 1], data[key]);
+			break;
 		case 0x108:
 			dmi_system_uuid(data + offset, ver);
 			printf("\n");
