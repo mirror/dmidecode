@@ -151,6 +151,7 @@ static const struct string_keyword opt_string_keyword[] = {
 	{ "bios-vendor", 0, 0x04 },
 	{ "bios-version", 0, 0x05 },
 	{ "bios-release-date", 0, 0x08 },
+	{ "bios-revision", 0, 0x15 },		/* 0x14 and 0x15 */
 	{ "system-manufacturer", 1, 0x04 },
 	{ "system-product-name", 1, 0x05 },
 	{ "system-version", 1, 0x06 },
