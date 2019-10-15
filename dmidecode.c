@@ -1906,10 +1906,12 @@ static const char *dmi_slot_length(u8 code)
 		"Other", /* 0x01 */
 		"Unknown",
 		"Short",
-		"Long" /* 0x04 */
+		"Long",
+		"2.5\" drive form factor",
+		"3.5\" drive form factor" /* 0x06 */
 	};
 
-	if (code >= 0x01 && code <= 0x04)
+	if (code >= 0x01 && code <= 0x06)
 		return length[code - 0x01];
 	return out_of_spec;
 }
