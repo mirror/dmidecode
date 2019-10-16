@@ -1901,7 +1901,7 @@ static const char *dmi_slot_current_usage(u8 code)
 
 static const char *dmi_slot_length(u8 code)
 {
-	/* 7.1O.4 */
+	/* 7.10.4 */
 	static const char *length[] = {
 		"Other", /* 0x01 */
 		"Unknown",
