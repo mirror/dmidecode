@@ -2033,6 +2033,16 @@ static void dmi_slot_segment_bus_func(u16 code1, u8 code2, u8 code3, const char 
 		       prefix, code1, code2, code3 >> 3, code3 & 0x7);
 }
 
+static void dmi_slot_peers(u8 n, const u8 *data, const char *prefix)
+{
+	int i;
+
+	for (i = 1; i <= n; i++, data += 5)
+		printf("%sPeer Device %d: %04x:%02x:%02x.%x (Width %u)\n",
+		       prefix, i, WORD(data), data[2], data[3] >> 3,
+		       data[3] & 0x07, data[4]);
+}
+
 /*
  * 7.11 On Board Devices Information (Type 10)
  */
@@ -4213,6 +4223,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_slot_characteristics(data[0x0B], data[0x0C], "\t\t");
 			if (h->length < 0x11) break;
 			dmi_slot_segment_bus_func(WORD(data + 0x0D), data[0x0F], data[0x10], "\t");
+			if (h->length < 0x13) break;
+			printf("\tData Bus Width: %u\n", data[0x11]);
+			printf("\tPeer Devices: %u\n", data[0x12]);
+			if (h->length - 0x13 >= data[0x12] * 5)
+				dmi_slot_peers(data[0x12], data + 0x13, "\t");
 			break;
 
 		case 10: /* 7.11 On Board Devices Information */
