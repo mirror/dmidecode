@@ -936,6 +936,10 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x140, "WinChip" },
 		{ 0x15E, "DSP" },
 		{ 0x1F4, "Video Processor" },
+
+		{ 0x200, "RV32" },
+		{ 0x201, "RV64" },
+		{ 0x202, "RV128" },
 	};
 	/*
 	 * Note to developers: when adding entries to this list, check if
@@ -1821,6 +1825,9 @@ static const char *dmi_slot_type(u8 code)
 		"PCI Express Mini 52-pin without bottom-side keep-outs",
 		"PCI Express Mini 76-pin" /* 0x23 */
 	};
+	static const char *type_0x30[] = {
+		"CXL FLexbus 1.0" /* 0x30 */
+	};
 	static const char *type_0xA0[] = {
 		"PC-98/C20", /* 0xA0 */
 		"PC-98/C24",
@@ -1844,7 +1851,14 @@ static const char *dmi_slot_type(u8 code)
 		"PCI Express 3 x2",
 		"PCI Express 3 x4",
 		"PCI Express 3 x8",
-		"PCI Express 3 x16" /* 0xB6 */
+		"PCI Express 3 x16",
+		out_of_spec, /* 0xB7 */
+		"PCI Express 4",
+		"PCI Express 4 x1",
+		"PCI Express 4 x2",
+		"PCI Express 4 x4",
+		"PCI Express 4 x8",
+		"PCI Express 4 x16" /* 0xBD */
 	};
 	/*
 	 * Note to developers: when adding entries to these lists, check if
@@ -1853,7 +1867,9 @@ static const char *dmi_slot_type(u8 code)
 
 	if (code >= 0x01 && code <= 0x23)
 		return type[code - 0x01];
-	if (code >= 0xA0 && code <= 0xB6)
+	if (code == 0x30)
+		return type_0x30[code - 0x30];
+	if (code >= 0xA0 && code <= 0xBD)
 		return type_0xA0[code - 0xA0];
 	return out_of_spec;
 }
@@ -1957,6 +1973,12 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
 		case 0xB4: /* PCI Express 3 */
 		case 0xB5: /* PCI Express 3 */
 		case 0xB6: /* PCI Express 3 */
+		case 0xB8: /* PCI Express 4 */
+		case 0xB9: /* PCI Express 4 */
+		case 0xBA: /* PCI Express 4 */
+		case 0xBB: /* PCI Express 4 */
+		case 0xBC: /* PCI Express 4 */
+		case 0xBD: /* PCI Express 4 */
 			printf("%sID: %u\n", prefix, code1);
 			break;
 		case 0x07: /* PCMCIA */
@@ -2298,12 +2320,13 @@ static const char *dmi_memory_array_location(u8 code)
 		"PC-98/C20 Add-on Card", /* 0xA0 */
 		"PC-98/C24 Add-on Card",
 		"PC-98/E Add-on Card",
-		"PC-98/Local Bus Add-on Card" /* 0xA3 */
+		"PC-98/Local Bus Add-on Card",
+		"CXL Flexbus 1.0" /* 0xA4 */
 	};
 
 	if (code >= 0x01 && code <= 0x0A)
 		return location[code - 0x01];
-	if (code >= 0xA0 && code <= 0xA3)
+	if (code >= 0xA0 && code <= 0xA4)
 		return location_0xA0[code - 0xA0];
 	return out_of_spec;
 }
@@ -2426,10 +2449,11 @@ static const char *dmi_memory_device_form_factor(u8 code)
 		"RIMM",
 		"SODIMM",
 		"SRIMM",
-		"FB-DIMM" /* 0x0F */
+		"FB-DIMM",
+		"Die" /* 0x10 */
 	};
 
-	if (code >= 0x01 && code <= 0x0F)
+	if (code >= 0x01 && code <= 0x10)
 		return form_factor[code - 0x01];
 	return out_of_spec;
 }
@@ -2478,10 +2502,12 @@ static const char *dmi_memory_device_type(u8 code)
 		"LPDDR2",
 		"LPDDR3",
 		"LPDDR4",
-		"Logical non-volatile device" /* 0x1F */
+		"Logical non-volatile device",
+		"HBM",
+		"HBM2" /* 0x21 */
 	};
 
-	if (code >= 0x01 && code <= 0x1F)
+	if (code >= 0x01 && code <= 0x21)
 		return type[code - 0x01];
 	return out_of_spec;
 }
@@ -2537,7 +2563,7 @@ static void dmi_memory_technology(u8 code)
 		"NVDIMM-N",
 		"NVDIMM-F",
 		"NVDIMM-P",
-		"Intel persistent memory" /* 0x07 */
+		"Intel Optane DC persistent memory" /* 0x07 */
 	};
 	if (code >= 0x01 && code <= 0x07)
 		printf(" %s", technology[code - 0x01]);
