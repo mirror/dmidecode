@@ -109,13 +109,19 @@ int is_printable(const u8 *data, int len)
 	return 1;
 }
 
-const char *dmi_string(const struct dmi_header *dm, u8 s)
+/* Replace non-ASCII characters with dots */
+static void ascii_filter(char *bp, size_t len)
+{
+	size_t i;
+
+	for (i = 0; i < len; i++)
+		if (bp[i] < 32 || bp[i] == 127)
+			bp[i] = '.';
+}
+
+static char *_dmi_string(const struct dmi_header *dm, u8 s, int filter)
 {
 	char *bp = (char *)dm->data;
-	size_t i, len;
-
-	if (s == 0)
-		return "Not Specified";
 
 	bp += dm->length;
 	while (s > 1 && *bp)
@@ -126,16 +132,24 @@ const char *dmi_string(const struct dmi_header *dm, u8 s)
 	}
 
 	if (!*bp)
-		return bad_index;
+		return NULL;
 
-	if (!(opt.flags & FLAG_DUMP))
-	{
-		/* ASCII filtering */
-		len = strlen(bp);
-		for (i = 0; i < len; i++)
-			if (bp[i] < 32 || bp[i] == 127)
-				bp[i] = '.';
-	}
+	if (filter)
+		ascii_filter(bp, strlen(bp));
+
+	return bp;
+}
+
+const char *dmi_string(const struct dmi_header *dm, u8 s)
+{
+	char *bp;
+
+	if (s == 0)
+		return "Not Specified";
+
+	bp = _dmi_string(dm, s, 1);
+	if (bp == NULL)
+		return bad_index;
 
 	return bp;
 }
@@ -208,7 +222,7 @@ static int dmi_bcd_range(u8 value, u8 low, u8 high)
 static void dmi_dump(const struct dmi_header *h, const char *prefix)
 {
 	int row, i;
-	const char *s;
+	char *s;
 
 	printf("%sHeader and Data:\n", prefix);
 	for (row = 0; row < ((h->length - 1) >> 4) + 1; row++)
@@ -224,7 +238,7 @@ static void dmi_dump(const struct dmi_header *h, const char *prefix)
 	{
 		printf("%sStrings:\n", prefix);
 		i = 1;
-		while ((s = dmi_string(h, i++)) != bad_index)
+		while ((s = _dmi_string(h, i++, !(opt.flags & FLAG_DUMP))))
 		{
 			if (opt.flags & FLAG_DUMP)
 			{
@@ -238,19 +252,9 @@ static void dmi_dump(const struct dmi_header *h, const char *prefix)
 					printf("\n");
 				}
 				/* String isn't filtered yet so do it now */
-				printf("%s\t\"", prefix);
-				while (*s)
-				{
-					if (*s < 32 || *s == 127)
-						fputc('.', stdout);
-					else
-						fputc(*s, stdout);
-					s++;
-				}
-				printf("\"\n");
+				ascii_filter(s, l - 1);
 			}
-			else
-				printf("%s\t%s\n", prefix, s);
+			printf("%s\t%s\n", prefix, s);
 		}
 	}
 }
