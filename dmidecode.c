@@ -3545,7 +3545,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	/* DSP0270: 8.5: Protocol Record Data */
 	rdata = &rec[0x2];
 
-	printf("%s\tProtocol ID: %02x (%s)\n", prefix, rid,
+	printf("%sProtocol ID: %02x (%s)\n", prefix, rid,
 		dmi_protocol_record_type(rid));
 
 	/*
@@ -3575,7 +3575,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	 * endianess of the field is always little after version 2.6.0
 	 * we can just pick a sufficiently recent version here.
 	 */
-	printf("%s\t\tService UUID: ", prefix);
+	printf("%s\tService UUID: ", prefix);
 	dmi_system_uuid(&rdata[0], 0x311);
 	printf("\n");
 
@@ -3585,13 +3585,13 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	 * uses decimal, so as to make it more comparable
 	 */
 	assign_val = rdata[16];
-	printf("%s\t\tHost IP Assignment Type: %s\n", prefix,
+	printf("%s\tHost IP Assignment Type: %s\n", prefix,
 		dmi_protocol_assignment_type(assign_val));
 
 	/* DSP0270: 8.6: Redfish Over IP Host Address format */
 	addrtype = rdata[17];
 	addrstr = dmi_address_type(addrtype);
-	printf("%s\t\tHost IP Address Format: %s\n", prefix,
+	printf("%s\tHost IP Address Format: %s\n", prefix,
 		addrstr);
 
 	/* DSP0270: 8.6 IP Assignment types */
@@ -3599,24 +3599,24 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	if (assign_val == 0x1 || assign_val == 0x3)
 	{
 		/* DSP0270: 8.6: the Host IPv[4|6] Address */
-		printf("%s\t\t%s Address: %s\n", prefix, addrstr,
+		printf("%s\t%s Address: %s\n", prefix, addrstr,
 			dmi_address_decode(&rdata[18], buf, addrtype));
 
 		/* DSP0270: 8.6: Prints the Host IPv[4|6] Mask */
-		printf("%s\t\t%s Mask: %s\n", prefix, addrstr,
+		printf("%s\t%s Mask: %s\n", prefix, addrstr,
 			dmi_address_decode(&rdata[34], buf, addrtype));
 	}
 
 	/* DSP0270: 8.6: Get the Redfish Service IP Discovery Type */
 	assign_val = rdata[50];
 	/* Redfish Service IP Discovery type mirrors Host IP Assignment type */
-	printf("%s\t\tRedfish Service IP Discovery Type: %s\n", prefix,
+	printf("%s\tRedfish Service IP Discovery Type: %s\n", prefix,
 		dmi_protocol_assignment_type(assign_val));
 
 	/* DSP0270: 8.6: Get the Redfish Service IP Address Format */
 	addrtype = rdata[51];
 	addrstr = dmi_address_type(addrtype);
-	printf("%s\t\tRedfish Service IP Address Format: %s\n", prefix,
+	printf("%s\tRedfish Service IP Address Format: %s\n", prefix,
 		addrstr);
 
 	if (assign_val == 0x1 || assign_val == 0x3)
@@ -3625,20 +3625,20 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 		u32 vlan;
 
 		/* DSP0270: 8.6: Prints the Redfish IPv[4|6] Service Address */
-		printf("%s\t\t%s Redfish Service Address: %s\n", prefix,
+		printf("%s\t%s Redfish Service Address: %s\n", prefix,
 			addrstr, dmi_address_decode(&rdata[52], buf,
 			addrtype));
 
 		/* DSP0270: 8.6: Prints the Redfish IPv[4|6] Service Mask */
-		printf("%s\t\t%s Redfish Service Mask: %s\n", prefix,
+		printf("%s\t%s Redfish Service Mask: %s\n", prefix,
 			addrstr, dmi_address_decode(&rdata[68], buf,
 			addrtype));
 
 		/* DSP0270: 8.6: Redfish vlan and port info */
 		port = WORD(&rdata[84]);
 		vlan = DWORD(&rdata[86]);
-		printf("%s\t\tRedfish Service Port: %hu\n", prefix, port);
-		printf("%s\t\tRedfish Service Vlan: %u\n", prefix, vlan);
+		printf("%s\tRedfish Service Port: %hu\n", prefix, port);
+		printf("%s\tRedfish Service Vlan: %u\n", prefix, vlan);
 	}
 
 	/* DSP0270: 8.6: Redfish host length and name */
@@ -3655,7 +3655,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 		hname = out_of_spec;
 		hlen = strlen(out_of_spec);
 	}
-	printf("%s\t\tRedfish Service Hostname: %.*s\n", prefix, hlen, hname);
+	printf("%s\tRedfish Service Hostname: %.*s\n", prefix, hlen, hname);
 }
 
 /*
@@ -3728,10 +3728,10 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 			/* USB Device Type - need at least 6 bytes */
 			u8 *usbdata = &data[0x7];
 			/* USB Device Descriptor: idVendor */
-			printf("%s\tidVendor: 0x%04x\n", prefix,
+			printf("%sidVendor: 0x%04x\n", prefix,
 				WORD(&usbdata[0x0]));
 			/* USB Device Descriptor: idProduct */
-			printf("%s\tidProduct: 0x%04x\n", prefix,
+			printf("%sidProduct: 0x%04x\n", prefix,
 				WORD(&usbdata[0x2]));
 			/*
 			 * USB Serial number is here, but its useless, don't
@@ -3743,16 +3743,16 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 			/* PCI Device Type - Need at least 8 bytes */
 			u8 *pcidata = &data[0x7];
 			/* PCI Device Descriptor: VendorID */
-			printf("%s\tVendorID: 0x%04x\n", prefix,
+			printf("%sVendorID: 0x%04x\n", prefix,
 				WORD(&pcidata[0x0]));
 			/* PCI Device Descriptor: DeviceID */
-			printf("%s\tDeviceID: 0x%04x\n", prefix,
+			printf("%sDeviceID: 0x%04x\n", prefix,
 				WORD(&pcidata[0x2]));
 			/* PCI Device Descriptor: PCI SubvendorID */
-			printf("%s\tSubVendorID: 0x%04x\n", prefix,
+			printf("%sSubVendorID: 0x%04x\n", prefix,
 				WORD(&pcidata[0x4]));
 			/* PCI Device Descriptor: PCI SubdeviceID */
-			printf("%s\tSubDeviceID: 0x%04x\n", prefix,
+			printf("%sSubDeviceID: 0x%04x\n", prefix,
 				WORD(&pcidata[0x6]));
 		}
 		else if (type == 0x4 && len >= 5)
@@ -3760,7 +3760,7 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 			/* OEM Device Type - Need at least 4 bytes */
 			u8 *oemdata = &data[0x7];
 			/* OEM Device Descriptor: IANA */
-			printf("%s\tVendor ID: 0x%02x:0x%02x:0x%02x:0x%02x\n",
+			printf("%sVendor ID: 0x%02x:0x%02x:0x%02x:0x%02x\n",
 				prefix, oemdata[0x0], oemdata[0x1],
 				oemdata[0x2], oemdata[0x3]);
 		}
