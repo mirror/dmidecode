@@ -4807,8 +4807,8 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 33: /* 7.34 64-bit Memory Error Information */
-			if (h->length < 0x1F) break;
 			printf("64-bit Memory Error Information\n");
+			if (h->length < 0x1F) break;
 			printf("\tType: %s\n",
 				dmi_memory_error_type(data[0x04]));
 			printf("\tGranularity: %s\n",
