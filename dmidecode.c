@@ -3780,8 +3780,9 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 	total_read++;
 	if (total_read > h->length)
 	{
-		printf("%s\tWARN: Total read length %d exceeds total structure length %d\n",
-			prefix, total_read, h->length);
+		fprintf(stderr,
+			"Total read length %d exceeds total structure length %d (handle 0x%04hx)\n",
+			total_read, h->length, h->handle);
 		return;
 	}
 
@@ -3801,8 +3802,9 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 			total_read += rec[1] + 2;
 			if (total_read > h->length)
 			{
-				printf("%s\tWARN: Total read length %d exceeds total structure length %d\n",
-					prefix, total_read, h->length);
+				fprintf(stderr,
+					"Total read length %d exceeds total structure length %d (handle 0x%04hx, record %d)\n",
+					total_read, h->length, h->handle, i + 1);
 				return;
 			}
 
