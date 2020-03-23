@@ -1190,13 +1190,13 @@ static void dmi_processor_voltage(u8 code)
 
 	if (code & 0x80)
 		printf(" %.1f V", (float)(code & 0x7f) / 10);
+	else if ((code & 0x07) == 0x00)
+		printf(" Unknown");
 	else
 	{
 		for (i = 0; i <= 2; i++)
 			if (code & (1 << i))
 				printf(" %s", voltage[i]);
-		if (code == 0x00)
-			printf(" Unknown");
 	}
 }
 
