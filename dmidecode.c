@@ -1515,18 +1515,19 @@ static void dmi_memory_module_size(u8 code)
 		printf(" (Single-bank Connection)");
 }
 
-static void dmi_memory_module_error(u8 code, const char *prefix)
+static void dmi_memory_module_error(u8 code)
 {
+	static const char *status[] = {
+		"OK", /* 0x00 */
+		"Uncorrectable Errors",
+		"Correctable Errors",
+		"Correctable and Uncorrectable Errors" /* 0x03 */
+	};
+
 	if (code & (1 << 2))
 		printf(" See Event Log\n");
 	else
-	{	if ((code & 0x03) == 0)
-			printf(" OK\n");
-		if (code & (1 << 0))
-			printf("%sUncorrectable Errors\n", prefix);
-		if (code & (1 << 1))
-			printf("%sCorrectable Errors\n", prefix);
-	}
+		printf(" %s\n", status[code & 0x03]);
 }
 
 /*
@@ -4142,7 +4143,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_memory_module_size(data[0x0A]);
 			printf("\n");
 			printf("\tError Status:");
-			dmi_memory_module_error(data[0x0B], "\t\t");
+			dmi_memory_module_error(data[0x0B]);
 			break;
 
 		case 7: /* 7.8 Cache Information */
