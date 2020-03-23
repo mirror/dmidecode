@@ -4651,7 +4651,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 25: /* 7.26 System Power Controls */
-			printf("\tSystem Power Controls\n");
+			printf("System Power Controls\n");
 			if (h->length < 0x09) break;
 			printf("\tNext Scheduled Power-on:");
 			dmi_power_controls_power_on(data + 0x04);
