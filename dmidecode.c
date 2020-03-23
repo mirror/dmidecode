@@ -3588,7 +3588,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	printf("%s\t\tHost IP Assignment Type: %s\n", prefix,
 		dmi_protocol_assignment_type(assign_val));
 
-	 /* DSP0270: 8.6: Redfish Over IP Host Address format */
+	/* DSP0270: 8.6: Redfish Over IP Host Address format */
 	addrtype = rdata[17];
 	addrstr = dmi_address_type(addrtype);
 	printf("%s\t\tHost IP Address Format: %s\n", prefix,
@@ -4856,7 +4856,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					WORD(data + 0x07));
 				if (WORD(data + 0x09) != 0xFFFF)
 					printf("\tThreshold Handle: 0x%04X\n",
-					WORD(data + 0x09));
+						WORD(data + 0x09));
 			}
 			break;
 
