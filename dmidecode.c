@@ -2083,11 +2083,10 @@ static void dmi_on_board_devices(const struct dmi_header *h, const char *prefix)
 	for (i = 0; i < count; i++)
 	{
 		if (count == 1)
-			printf("%sOn Board Device Information\n",
-				prefix);
+			pr_handle_name("On Board Device Information");
 		else
-			printf("%sOn Board Device %d Information\n",
-				prefix, i + 1);
+			pr_handle_name("On Board Device %d Information",
+				       i + 1);
 		printf("%s\tType: %s\n",
 			prefix, dmi_on_board_devices_type(p[2 * i] & 0x7F));
 		printf("%s\tStatus: %s\n",
@@ -3397,7 +3396,7 @@ static void dmi_additional_info(const struct dmi_header *h, const char *prefix)
 
 	for (i = 0; i < count; i++)
 	{
-		printf("%sAdditional Information %d\n", prefix, i + 1);
+		pr_handle_name("Additional Information %d", i + 1);
 
 		/* Check for short entries */
 		if (h->length < offset + 1) break;
@@ -3893,7 +3892,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 	switch (h->type)
 	{
 		case 0: /* 7.1 BIOS Information */
-			printf("BIOS Information\n");
+			pr_handle_name("BIOS Information");
 			if (h->length < 0x12) break;
 			printf("\tVendor: %s\n",
 				dmi_string(h, data[0x04]));
@@ -3933,7 +3932,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 1: /* 7.2 System Information */
-			printf("System Information\n");
+			pr_handle_name("System Information");
 			if (h->length < 0x08) break;
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x04]));
@@ -3957,7 +3956,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 2: /* 7.3 Base Board Information */
-			printf("Base Board Information\n");
+			pr_handle_name("Base Board Information");
 			if (h->length < 0x08) break;
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x04]));
@@ -3988,7 +3987,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 3: /* 7.4 Chassis Information */
-			printf("Chassis Information\n");
+			pr_handle_name("Chassis Information");
 			if (h->length < 0x09) break;
 			printf("\tManufacturer: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4030,7 +4029,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 4: /* 7.5 Processor Information */
-			printf("Processor Information\n");
+			pr_handle_name("Processor Information");
 			if (h->length < 0x1A) break;
 			printf("\tSocket Designation: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4100,7 +4099,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 5: /* 7.6 Memory Controller Information */
-			printf("Memory Controller Information\n");
+			pr_handle_name("Memory Controller Information");
 			if (h->length < 0x0F) break;
 			printf("\tError Detecting Method: %s\n",
 				dmi_memory_controller_ed_method(data[0x04]));
@@ -4130,7 +4129,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 6: /* 7.7 Memory Module Information */
-			printf("Memory Module Information\n");
+			pr_handle_name("Memory Module Information");
 			if (h->length < 0x0C) break;
 			printf("\tSocket Designation: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4154,7 +4153,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 7: /* 7.8 Cache Information */
-			printf("Cache Information\n");
+			pr_handle_name("Cache Information");
 			if (h->length < 0x0F) break;
 			printf("\tSocket Designation: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4197,7 +4196,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 8: /* 7.9 Port Connector Information */
-			printf("Port Connector Information\n");
+			pr_handle_name("Port Connector Information");
 			if (h->length < 0x09) break;
 			printf("\tInternal Reference Designator: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4212,7 +4211,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 9: /* 7.10 System Slots */
-			printf("System Slot Information\n");
+			pr_handle_name("System Slot Information");
 			if (h->length < 0x0C) break;
 			printf("\tDesignation: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4243,19 +4242,19 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 11: /* 7.12 OEM Strings */
-			printf("OEM Strings\n");
+			pr_handle_name("OEM Strings");
 			if (h->length < 0x05) break;
 			dmi_oem_strings(h, "\t");
 			break;
 
 		case 12: /* 7.13 System Configuration Options */
-			printf("System Configuration Options\n");
+			pr_handle_name("System Configuration Options");
 			if (h->length < 0x05) break;
 			dmi_system_configuration_options(h, "\t");
 			break;
 
 		case 13: /* 7.14 BIOS Language Information */
-			printf("BIOS Language Information\n");
+			pr_handle_name("BIOS Language Information");
 			if (h->length < 0x16) break;
 			if (ver >= 0x0201)
 			{
@@ -4269,7 +4268,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 14: /* 7.15 Group Associations */
-			printf("Group Associations\n");
+			pr_handle_name("Group Associations");
 			if (h->length < 0x05) break;
 			printf("\tName: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4279,7 +4278,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 15: /* 7.16 System Event Log */
-			printf("System Event Log\n");
+			pr_handle_name("System Event Log");
 			if (h->length < 0x14) break;
 			printf("\tArea Length: %u bytes\n",
 				WORD(data + 0x04));
@@ -4311,7 +4310,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 16: /* 7.17 Physical Memory Array */
-			printf("Physical Memory Array\n");
+			pr_handle_name("Physical Memory Array");
 			if (h->length < 0x0F) break;
 			printf("\tLocation: %s\n",
 				dmi_memory_array_location(data[0x04]));
@@ -4347,7 +4346,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 17: /* 7.18 Memory Device */
-			printf("Memory Device\n");
+			pr_handle_name("Memory Device");
 			if (h->length < 0x15) break;
 			if (!(opt.flags & FLAG_QUIET))
 			{
@@ -4457,7 +4456,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 18: /* 7.19 32-bit Memory Error Information */
-			printf("32-bit Memory Error Information\n");
+			pr_handle_name("32-bit Memory Error Information");
 			if (h->length < 0x17) break;
 			printf("\tType: %s\n",
 				dmi_memory_error_type(data[0x04]));
@@ -4480,7 +4479,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 19: /* 7.20 Memory Array Mapped Address */
-			printf("Memory Array Mapped Address\n");
+			pr_handle_name("Memory Array Mapped Address");
 			if (h->length < 0x0F) break;
 			if (h->length >= 0x1F && DWORD(data + 0x04) == 0xFFFFFFFF)
 			{
@@ -4516,7 +4515,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 20: /* 7.21 Memory Device Mapped Address */
-			printf("Memory Device Mapped Address\n");
+			pr_handle_name("Memory Device Mapped Address");
 			if (h->length < 0x13) break;
 			if (h->length >= 0x23 && DWORD(data + 0x04) == 0xFFFFFFFF)
 			{
@@ -4559,7 +4558,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 21: /* 7.22 Built-in Pointing Device */
-			printf("Built-in Pointing Device\n");
+			pr_handle_name("Built-in Pointing Device");
 			if (h->length < 0x07) break;
 			printf("\tType: %s\n",
 				dmi_pointing_device_type(data[0x04]));
@@ -4570,7 +4569,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 22: /* 7.23 Portable Battery */
-			printf("Portable Battery\n");
+			pr_handle_name("Portable Battery");
 			if (h->length < 0x10) break;
 			printf("\tLocation: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4618,7 +4617,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 23: /* 7.24 System Reset */
-			printf("System Reset\n");
+			pr_handle_name("System Reset");
 			if (h->length < 0x0D) break;
 			printf("\tStatus: %s\n",
 				data[0x04] & (1 << 0) ? "Enabled" : "Disabled");
@@ -4645,7 +4644,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 24: /* 7.25 Hardware Security */
-			printf("Hardware Security\n");
+			pr_handle_name("Hardware Security");
 			if (h->length < 0x05) break;
 			printf("\tPower-On Password Status: %s\n",
 				dmi_hardware_security_status(data[0x04] >> 6));
@@ -4658,7 +4657,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 25: /* 7.26 System Power Controls */
-			printf("System Power Controls\n");
+			pr_handle_name("System Power Controls");
 			if (h->length < 0x09) break;
 			printf("\tNext Scheduled Power-on:");
 			dmi_power_controls_power_on(data + 0x04);
@@ -4666,7 +4665,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 26: /* 7.27 Voltage Probe */
-			printf("Voltage Probe\n");
+			pr_handle_name("Voltage Probe");
 			if (h->length < 0x14) break;
 			printf("\tDescription: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4698,7 +4697,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 27: /* 7.28 Cooling Device */
-			printf("Cooling Device\n");
+			pr_handle_name("Cooling Device");
 			if (h->length < 0x0C) break;
 			if (!(opt.flags & FLAG_QUIET) && WORD(data + 0x04) != 0xFFFF)
 				printf("\tTemperature Probe Handle: 0x%04X\n",
@@ -4721,7 +4720,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 28: /* 7.29 Temperature Probe */
-			printf("Temperature Probe\n");
+			pr_handle_name("Temperature Probe");
 			if (h->length < 0x14) break;
 			printf("\tDescription: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4753,7 +4752,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 29: /* 7.30 Electrical Current Probe */
-			printf("Electrical Current Probe\n");
+			pr_handle_name("Electrical Current Probe");
 			if (h->length < 0x14) break;
 			printf("\tDescription: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4785,7 +4784,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 30: /* 7.31 Out-of-band Remote Access */
-			printf("Out-of-band Remote Access\n");
+			pr_handle_name("Out-of-band Remote Access");
 			if (h->length < 0x06) break;
 			printf("\tManufacturer Name: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4796,7 +4795,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 31: /* 7.32 Boot Integrity Services Entry Point */
-			printf("Boot Integrity Services Entry Point\n");
+			pr_handle_name("Boot Integrity Services Entry Point");
 			if (h->length < 0x1C) break;
 			printf("\tChecksum: %s\n",
 				checksum(data, h->length) ? "OK" : "Invalid");
@@ -4808,14 +4807,14 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 32: /* 7.33 System Boot Information */
-			printf("System Boot Information\n");
+			pr_handle_name("System Boot Information");
 			if (h->length < 0x0B) break;
 			printf("\tStatus: %s\n",
 				dmi_system_boot_status(data[0x0A]));
 			break;
 
 		case 33: /* 7.34 64-bit Memory Error Information */
-			printf("64-bit Memory Error Information\n");
+			pr_handle_name("64-bit Memory Error Information");
 			if (h->length < 0x1F) break;
 			printf("\tType: %s\n",
 				dmi_memory_error_type(data[0x04]));
@@ -4838,7 +4837,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 34: /* 7.35 Management Device */
-			printf("Management Device\n");
+			pr_handle_name("Management Device");
 			if (h->length < 0x0B) break;
 			printf("\tDescription: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4851,7 +4850,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 35: /* 7.36 Management Device Component */
-			printf("Management Device Component\n");
+			pr_handle_name("Management Device Component");
 			if (h->length < 0x0B) break;
 			printf("\tDescription: %s\n",
 				dmi_string(h, data[0x04]));
@@ -4868,7 +4867,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 36: /* 7.37 Management Device Threshold Data */
-			printf("Management Device Threshold Data\n");
+			pr_handle_name("Management Device Threshold Data");
 			if (h->length < 0x10) break;
 			if (WORD(data + 0x04) != 0x8000)
 				printf("\tLower Non-critical Threshold: %d\n",
@@ -4891,7 +4890,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 37: /* 7.38 Memory Channel */
-			printf("Memory Channel\n");
+			pr_handle_name("Memory Channel");
 			if (h->length < 0x07) break;
 			printf("\tType: %s\n",
 				dmi_memory_channel_type(data[0x04]));
@@ -4908,7 +4907,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			 * We use the word "Version" instead of "Revision", conforming to
 			 * the IPMI specification.
 			 */
-			printf("IPMI Device Information\n");
+			pr_handle_name("IPMI Device Information");
 			if (h->length < 0x10) break;
 			printf("\tInterface Type: %s\n",
 				dmi_ipmi_interface_type(data[0x04]));
@@ -4946,7 +4945,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 39: /* 7.40 System Power Supply */
-			printf("System Power Supply\n");
+			pr_handle_name("System Power Supply");
 			if (h->length < 0x10) break;
 			if (data[0x04] != 0x00)
 				printf("\tPower Unit Group: %u\n",
@@ -5006,7 +5005,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 41: /* 7.42 Onboard Device Extended Information */
-			printf("Onboard Device\n");
+			pr_handle_name("Onboard Device");
 			if (h->length < 0x0B) break;
 			printf("\tReference Designation: %s\n", dmi_string(h, data[0x04]));
 			printf("\tType: %s\n",
@@ -5018,7 +5017,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 42: /* 7.43 Management Controller Host Interface */
-			printf("Management Controller Host Interface\n");
+			pr_handle_name("Management Controller Host Interface");
 			if (ver < 0x0302)
 			{
 				if (h->length < 0x05) break;
@@ -5043,7 +5042,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 43: /* 7.44 TPM Device */
-			printf("TPM Device\n");
+			pr_handle_name("TPM Device");
 			if (h->length < 0x1B) break;
 			printf("\tVendor ID:");
 			dmi_tpm_vendor_id(data + 0x04);
@@ -5080,11 +5079,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			break;
 
 		case 126: /* 7.44 Inactive */
-			printf("Inactive\n");
+			pr_handle_name("Inactive");
 			break;
 
 		case 127: /* 7.45 End Of Table */
-			printf("End Of Table\n");
+			pr_handle_name("End Of Table");
 			break;
 
 		default:
@@ -5092,7 +5091,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				break;
 			if (opt.flags & FLAG_QUIET)
 				return;
-			printf("%s Type\n",
+			pr_handle_name("%s Type",
 				h->type >= 128 ? "OEM-specific" : "Unknown");
 			dmi_dump(h, "\t");
 	}

@@ -25,6 +25,7 @@
 #include "types.h"
 #include "dmidecode.h"
 #include "dmioem.h"
+#include "dmioutput.h"
 
 /*
  * Globals for vendor-specific decodes
@@ -92,7 +93,7 @@ static int dmi_decode_acer(const struct dmi_header *h)
 			 * brands, including Fujitsu-Siemens, Medion, Lenovo,
 			 * and eMachines.
 			 */
-			printf("Acer Hotkey Function\n");
+			pr_handle_name("Acer Hotkey Function");
 			if (h->length < 0x0F) break;
 			cap = WORD(data + 0x04);
 			printf("\tFunction bitmap for Communication Button: 0x%04hx\n", cap);
@@ -157,7 +158,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			/*
 			 * Vendor Specific: HPE ProLiant System/Rack Locator
 			 */
-			printf("%s ProLiant System/Rack Locator\n", company);
+			pr_handle_name("%s ProLiant System/Rack Locator", company);
 			if (h->length < 0x0B) break;
 			printf("\tRack Name: %s\n", dmi_string(h, data[0x04]));
 			printf("\tEnclosure Name: %s\n", dmi_string(h, data[0x05]));
@@ -189,10 +190,9 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *
 			 * Type 221: is deprecated in the latest docs
 			 */
-			printf("%s %s\n", company,
-				h->type == 221 ?
-					"BIOS iSCSI NIC PCI and MAC Information" :
-					"BIOS PXE NIC PCI and MAC Information");
+			pr_handle_name("%s %s", company, h->type == 221 ?
+				       "BIOS iSCSI NIC PCI and MAC Information" :
+				       "BIOS PXE NIC PCI and MAC Information");
 			nic = 1;
 			ptr = 4;
 			while (h->length >= ptr + 8)
@@ -224,7 +224,8 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *  0x08  |   MAC  | 32B   | MAC addr padded w/ 0s
 			 *  0x28  | Port No| BYTE  | Each NIC maps to a Port
 			 */
-			printf("%s BIOS PXE NIC PCI and MAC Information\n", company);
+			pr_handle_name("%s BIOS PXE NIC PCI and MAC Information",
+				       company);
 			if (h->length < 0x0E) break;
 			/* If the record isn't long enough, we don't have an ID
 			 * use 0xFF to use the internal counter.
@@ -240,7 +241,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *
 			 * Source: hpwdt kernel driver
 			 */
-			printf("%s 64-bit CRU Information\n", company);
+			pr_handle_name("%s 64-bit CRU Information", company);
 			if (h->length < 0x18) break;
 			printf("\tSignature: 0x%08x", DWORD(data + 0x04));
 			if (is_printable(data + 0x04, 4))
@@ -265,7 +266,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *
 			 * Source: hpwdt kernel driver
 			 */
-			printf("%s ProLiant Information\n", company);
+			pr_handle_name("%s ProLiant Information", company);
 			if (h->length < 0x08) break;
 			printf("\tPower Features: 0x%08x\n", DWORD(data + 0x04));
 			if (h->length < 0x0C) break;
@@ -318,7 +319,7 @@ static int dmi_decode_ibm_lenovo(const struct dmi_header *h)
 			 || strcmp(dmi_string(h, 1), "TVT-Enablement") != 0)
 				return 0;
 
-			printf("ThinkVantage Technologies\n");
+			pr_handle_name("ThinkVantage Technologies");
 			printf("\tVersion: %u\n", data[0x04]);
 			printf("\tDiagnostics: %s\n",
 				data[0x14] & 0x80 ? "Available" : "No");
@@ -357,7 +358,7 @@ static int dmi_decode_ibm_lenovo(const struct dmi_header *h)
 			if (data[0x06] != 0x07 || data[0x07] != 0x03 || data[0x08] != 0x01)
 				return 0;
 
-			printf("ThinkPad Device Presence Detection\n");
+			pr_handle_name("ThinkPad Device Presence Detection");
 			printf("\tFingerprint Reader: %s\n",
 				data[0x09] & 0x01 ? "Present" : "No");
 			break;
@@ -390,7 +391,7 @@ static int dmi_decode_ibm_lenovo(const struct dmi_header *h)
 			if (data[0x0A] != 0x0B || data[0x0B] != 0x07 || data[0x0C] != 0x01)
 				return 0;
 
-			printf("ThinkPad Embedded Controller Program\n");
+			pr_handle_name("ThinkPad Embedded Controller Program");
 			printf("\tVersion ID: %s\n", dmi_string(h, 1));
 			printf("\tRelease Date: %s\n", dmi_string(h, 2));
 			break;
