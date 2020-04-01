@@ -71,3 +71,38 @@ void pr_attr(const char *name, const char *format, ...)
 	va_end(args);
 	printf("\n");
 }
+
+void pr_list_start(const char *name, const char *format, ...)
+{
+	va_list args;
+
+	printf("\t%s:", name);
+
+	/* format is optional, skip value if not provided */
+	if (format)
+	{
+		printf(" ");
+		va_start(args, format);
+		vprintf(format, args);
+		va_end(args);
+	}
+	printf("\n");
+
+}
+
+void pr_list_item(const char *format, ...)
+{
+	va_list args;
+
+	printf("\t\t");
+
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+	printf("\n");
+}
+
+void pr_list_end(void)
+{
+	/* a no-op for text output */
+}

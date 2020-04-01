@@ -26,3 +26,6 @@ void pr_info(const char *format, ...);
 void pr_handle(const struct dmi_header *h);
 void pr_handle_name(const char *format, ...);
 void pr_attr(const char *name, const char *format, ...);
+void pr_list_start(const char *name, const char *format, ...);
+void pr_list_item(const char *format, ...);
+void pr_list_end(void);
