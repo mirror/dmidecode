@@ -72,6 +72,18 @@ void pr_attr(const char *name, const char *format, ...)
 	printf("\n");
 }
 
+void pr_subattr(const char *name, const char *format, ...)
+{
+	va_list args;
+
+	printf("\t\t%s: ", name);
+
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+	printf("\n");
+}
+
 void pr_list_start(const char *name, const char *format, ...)
 {
 	va_list args;

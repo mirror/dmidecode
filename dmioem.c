@@ -97,10 +97,10 @@ static int dmi_decode_acer(const struct dmi_header *h)
 			if (h->length < 0x0F) break;
 			cap = WORD(data + 0x04);
 			pr_attr("Function bitmap for Communication Button", "0x%04hx", cap);
-			printf("\t\tWiFi: %s\n", cap & 0x0001 ? "Yes" : "No");
-			printf("\t\t3G: %s\n", cap & 0x0040 ? "Yes" : "No");
-			printf("\t\tWiMAX: %s\n", cap & 0x0080 ? "Yes" : "No");
-			printf("\t\tBluetooth: %s\n", cap & 0x0800 ? "Yes" : "No");
+			pr_subattr("WiFi", "%s", cap & 0x0001 ? "Yes" : "No");
+			pr_subattr("3G", "%s", cap & 0x0040 ? "Yes" : "No");
+			pr_subattr("WiMAX", "%s", cap & 0x0080 ? "Yes" : "No");
+			pr_subattr("Bluetooth", "%s", cap & 0x0800 ? "Yes" : "No");
 			pr_attr("Function bitmap for Application Button", "0x%04hx", WORD(data + 0x06));
 			pr_attr("Function bitmap for Media Button", "0x%04hx", WORD(data + 0x08));
 			pr_attr("Function bitmap for Display Button", "0x%04hx", WORD(data + 0x0A));
@@ -278,8 +278,8 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			if (h->length < 0x14) break;
 			feat = DWORD(data + 0x10);
 			pr_attr("Misc. Features", "0x%08x", feat);
-			printf("\t\tiCRU: %s\n", feat & 0x0001 ? "Yes" : "No");
-			printf("\t\tUEFI: %s\n", feat & 0x1400 ? "Yes" : "No");
+			pr_subattr("iCRU", "%s", feat & 0x0001 ? "Yes" : "No");
+			pr_subattr("UEFI", "%s", feat & 0x1400 ? "Yes" : "No");
 			break;
 
 		default:

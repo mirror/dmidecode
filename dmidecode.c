@@ -431,7 +431,8 @@ static void dmi_bios_characteristics_x2(u8 code)
  * 7.2 System Information (Type 1)
  */
 
-static void dmi_system_uuid(const char *attr, const u8 *p, u16 ver)
+static void dmi_system_uuid(void (*print_cb)(const char *name, const char *format, ...),
+			    const char *attr, const u8 *p, u16 ver)
 {
 	int only0xFF = 1, only0x00 = 1;
 	int i;
@@ -444,16 +445,16 @@ static void dmi_system_uuid(const char *attr, const u8 *p, u16 ver)
 
 	if (only0xFF)
 	{
-		if (attr)
-			pr_attr(attr, "Not Present");
+		if (print_cb)
+			print_cb(attr, "Not Present");
 		else
 			printf("Not Present\n");
 		return;
 	}
 	if (only0x00)
 	{
-		if (attr)
-			pr_attr(attr, "Not Settable");
+		if (print_cb)
+			print_cb(attr, "Not Settable");
 		else
 			printf("Not Settable\n");
 		return;
@@ -469,8 +470,8 @@ static void dmi_system_uuid(const char *attr, const u8 *p, u16 ver)
 	 */
 	if (ver >= 0x0206)
 	{
-		if (attr)
-			pr_attr(attr,
+		if (print_cb)
+			print_cb(attr,
 				"%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 				p[3], p[2], p[1], p[0], p[5], p[4], p[7], p[6],
 				p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
@@ -481,8 +482,8 @@ static void dmi_system_uuid(const char *attr, const u8 *p, u16 ver)
 	}
 	else
 	{
-		if (attr)
-			pr_attr(attr,
+		if (print_cb)
+			print_cb(attr,
 				"%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 				p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
 				p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
@@ -3655,7 +3656,7 @@ static const char *dmi_address_decode(u8 *data, char *storage, u8 addrtype)
 /*
  * DSP0270: 8.5: Parse the protocol record format
  */
-static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
+static void dmi_parse_protocol_record(u8 *rec)
 {
 	u8 rid;
 	u8 rlen;
@@ -3666,6 +3667,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	u8 hlen;
 	const char *addrstr;
 	const char *hname;
+	char attr[38];
 
 	/* DSP0270: 8.5: Protocol Identifier */
 	rid = rec[0x0];
@@ -3674,7 +3676,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	/* DSP0270: 8.5: Protocol Record Data */
 	rdata = &rec[0x2];
 
-	printf("%sProtocol ID: %02x (%s)\n", prefix, rid,
+	pr_attr("Protocol ID", "%02x (%s)", rid,
 		dmi_protocol_record_type(rid));
 
 	/*
@@ -3704,8 +3706,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	 * endianess of the field is always little after version 2.6.0
 	 * we can just pick a sufficiently recent version here.
 	 */
-	printf("%s\tService UUID: ", prefix);
-	dmi_system_uuid(NULL, &rdata[0], 0x311);	/* FIXME */
+	dmi_system_uuid(pr_subattr, "Service UUID", &rdata[0], 0x311);
 
 	/*
 	 * DSP0270: 8.6: Redfish Over IP Host IP Assignment Type
@@ -3713,13 +3714,13 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	 * uses decimal, so as to make it more comparable
 	 */
 	assign_val = rdata[16];
-	printf("%s\tHost IP Assignment Type: %s\n", prefix,
+	pr_subattr("Host IP Assignment Type", "%s",
 		dmi_protocol_assignment_type(assign_val));
 
 	/* DSP0270: 8.6: Redfish Over IP Host Address format */
 	addrtype = rdata[17];
 	addrstr = dmi_address_type(addrtype);
-	printf("%s\tHost IP Address Format: %s\n", prefix,
+	pr_subattr("Host IP Address Format", "%s",
 		addrstr);
 
 	/* DSP0270: 8.6 IP Assignment types */
@@ -3727,24 +3728,26 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	if (assign_val == 0x1 || assign_val == 0x3)
 	{
 		/* DSP0270: 8.6: the Host IPv[4|6] Address */
-		printf("%s\t%s Address: %s\n", prefix, addrstr,
+		sprintf(attr, "%s Address", addrstr);
+		pr_subattr(attr, "%s",
 			dmi_address_decode(&rdata[18], buf, addrtype));
 
 		/* DSP0270: 8.6: Prints the Host IPv[4|6] Mask */
-		printf("%s\t%s Mask: %s\n", prefix, addrstr,
+		sprintf(attr, "%s Mask", addrstr);
+		pr_subattr(attr, "%s",
 			dmi_address_decode(&rdata[34], buf, addrtype));
 	}
 
 	/* DSP0270: 8.6: Get the Redfish Service IP Discovery Type */
 	assign_val = rdata[50];
 	/* Redfish Service IP Discovery type mirrors Host IP Assignment type */
-	printf("%s\tRedfish Service IP Discovery Type: %s\n", prefix,
+	pr_subattr("Redfish Service IP Discovery Type", "%s",
 		dmi_protocol_assignment_type(assign_val));
 
 	/* DSP0270: 8.6: Get the Redfish Service IP Address Format */
 	addrtype = rdata[51];
 	addrstr = dmi_address_type(addrtype);
-	printf("%s\tRedfish Service IP Address Format: %s\n", prefix,
+	pr_subattr("Redfish Service IP Address Format", "%s",
 		addrstr);
 
 	if (assign_val == 0x1 || assign_val == 0x3)
@@ -3753,20 +3756,22 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 		u32 vlan;
 
 		/* DSP0270: 8.6: Prints the Redfish IPv[4|6] Service Address */
-		printf("%s\t%s Redfish Service Address: %s\n", prefix,
-			addrstr, dmi_address_decode(&rdata[52], buf,
+		sprintf(attr, "%s Redfish Service Address", addrstr);
+		pr_subattr(attr, "%s",
+			dmi_address_decode(&rdata[52], buf,
 			addrtype));
 
 		/* DSP0270: 8.6: Prints the Redfish IPv[4|6] Service Mask */
-		printf("%s\t%s Redfish Service Mask: %s\n", prefix,
-			addrstr, dmi_address_decode(&rdata[68], buf,
+		sprintf(attr, "%s Redfish Service Mask", addrstr);
+		pr_subattr(attr, "%s",
+			dmi_address_decode(&rdata[68], buf,
 			addrtype));
 
 		/* DSP0270: 8.6: Redfish vlan and port info */
 		port = WORD(&rdata[84]);
 		vlan = DWORD(&rdata[86]);
-		printf("%s\tRedfish Service Port: %hu\n", prefix, port);
-		printf("%s\tRedfish Service Vlan: %u\n", prefix, vlan);
+		pr_subattr("Redfish Service Port", "%hu", port);
+		pr_subattr("Redfish Service Vlan", "%u", vlan);
 	}
 
 	/* DSP0270: 8.6: Redfish host length and name */
@@ -3783,7 +3788,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 		hname = out_of_spec;
 		hlen = strlen(out_of_spec);
 	}
-	printf("%s\tRedfish Service Hostname: %.*s\n", prefix, hlen, hname);
+	pr_subattr("Redfish Service Hostname", "%.*s", hlen, hname);
 }
 
 /*
@@ -3803,8 +3808,7 @@ static const char *dmi_parse_device_type(u8 type)
 	return out_of_spec;
 }
 
-static void dmi_parse_controller_structure(const struct dmi_header *h,
-					   const char *prefix)
+static void dmi_parse_controller_structure(const struct dmi_header *h)
 {
 	int i;
 	u8 *data = h->data;
@@ -3936,7 +3940,7 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 				return;
 			}
 
-			dmi_parse_protocol_record(prefix, rec);
+			dmi_parse_protocol_record(rec);
 
 			/*
 			 * DSP0270: 8.6
@@ -4062,7 +4066,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			pr_attr("Serial Number", "%s",
 				dmi_string(h, data[0x07]));
 			if (h->length < 0x19) break;
-			dmi_system_uuid("UUID", data + 0x08, ver);
+			dmi_system_uuid(pr_attr, "UUID", data + 0x08, ver);
 			pr_attr("Wake-up Type", "%s",
 				dmi_system_wake_up_type(data[0x18]));
 			if (h->length < 0x1B) break;
@@ -5002,7 +5006,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				}
 			}
 			else
-				dmi_parse_controller_structure(h, "\t");
+				dmi_parse_controller_structure(h);
 			break;
 
 		case 43: /* 7.44 TPM Device */
@@ -5104,7 +5108,7 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 				printf("%u.%u\n", data[key - 1], data[key]);
 			break;
 		case 0x108:
-			dmi_system_uuid(NULL, data + offset, ver);
+			dmi_system_uuid(NULL, NULL, data + offset, ver);
 			break;
 		case 0x305:
 			printf("%s\n", dmi_chassis_type(data[offset]));
