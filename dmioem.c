@@ -96,16 +96,16 @@ static int dmi_decode_acer(const struct dmi_header *h)
 			pr_handle_name("Acer Hotkey Function");
 			if (h->length < 0x0F) break;
 			cap = WORD(data + 0x04);
-			printf("\tFunction bitmap for Communication Button: 0x%04hx\n", cap);
+			pr_attr("Function bitmap for Communication Button", "0x%04hx", cap);
 			printf("\t\tWiFi: %s\n", cap & 0x0001 ? "Yes" : "No");
 			printf("\t\t3G: %s\n", cap & 0x0040 ? "Yes" : "No");
 			printf("\t\tWiMAX: %s\n", cap & 0x0080 ? "Yes" : "No");
 			printf("\t\tBluetooth: %s\n", cap & 0x0800 ? "Yes" : "No");
-			printf("\tFunction bitmap for Application Button: 0x%04hx\n", WORD(data + 0x06));
-			printf("\tFunction bitmap for Media Button: 0x%04hx\n", WORD(data + 0x08));
-			printf("\tFunction bitmap for Display Button: 0x%04hx\n", WORD(data + 0x0A));
-			printf("\tFunction bitmap for Others Button: 0x%04hx\n", WORD(data + 0x0C));
-			printf("\tCommunication Function Key Number: %d\n", data[0x0E]);
+			pr_attr("Function bitmap for Application Button", "0x%04hx", WORD(data + 0x06));
+			pr_attr("Function bitmap for Media Button", "0x%04hx", WORD(data + 0x08));
+			pr_attr("Function bitmap for Display Button", "0x%04hx", WORD(data + 0x0A));
+			pr_attr("Function bitmap for Others Button", "0x%04hx", WORD(data + 0x0C));
+			pr_attr("Communication Function Key Number", "%d", data[0x0E]);
 			break;
 
 		default:
@@ -128,19 +128,21 @@ static void dmi_print_hp_net_iface_rec(u8 id, u8 bus, u8 dev, const u8 *mac)
 	 * 640K ought to be enough for anybody(said no one, ever).
 	 * */
 	static u8 nic_ctr;
+	char attr[8];
 
 	if (id == 0xFF)
 		id = ++nic_ctr;
 
+	sprintf(attr, "NIC %hu", id);
 	if (dev == 0x00 && bus == 0x00)
-		printf("\tNIC %d: Disabled\n", id);
+		pr_attr(attr, "Disabled");
 	else if (dev == 0xFF && bus == 0xFF)
-		printf("\tNIC %d: Not Installed\n", id);
+		pr_attr(attr, "Not Installed");
 	else
 	{
-		printf("\tNIC %d: PCI device %02x:%02x.%x, "
-			"MAC address %02X:%02X:%02X:%02X:%02X:%02X\n",
-			id, bus, dev >> 3, dev & 7,
+		pr_attr(attr, "PCI device %02x:%02x.%x, "
+			"MAC address %02X:%02X:%02X:%02X:%02X:%02X",
+			bus, dev >> 3, dev & 7,
 			mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 	}
 }
@@ -160,13 +162,13 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 */
 			pr_handle_name("%s ProLiant System/Rack Locator", company);
 			if (h->length < 0x0B) break;
-			printf("\tRack Name: %s\n", dmi_string(h, data[0x04]));
-			printf("\tEnclosure Name: %s\n", dmi_string(h, data[0x05]));
-			printf("\tEnclosure Model: %s\n", dmi_string(h, data[0x06]));
-			printf("\tEnclosure Serial: %s\n", dmi_string(h, data[0x0A]));
-			printf("\tEnclosure Bays: %d\n", data[0x08]);
-			printf("\tServer Bay: %s\n", dmi_string(h, data[0x07]));
-			printf("\tBays Filled: %d\n", data[0x09]);
+			pr_attr("Rack Name", "%s", dmi_string(h, data[0x04]));
+			pr_attr("Enclosure Name", "%s", dmi_string(h, data[0x05]));
+			pr_attr("Enclosure Model", "%s", dmi_string(h, data[0x06]));
+			pr_attr("Enclosure Serial", "%s", dmi_string(h, data[0x0A]));
+			pr_attr("Enclosure Bays", "%d", data[0x08]);
+			pr_attr("Server Bay", "%s", dmi_string(h, data[0x07]));
+			pr_attr("Bays Filled", "%d", data[0x09]);
 			break;
 
 		case 209:
@@ -243,20 +245,22 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 */
 			pr_handle_name("%s 64-bit CRU Information", company);
 			if (h->length < 0x18) break;
-			printf("\tSignature: 0x%08x", DWORD(data + 0x04));
 			if (is_printable(data + 0x04, 4))
-				printf(" (%c%c%c%c)", data[0x04], data[0x05],
+				pr_attr("Signature", "0x%08x (%c%c%c%c)",
+					DWORD(data + 0x04),
+					data[0x04], data[0x05],
 					data[0x06], data[0x07]);
-			printf("\n");
+			else
+				pr_attr("Signature", "0x%08x", DWORD(data + 0x04));
 			if (DWORD(data + 0x04) == 0x55524324)
 			{
 				u64 paddr = QWORD(data + 0x08);
 				paddr.l += DWORD(data + 0x14);
 				if (paddr.l < DWORD(data + 0x14))
 					paddr.h++;
-				printf("\tPhysical Address: 0x%08x%08x\n",
+				pr_attr("Physical Address", "0x%08x%08x",
 					paddr.h, paddr.l);
-				printf("\tLength: 0x%08x\n", DWORD(data + 0x10));
+				pr_attr("Length", "0x%08x", DWORD(data + 0x10));
 			}
 			break;
 
@@ -268,12 +272,12 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 */
 			pr_handle_name("%s ProLiant Information", company);
 			if (h->length < 0x08) break;
-			printf("\tPower Features: 0x%08x\n", DWORD(data + 0x04));
+			pr_attr("Power Features", "0x%08x", DWORD(data + 0x04));
 			if (h->length < 0x0C) break;
-			printf("\tOmega Features: 0x%08x\n", DWORD(data + 0x08));
+			pr_attr("Omega Features", "0x%08x", DWORD(data + 0x08));
 			if (h->length < 0x14) break;
 			feat = DWORD(data + 0x10);
-			printf("\tMisc. Features: 0x%08x\n", feat);
+			pr_attr("Misc. Features", "0x%08x", feat);
 			printf("\t\tiCRU: %s\n", feat & 0x0001 ? "Yes" : "No");
 			printf("\t\tUEFI: %s\n", feat & 0x1400 ? "Yes" : "No");
 			break;
@@ -320,8 +324,8 @@ static int dmi_decode_ibm_lenovo(const struct dmi_header *h)
 				return 0;
 
 			pr_handle_name("ThinkVantage Technologies");
-			printf("\tVersion: %u\n", data[0x04]);
-			printf("\tDiagnostics: %s\n",
+			pr_attr("Version", "%u", data[0x04]);
+			pr_attr("Diagnostics", "%s",
 				data[0x14] & 0x80 ? "Available" : "No");
 			break;
 
@@ -359,7 +363,7 @@ static int dmi_decode_ibm_lenovo(const struct dmi_header *h)
 				return 0;
 
 			pr_handle_name("ThinkPad Device Presence Detection");
-			printf("\tFingerprint Reader: %s\n",
+			pr_attr("Fingerprint Reader", "%s",
 				data[0x09] & 0x01 ? "Present" : "No");
 			break;
 
@@ -392,8 +396,8 @@ static int dmi_decode_ibm_lenovo(const struct dmi_header *h)
 				return 0;
 
 			pr_handle_name("ThinkPad Embedded Controller Program");
-			printf("\tVersion ID: %s\n", dmi_string(h, 1));
-			printf("\tRelease Date: %s\n", dmi_string(h, 2));
+			pr_attr("Version ID", "%s", dmi_string(h, 1));
+			pr_attr("Release Date", "%s", dmi_string(h, 2));
 			break;
 
 		default:

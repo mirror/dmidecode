@@ -261,7 +261,7 @@ static void dmi_dump(const struct dmi_header *h, const char *prefix)
 }
 
 /* shift is 0 if the value is in bytes, 1 if it is in kilobytes */
-static void dmi_print_memory_size(u64 code, int shift)
+static void dmi_print_memory_size(const char *attr, u64 code, int shift)
 {
 	unsigned long capacity;
 	u16 split[7];
@@ -301,7 +301,7 @@ static void dmi_print_memory_size(u64 code, int shift)
 	else
 		capacity = split[i];
 
-	printf(" %lu %s", capacity, unit[i + shift]);
+	pr_attr(attr, "%lu %s", capacity, unit[i + shift]);
 }
 
 /*
@@ -310,10 +310,19 @@ static void dmi_print_memory_size(u64 code, int shift)
 
 static void dmi_bios_runtime_size(u32 code)
 {
+	const char *format;
+
 	if (code & 0x000003FF)
-		printf(" %u bytes", code);
+	{
+		format = "%u bytes";
+	}
 	else
-		printf(" %u kB", code >> 10);
+	{
+		format = "%u kB";
+		code >>= 10;
+	}
+
+	pr_attr("Runtime Size", format, code);
 }
 
 static void dmi_bios_rom_size(u8 code1, u16 code2)
@@ -325,10 +334,10 @@ static void dmi_bios_rom_size(u8 code1, u16 code2)
 	if (code1 != 0xFF)
 	{
 		u64 s = { .l = (code1 + 1) << 6 };
-		dmi_print_memory_size(s, 1);
+		dmi_print_memory_size("ROM Size", s, 1);
 	}
 	else
-		printf(" %u %s", code2 & 0x3FFF, unit[code2 >> 14]);
+		pr_attr("ROM Size", "%u %s", code2 & 0x3FFF, unit[code2 >> 14]);
 }
 
 static void dmi_bios_characteristics(u64 code, const char *prefix)
@@ -426,7 +435,7 @@ static void dmi_bios_characteristics_x2(u8 code, const char *prefix)
  * 7.2 System Information (Type 1)
  */
 
-static void dmi_system_uuid(const u8 *p, u16 ver)
+static void dmi_system_uuid(const char *attr, const u8 *p, u16 ver)
 {
 	int only0xFF = 1, only0x00 = 1;
 	int i;
@@ -439,12 +448,18 @@ static void dmi_system_uuid(const u8 *p, u16 ver)
 
 	if (only0xFF)
 	{
-		printf("Not Present");
+		if (attr)
+			pr_attr(attr, "Not Present");
+		else
+			printf("Not Present\n");
 		return;
 	}
 	if (only0x00)
 	{
-		printf("Not Settable");
+		if (attr)
+			pr_attr(attr, "Not Settable");
+		else
+			printf("Not Settable\n");
 		return;
 	}
 
@@ -457,13 +472,29 @@ static void dmi_system_uuid(const u8 *p, u16 ver)
 	 * for older versions.
 	 */
 	if (ver >= 0x0206)
-		printf("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-			p[3], p[2], p[1], p[0], p[5], p[4], p[7], p[6],
-			p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+	{
+		if (attr)
+			pr_attr(attr,
+				"%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+				p[3], p[2], p[1], p[0], p[5], p[4], p[7], p[6],
+				p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+		else
+			printf("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x\n",
+				p[3], p[2], p[1], p[0], p[5], p[4], p[7], p[6],
+				p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+	}
 	else
-		printf("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-			p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-			p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+	{
+		if (attr)
+			pr_attr(attr,
+				"%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+				p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+				p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+		else
+			printf("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x\n",
+				p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+				p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+	}
 }
 
 static const char *dmi_system_wake_up_type(u8 code)
@@ -649,17 +680,17 @@ static const char *dmi_chassis_security_status(u8 code)
 static void dmi_chassis_height(u8 code)
 {
 	if (code == 0x00)
-		printf(" Unspecified");
+		pr_attr("Height", "Unspecified");
 	else
-		printf(" %u U", code);
+		pr_attr("Height", "%u U", code);
 }
 
 static void dmi_chassis_power_cords(u8 code)
 {
 	if (code == 0x00)
-		printf(" Unspecified");
+		pr_attr("Number Of Power Cords", "Unspecified");
 	else
-		printf(" %u", code);
+		pr_attr("Number Of Power Cords", "%u", code);
 }
 
 static void dmi_chassis_elements(u8 count, u8 len, const u8 *p, const char *prefix)
@@ -1052,8 +1083,8 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 	 * This might help learn about new processors supporting the
 	 * CPUID instruction or another form of identification.
 	 */
-	printf("%sID: %02X %02X %02X %02X %02X %02X %02X %02X\n",
-		prefix, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+	pr_attr("ID", "%02X %02X %02X %02X %02X %02X %02X %02X",
+		p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
 
 	if (type == 0x05) /* 80386 */
 	{
@@ -1061,8 +1092,9 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 		/*
 		 * 80386 have a different signature.
 		 */
-		printf("%sSignature: Type %u, Family %u, Major Stepping %u, Minor Stepping %u\n",
-			prefix, dx >> 12, (dx >> 8) & 0xF,
+		pr_attr("Signature",
+			"Type %u, Family %u, Major Stepping %u, Minor Stepping %u",
+			dx >> 12, (dx >> 8) & 0xF,
 			(dx >> 4) & 0xF, dx & 0xF);
 		return;
 	}
@@ -1080,8 +1112,9 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 			sig = 1;
 		else
 		{
-			printf("%sSignature: Type %u, Family %u, Model %u, Stepping %u\n",
-				prefix, (dx >> 12) & 0x3, (dx >> 8) & 0xF,
+			pr_attr("Signature",
+				"Type %u, Family %u, Model %u, Stepping %u",
+				(dx >> 12) & 0x3, (dx >> 8) & 0xF,
 				(dx >> 4) & 0xF, dx & 0xF);
 			return;
 		}
@@ -1097,8 +1130,9 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 		 */
 		if (midr == 0)
 			return;
-		printf("%sSignature: Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u\n",
-			prefix, midr >> 24, (midr >> 20) & 0xF,
+		pr_attr("Signature",
+			"Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u",
+			midr >> 24, (midr >> 20) & 0xF,
 			(midr >> 16) & 0xF, (midr >> 4) & 0xFFF, midr & 0xF);
 		return;
 	}
@@ -1153,15 +1187,15 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 	switch (sig)
 	{
 		case 1: /* Intel */
-			printf("%sSignature: Type %u, Family %u, Model %u, Stepping %u\n",
-				prefix, (eax >> 12) & 0x3,
+			pr_attr("Signature",
+				"Type %u, Family %u, Model %u, Stepping %u",
+				(eax >> 12) & 0x3,
 				((eax >> 20) & 0xFF) + ((eax >> 8) & 0x0F),
 				((eax >> 12) & 0xF0) + ((eax >> 4) & 0x0F),
 				eax & 0xF);
 			break;
 		case 2: /* AMD, publication #25481 revision 2.28 */
-			printf("%sSignature: Family %u, Model %u, Stepping %u\n",
-				prefix,
+			pr_attr("Signature", "Family %u, Model %u, Stepping %u",
 				((eax >> 8) & 0xF) + (((eax >> 8) & 0xF) == 0xF ? (eax >> 20) & 0xFF : 0),
 				((eax >> 4) & 0xF) | (((eax >> 8) & 0xF) == 0xF ? (eax >> 12) & 0xF0 : 0),
 				eax & 0xF);
@@ -1183,7 +1217,7 @@ static void dmi_processor_id(const struct dmi_header *h, const char *prefix)
 	}
 }
 
-static void dmi_processor_voltage(u8 code)
+static void dmi_processor_voltage(const char *attr, u8 code)
 {
 	/* 7.5.4 */
 	static const char *voltage[] = {
@@ -1194,25 +1228,47 @@ static void dmi_processor_voltage(u8 code)
 	int i;
 
 	if (code & 0x80)
-		printf(" %.1f V", (float)(code & 0x7f) / 10);
+		pr_attr(attr, "%.1f V", (float)(code & 0x7f) / 10);
 	else if ((code & 0x07) == 0x00)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
 	{
+		char voltage_str[18];
+		int off = 0;
+
 		for (i = 0; i <= 2; i++)
+		{
 			if (code & (1 << i))
-				printf(" %s", voltage[i]);
+			{
+				/* Insert space if not the first value */
+				off += sprintf(voltage_str + off,
+					       off ? " %s" :"%s",
+					       voltage[i]);
+			}
+		}
+		if (off)
+			pr_attr(attr, voltage_str);
 	}
 }
 
-static void dmi_processor_frequency(const u8 *p)
+static void dmi_processor_frequency(const char *attr, const u8 *p)
 {
 	u16 code = WORD(p);
 
 	if (code)
-		printf("%u MHz", code);
+	{
+		if (attr)
+			pr_attr(attr, "%u MHz", code);
+		else
+			printf("%u MHz\n", code);
+	}
 	else
-		printf("Unknown");
+	{
+		if (attr)
+			pr_attr(attr, "Unknown");
+		else
+			printf("Unknown\n");
+	}
 }
 
 /* code is assumed to be a 3-bit value */
@@ -1303,17 +1359,18 @@ static const char *dmi_processor_upgrade(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_processor_cache(u16 code, const char *level, u16 ver)
+static void dmi_processor_cache(const char *attr, u16 code, const char *level,
+				u16 ver)
 {
 	if (code == 0xFFFF)
 	{
 		if (ver >= 0x0203)
-			printf(" Not Provided");
+			pr_attr(attr, "Not Provided");
 		else
-			printf(" No %s Cache", level);
+			pr_attr(attr, "No %s Cache", level);
 	}
 	else
-		printf(" 0x%04X", code);
+		pr_attr(attr, "0x%04X", code);
 }
 
 static void dmi_processor_characteristics(u16 code, const char *prefix)
@@ -1478,46 +1535,48 @@ static void dmi_memory_module_types(u16 code, const char *sep)
 static void dmi_memory_module_connections(u8 code)
 {
 	if (code == 0xFF)
-		printf(" None");
+		pr_attr("Bank Connections", "None");
+	else if ((code & 0xF0) == 0xF0)
+		pr_attr("Bank Connections", "%u", code & 0x0F);
+	else if ((code & 0x0F) == 0x0F)
+		pr_attr("Bank Connections", "%u", code >> 4);
 	else
-	{
-		if ((code & 0xF0) != 0xF0)
-			printf(" %u", code >> 4);
-		if ((code & 0x0F) != 0x0F)
-			printf(" %u", code & 0x0F);
-	}
+		pr_attr("Bank Connections", "%u %u", code >> 4, code & 0x0F);
 }
 
-static void dmi_memory_module_speed(u8 code)
+static void dmi_memory_module_speed(const char *attr, u8 code)
 {
 	if (code == 0)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" %u ns", code);
+		pr_attr(attr, "%u ns", code);
 }
 
-static void dmi_memory_module_size(u8 code)
+static void dmi_memory_module_size(const char *attr, u8 code)
 {
+	const char *connection;
+
 	/* 7.7.2 */
+	if (code & 0x80)
+		connection = " (Double-bank Connection)";
+	else
+		connection = " (Single-bank Connection)";
+
 	switch (code & 0x7F)
 	{
 		case 0x7D:
-			printf(" Not Determinable");
+			pr_attr(attr, "Not Determinable%s", connection);
 			break;
 		case 0x7E:
-			printf(" Disabled");
+			pr_attr(attr, "Disabled%s", connection);
 			break;
 		case 0x7F:
-			printf(" Not Installed");
+			pr_attr(attr, "Not Installed");
 			return;
 		default:
-			printf(" %u MB", 1 << (code & 0x7F));
+			pr_attr(attr, "%u MB%s", 1 << (code & 0x7F),
+				connection);
 	}
-
-	if (code & 0x80)
-		printf(" (Double-bank Connection)");
-	else
-		printf(" (Single-bank Connection)");
 }
 
 static void dmi_memory_module_error(u8 code)
@@ -1530,9 +1589,9 @@ static void dmi_memory_module_error(u8 code)
 	};
 
 	if (code & (1 << 2))
-		printf(" See Event Log\n");
+		pr_attr("Error Status", "See Event Log");
 	else
-		printf(" %s\n", status[code & 0x03]);
+		pr_attr("Error Status", "%s", status[code & 0x03]);
 }
 
 /*
@@ -1564,7 +1623,7 @@ static const char *dmi_cache_location(u8 code)
 	return location[code];
 }
 
-static void dmi_cache_size_2(u32 code)
+static void dmi_cache_size_2(const char *attr, u32 code)
 {
 	u64 size;
 
@@ -1581,12 +1640,13 @@ static void dmi_cache_size_2(u32 code)
 	}
 
 	/* Use a more convenient unit for large cache size */
-	dmi_print_memory_size(size, 1);
+	dmi_print_memory_size(attr, size, 1);
 }
 
-static void dmi_cache_size(u16 code)
+static void dmi_cache_size(const char *attr, u16 code)
 {
-	dmi_cache_size_2((((u32)code & 0x8000LU) << 16) | (code & 0x7FFFLU));
+	dmi_cache_size_2(attr,
+			 (((u32)code & 0x8000LU) << 16) | (code & 0x7FFFLU));
 }
 
 static void dmi_cache_types(u16 code, const char *sep)
@@ -1938,16 +1998,16 @@ static const char *dmi_slot_length(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
+static void dmi_slot_id(u8 code1, u8 code2, u8 type)
 {
 	/* 7.10.5 */
 	switch (type)
 	{
 		case 0x04: /* MCA */
-			printf("%sID: %u\n", prefix, code1);
+			pr_attr("ID", "%u", code1);
 			break;
 		case 0x05: /* EISA */
-			printf("%sID: %u\n", prefix, code1);
+			pr_attr("ID", "%u", code1);
 			break;
 		case 0x06: /* PCI */
 		case 0x0E: /* PCI */
@@ -1985,10 +2045,10 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type, const char *prefix)
 		case 0xBB: /* PCI Express 4 */
 		case 0xBC: /* PCI Express 4 */
 		case 0xBD: /* PCI Express 4 */
-			printf("%sID: %u\n", prefix, code1);
+			pr_attr("ID", "%u", code1);
 			break;
 		case 0x07: /* PCMCIA */
-			printf("%sID: Adapter %u, Socket %u\n", prefix, code1, code2);
+			pr_attr("ID", "Adapter %u, Socket %u", code1, code2);
 			break;
 	}
 }
@@ -2031,22 +2091,26 @@ static void dmi_slot_characteristics(u8 code1, u8 code2, const char *prefix)
 	}
 }
 
-static void dmi_slot_segment_bus_func(u16 code1, u8 code2, u8 code3, const char *prefix)
+static void dmi_slot_segment_bus_func(u16 code1, u8 code2, u8 code3)
 {
 	/* 7.10.8 */
 	if (!(code1 == 0xFFFF && code2 == 0xFF && code3 == 0xFF))
-		printf("%sBus Address: %04x:%02x:%02x.%x\n",
-		       prefix, code1, code2, code3 >> 3, code3 & 0x7);
+		pr_attr("Bus Address", "%04x:%02x:%02x.%x",
+			code1, code2, code3 >> 3, code3 & 0x7);
 }
 
-static void dmi_slot_peers(u8 n, const u8 *data, const char *prefix)
+static void dmi_slot_peers(u8 n, const u8 *data)
 {
+	char attr[16];
 	int i;
 
 	for (i = 1; i <= n; i++, data += 5)
-		printf("%sPeer Device %d: %04x:%02x:%02x.%x (Width %u)\n",
-		       prefix, i, WORD(data), data[2], data[3] >> 3,
-		       data[3] & 0x07, data[4]);
+	{
+		sprintf(attr, "Peer Device %hu", i);
+		pr_attr(attr, "%04x:%02x:%02x.%x (Width %u)",
+			WORD(data), data[2], data[3] >> 3, data[3] & 0x07,
+			data[4]);
+	}
 }
 
 /*
@@ -2074,7 +2138,7 @@ static const char *dmi_on_board_devices_type(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_on_board_devices(const struct dmi_header *h, const char *prefix)
+static void dmi_on_board_devices(const struct dmi_header *h)
 {
 	u8 *p = h->data + 4;
 	u8 count = (h->length - 0x04) / 2;
@@ -2087,12 +2151,11 @@ static void dmi_on_board_devices(const struct dmi_header *h, const char *prefix)
 		else
 			pr_handle_name("On Board Device %d Information",
 				       i + 1);
-		printf("%s\tType: %s\n",
-			prefix, dmi_on_board_devices_type(p[2 * i] & 0x7F));
-		printf("%s\tStatus: %s\n",
-			prefix, p[2 * i] & 0x80 ? "Enabled" : "Disabled");
-		printf("%s\tDescription: %s\n",
-			prefix, dmi_string(h, p[2 * i + 1]));
+		pr_attr("Type", "%s",
+			dmi_on_board_devices_type(p[2 * i] & 0x7F));
+		pr_attr("Status", "%s",
+			p[2 * i] & 0x80 ? "Enabled" : "Disabled");
+		pr_attr("Description", "%s", dmi_string(h, p[2 * i + 1]));
 	}
 }
 
@@ -2100,30 +2163,36 @@ static void dmi_on_board_devices(const struct dmi_header *h, const char *prefix)
  * 7.12 OEM Strings (Type 11)
  */
 
-static void dmi_oem_strings(const struct dmi_header *h, const char *prefix)
+static void dmi_oem_strings(const struct dmi_header *h)
 {
+	char attr[11];
 	u8 *p = h->data + 4;
 	u8 count = p[0x00];
 	int i;
 
 	for (i = 1; i <= count; i++)
-		printf("%sString %d: %s\n",
-			prefix, i, dmi_string(h, i));
+	{
+		sprintf(attr, "String %hu", i);
+		pr_attr(attr, "%s",dmi_string(h, i));
+	}
 }
 
 /*
  * 7.13 System Configuration Options (Type 12)
  */
 
-static void dmi_system_configuration_options(const struct dmi_header *h, const char *prefix)
+static void dmi_system_configuration_options(const struct dmi_header *h)
 {
+	char attr[11];
 	u8 *p = h->data + 4;
 	u8 count = p[0x00];
 	int i;
 
 	for (i = 1; i <= count; i++)
-		printf("%sOption %d: %s\n",
-			prefix, i, dmi_string(h, i));
+	{
+		sprintf(attr, "Option %hu", i);
+		pr_attr(attr, "%s",dmi_string(h, i));
+	}
 }
 
 /*
@@ -2197,7 +2266,7 @@ static void dmi_event_log_status(u8 code)
 		"Full" /* 1 */
 	};
 
-	printf(" %s, %s",
+	pr_attr("Status", "%s, %s",
 		valid[(code >> 0) & 1], full[(code >> 1) & 1]);
 }
 
@@ -2209,16 +2278,17 @@ static void dmi_event_log_address(u8 method, const u8 *p)
 		case 0x00:
 		case 0x01:
 		case 0x02:
-			printf(" Index 0x%04X, Data 0x%04X", WORD(p), WORD(p + 2));
+			pr_attr("Access Address", "Index 0x%04X, Data 0x%04X",
+				WORD(p), WORD(p + 2));
 			break;
 		case 0x03:
-			printf(" 0x%08X", DWORD(p));
+			pr_attr("Access Address", "0x%08X", DWORD(p));
 			break;
 		case 0x04:
-			printf(" 0x%04X", WORD(p));
+			pr_attr("Access Address", "0x%04X", WORD(p));
 			break;
 		default:
-			printf(" Unknown");
+			pr_attr("Access Address", "Unknown");
 	}
 }
 
@@ -2295,19 +2365,22 @@ static const char *dmi_event_log_descriptor_format(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_event_log_descriptors(u8 count, u8 len, const u8 *p, const char *prefix)
+static void dmi_event_log_descriptors(u8 count, u8 len, const u8 *p)
 {
 	/* 7.16.1 */
+	char attr[16];
 	int i;
 
 	for (i = 0; i < count; i++)
 	{
 		if (len >= 0x02)
 		{
-			printf("%sDescriptor %u: %s\n",
-				prefix, i + 1, dmi_event_log_descriptor_type(p[i * len]));
-			printf("%sData Format %u: %s\n",
-				prefix, i + 1, dmi_event_log_descriptor_format(p[i * len + 1]));
+			sprintf(attr, "Descriptor %hu", i + 1);
+			pr_attr(attr, "%s",
+				dmi_event_log_descriptor_type(p[i * len]));
+			sprintf(attr, "Data Format %hu", i + 1);
+			pr_attr(attr, "%s",
+				dmi_event_log_descriptor_format(p[i * len + 1]));
 		}
 	}
 }
@@ -2385,40 +2458,40 @@ static const char *dmi_memory_array_ec_type(u8 code)
 static void dmi_memory_array_error_handle(u16 code)
 {
 	if (code == 0xFFFE)
-		printf(" Not Provided");
+		pr_attr("Error Information Handle", "Not Provided");
 	else if (code == 0xFFFF)
-		printf(" No Error");
+		pr_attr("Error Information Handle", "No Error");
 	else
-		printf(" 0x%04X", code);
+		pr_attr("Error Information Handle", "0x%04X", code);
 }
 
 /*
  * 7.18 Memory Device (Type 17)
  */
 
-static void dmi_memory_device_width(u16 code)
+static void dmi_memory_device_width(const char *attr, u16 code)
 {
 	/*
 	 * If no memory module is present, width may be 0
 	 */
 	if (code == 0xFFFF || code == 0)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" %u bits", code);
+		pr_attr(attr, "%u bits", code);
 }
 
 static void dmi_memory_device_size(u16 code)
 {
 	if (code == 0)
-		printf(" No Module Installed");
+		pr_attr("Size", "No Module Installed");
 	else if (code == 0xFFFF)
-		printf(" Unknown");
+		pr_attr("Size", "Unknown");
 	else
 	{
 		u64 s = { .l = code & 0x7FFF };
 		if (!(code & 0x8000))
 			s.l <<= 10;
-		dmi_print_memory_size(s, 1);
+		dmi_print_memory_size("Size", s, 1);
 	}
 }
 
@@ -2431,19 +2504,20 @@ static void dmi_memory_device_extended_size(u32 code)
 	 * as an integer without rounding
 	 */
 	if (code & 0x3FFUL)
-		printf(" %lu MB", (unsigned long)code);
+		pr_attr("Size", "%lu MB", (unsigned long)code);
 	else if (code & 0xFFC00UL)
-		printf(" %lu GB", (unsigned long)code >> 10);
+		pr_attr("Size", "%lu GB", (unsigned long)code >> 10);
 	else
-		printf(" %lu TB", (unsigned long)code >> 20);
+		pr_attr("Size", "%lu TB", (unsigned long)code >> 20);
 }
 
-static void dmi_memory_voltage_value(u16 code)
+static void dmi_memory_voltage_value(const char *attr, u16 code)
 {
 	if (code == 0)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(code % 100 ? " %g V" : " %.1f V", (float)code / 1000);
+		pr_attr(attr, code % 100 ? "%g V" : "%.1f V",
+			(float)code / 1000);
 }
 
 static const char *dmi_memory_device_form_factor(u8 code)
@@ -2476,11 +2550,11 @@ static const char *dmi_memory_device_form_factor(u8 code)
 static void dmi_memory_device_set(u8 code)
 {
 	if (code == 0)
-		printf(" None");
+		pr_attr("Set", "None");
 	else if (code == 0xFF)
-		printf(" Unknown");
+		pr_attr("Set", "Unknown");
 	else
-		printf(" %u", code);
+		pr_attr("Set", "%u", code);
 }
 
 static const char *dmi_memory_device_type(u8 code)
@@ -2547,25 +2621,29 @@ static void dmi_memory_device_type_detail(u16 code)
 		"Unbuffered (Unregistered)",
 		"LRDIMM"  /* 15 */
 	};
+	char list[172];		/* Update length if you touch the array above */
 
 	if ((code & 0xFFFE) == 0)
-		printf(" None");
+		pr_attr("Type Detail", "None");
 	else
 	{
-		int i;
+		int i, off = 0;
 
+		list[0] = '\0';
 		for (i = 1; i <= 15; i++)
 			if (code & (1 << i))
-				printf(" %s", detail[i - 1]);
+				off += sprintf(list + off, off ? " %s" : "%s",
+					       detail[i - 1]);
+		pr_attr("Type Detail", list);
 	}
 }
 
-static void dmi_memory_device_speed(u16 code)
+static void dmi_memory_device_speed(const char *attr, u16 code)
 {
 	if (code == 0)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" %u MT/s", code);
+		pr_attr(attr, "%u MT/s", code);
 }
 
 static void dmi_memory_technology(u8 code)
@@ -2581,9 +2659,9 @@ static void dmi_memory_technology(u8 code)
 		"Intel Optane DC persistent memory" /* 0x07 */
 	};
 	if (code >= 0x01 && code <= 0x07)
-		printf(" %s", technology[code - 0x01]);
+		pr_attr("Memory Technology", "%s", technology[code - 0x01]);
 	else
-		printf(" %s", out_of_spec);
+		pr_attr("Memory Technology", "%s", out_of_spec);
 }
 
 static void dmi_memory_operating_mode_capability(u16 code)
@@ -2596,49 +2674,54 @@ static void dmi_memory_operating_mode_capability(u16 code)
 		"Byte-accessible persistent memory",
 		"Block-accessible persistent memory" /* 5 */
 	};
+	char list[99];		/* Update length if you touch the array above */
 
 	if ((code & 0xFFFE) == 0)
-		printf(" None");
+		pr_attr("Memory Operating Mode Capability", "None");
 	else {
-		int i;
+		int i, off = 0;
 
+		list[0] = '\0';
 		for (i = 1; i <= 5; i++)
 			if (code & (1 << i))
-				printf(" %s", mode[i - 1]);
+				off += sprintf(list + off, off ? " %s" : "%s",
+					       mode[i - 1]);
+		pr_attr("Memory Operating Mode Capability", list);
 	}
 }
 
-static void dmi_memory_manufacturer_id(u16 code)
+static void dmi_memory_manufacturer_id(const char *attr, u16 code)
 {
 	/* 7.18.8 */
 	/* 7.18.10 */
 	/* LSB is 7-bit Odd Parity number of continuation codes */
 	if (code == 0)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" Bank %d, Hex 0x%02X", (code & 0x7F) + 1, code >> 8);
+		pr_attr(attr, "Bank %d, Hex 0x%02X",
+			(code & 0x7F) + 1, code >> 8);
 }
 
-static void dmi_memory_product_id(u16 code)
+static void dmi_memory_product_id(const char *attr, u16 code)
 {
 	/* 7.18.9 */
 	/* 7.18.11 */
 	if (code == 0)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" 0x%04X", code);
+		pr_attr(attr, "0x%04X", code);
 }
 
-static void dmi_memory_size(u64 code)
+static void dmi_memory_size(const char *attr, u64 code)
 {
 	/* 7.18.12 */
 	/* 7.18.13 */
 	if (code.h == 0xFFFFFFFF && code.l == 0xFFFFFFFF)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else if (code.h == 0x0 && code.l == 0x0)
-		printf(" None");
+		pr_attr(attr, "None");
 	else
-		dmi_print_memory_size(code, 0);
+		dmi_print_memory_size(attr, code, 0);
 }
 
 /*
@@ -2704,17 +2787,17 @@ static const char *dmi_memory_error_operation(u8 code)
 static void dmi_memory_error_syndrome(u32 code)
 {
 	if (code == 0x00000000)
-		printf(" Unknown");
+		pr_attr("Vendor Syndrome", "Unknown");
 	else
-		printf(" 0x%08X", code);
+		pr_attr("Vendor Syndrome", "0x%08X", code);
 }
 
-static void dmi_32bit_memory_error_address(u32 code)
+static void dmi_32bit_memory_error_address(const char *attr, u32 code)
 {
 	if (code == 0x80000000)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" 0x%08X", code);
+		pr_attr(attr, "0x%08X", code);
 }
 
 /*
@@ -2724,23 +2807,23 @@ static void dmi_32bit_memory_error_address(u32 code)
 static void dmi_mapped_address_size(u32 code)
 {
 	if (code == 0)
-		printf(" Invalid");
+		pr_attr("Range Size", "Invalid");
 	else
 	{
 		u64 size;
 
 		size.h = 0;
 		size.l = code;
-		dmi_print_memory_size(size, 1);
+		dmi_print_memory_size("Range Size", size, 1);
 	}
 }
 
 static void dmi_mapped_address_extended_size(u64 start, u64 end)
 {
 	if (start.h == end.h && start.l == end.l)
-		printf(" Invalid");
+		pr_attr("Range Size", "Invalid");
 	else
-		dmi_print_memory_size(u64_range(start, end), 0);
+		dmi_print_memory_size("Range Size", u64_range(start, end), 0);
 }
 
 /*
@@ -2750,36 +2833,32 @@ static void dmi_mapped_address_extended_size(u64 start, u64 end)
 static void dmi_mapped_address_row_position(u8 code)
 {
 	if (code == 0)
-		printf(" %s", out_of_spec);
+		pr_attr("Partition Row Position", "%s", out_of_spec);
 	else if (code == 0xFF)
-		printf(" Unknown");
+		pr_attr("Partition Row Position", "Unknown");
 	else
-		printf(" %u", code);
+		pr_attr("Partition Row Position", "%u", code);
 }
 
-static void dmi_mapped_address_interleave_position(u8 code, const char *prefix)
+static void dmi_mapped_address_interleave_position(u8 code)
 {
 	if (code != 0)
 	{
-		printf("%sInterleave Position:", prefix);
 		if (code == 0xFF)
-			printf(" Unknown");
+			pr_attr("Interleave Position", "Unknown");
 		else
-			printf(" %u", code);
-		printf("\n");
+			pr_attr("Interleave Position", "%u", code);
 	}
 }
 
-static void dmi_mapped_address_interleaved_data_depth(u8 code, const char *prefix)
+static void dmi_mapped_address_interleaved_data_depth(u8 code)
 {
 	if (code != 0)
 	{
-		printf("%sInterleaved Data Depth:", prefix);
 		if (code == 0xFF)
-			printf(" Unknown");
+			pr_attr("Interleaved Data Depth", "Unknown");
 		else
-			printf(" %u", code);
-		printf("\n");
+			pr_attr("Interleaved Data Depth", "%u", code);
 	}
 }
 
@@ -2859,25 +2938,25 @@ static const char *dmi_battery_chemistry(u8 code)
 static void dmi_battery_capacity(u16 code, u8 multiplier)
 {
 	if (code == 0)
-		printf(" Unknown");
+		pr_attr("Design Capacity", "Unknown");
 	else
-		printf(" %u mWh", code * multiplier);
+		pr_attr("Design Capacity", "%u mWh", code * multiplier);
 }
 
 static void dmi_battery_voltage(u16 code)
 {
 	if (code == 0)
-		printf(" Unknown");
+		pr_attr("Design Voltage", "Unknown");
 	else
-		printf(" %u mV", code);
+		pr_attr("Design Voltage", "%u mV", code);
 }
 
 static void dmi_battery_maximum_error(u8 code)
 {
 	if (code == 0xFF)
-		printf(" Unknown");
+		pr_attr("Maximum Error", "Unknown");
 	else
-		printf(" %u%%", code);
+		pr_attr("Maximum Error", "%u%%", code);
 }
 
 /*
@@ -2897,20 +2976,20 @@ static const char *dmi_system_reset_boot_option(u8 code)
 	return option[code];
 }
 
-static void dmi_system_reset_count(u16 code)
+static void dmi_system_reset_count(const char *attr, u16 code)
 {
 	if (code == 0xFFFF)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" %u", code);
+		pr_attr(attr, "%u", code);
 }
 
-static void dmi_system_reset_timer(u16 code)
+static void dmi_system_reset_timer(const char *attr, u16 code)
 {
 	if (code == 0xFFFF)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" %u min", code);
+		pr_attr(attr, "%u min", code);
 }
 
 /*
@@ -2935,27 +3014,32 @@ static const char *dmi_hardware_security_status(u8 code)
 
 static void dmi_power_controls_power_on(const u8 *p)
 {
+	char time[15];
+	int off = 0;
+
 	/* 7.26.1 */
 	if (dmi_bcd_range(p[0], 0x01, 0x12))
-		printf(" %02X", p[0]);
+		off += sprintf(time + off, "%02X", p[0]);
 	else
-		printf(" *");
+		off += sprintf(time + off, "*");
 	if (dmi_bcd_range(p[1], 0x01, 0x31))
-		printf("-%02X", p[1]);
+		off += sprintf(time + off, "-%02X", p[1]);
 	else
-		printf("-*");
+		off += sprintf(time + off, "-*");
 	if (dmi_bcd_range(p[2], 0x00, 0x23))
-		printf(" %02X", p[2]);
+		off += sprintf(time + off, " %02X", p[2]);
 	else
-		printf(" *");
+		off += sprintf(time + off, " *");
 	if (dmi_bcd_range(p[3], 0x00, 0x59))
-		printf(":%02X", p[3]);
+		off += sprintf(time + off, ":%02X", p[3]);
 	else
-		printf(":*");
+		off += sprintf(time + off, ":*");
 	if (dmi_bcd_range(p[4], 0x00, 0x59))
-		printf(":%02X", p[4]);
+		off += sprintf(time + off, ":%02X", p[4]);
 	else
-		printf(":*");
+		off += sprintf(time + off, ":*");
+
+	pr_attr("Next Scheduled Power-on", time);
 }
 
 /*
@@ -3001,28 +3085,28 @@ static const char *dmi_probe_status(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_voltage_probe_value(u16 code)
+static void dmi_voltage_probe_value(const char *attr, u16 code)
 {
 	if (code == 0x8000)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" %.3f V", (float)(i16)code / 1000);
+		pr_attr(attr, "%.3f V", (float)(i16)code / 1000);
 }
 
 static void dmi_voltage_probe_resolution(u16 code)
 {
 	if (code == 0x8000)
-		printf(" Unknown");
+		pr_attr("Resolution", "Unknown");
 	else
-		printf(" %.1f mV", (float)code / 10);
+		pr_attr("Resolution", "%.1f mV", (float)code / 10);
 }
 
 static void dmi_probe_accuracy(u16 code)
 {
 	if (code == 0x8000)
-		printf(" Unknown");
+		pr_attr("Accuracy", "Unknown");
 	else
-		printf(" %.2f%%", (float)code / 100);
+		pr_attr("Accuracy", "%.2f%%", (float)code / 100);
 }
 
 /*
@@ -3058,9 +3142,9 @@ static const char *dmi_cooling_device_type(u8 code)
 static void dmi_cooling_device_speed(u16 code)
 {
 	if (code == 0x8000)
-		printf(" Unknown Or Non-rotating");
+		pr_attr("Nominal Speed", "Unknown Or Non-rotating");
 	else
-		printf(" %u rpm", code);
+		pr_attr("Nominal Speed", "%u rpm", code);
 }
 
 /*
@@ -3093,40 +3177,40 @@ static const char *dmi_temperature_probe_location(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_temperature_probe_value(u16 code)
+static void dmi_temperature_probe_value(const char *attr, u16 code)
 {
 	if (code == 0x8000)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" %.1f deg C", (float)(i16)code / 10);
+		pr_attr(attr, "%.1f deg C", (float)(i16)code / 10);
 }
 
 static void dmi_temperature_probe_resolution(u16 code)
 {
 	if (code == 0x8000)
-		printf(" Unknown");
+		pr_attr("Resolution", "Unknown");
 	else
-		printf(" %.3f deg C", (float)code / 1000);
+		pr_attr("Resolution", "%.3f deg C", (float)code / 1000);
 }
 
 /*
  * 7.30 Electrical Current Probe (Type 29)
  */
 
-static void dmi_current_probe_value(u16 code)
+static void dmi_current_probe_value(const char *attr, u16 code)
 {
 	if (code == 0x8000)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" %.3f A", (float)(i16)code / 1000);
+		pr_attr(attr, "%.3f A", (float)(i16)code / 1000);
 }
 
 static void dmi_current_probe_resolution(u16 code)
 {
 	if (code == 0x8000)
-		printf(" Unknown");
+		pr_attr("Resolution", "Unknown");
 	else
-		printf(" %.1f mA", (float)code / 10);
+		pr_attr("Resolution", "%.1f mA", (float)code / 10);
 }
 
 /*
@@ -3160,12 +3244,12 @@ static const char *dmi_system_boot_status(u8 code)
  * 7.34 64-bit Memory Error Information (Type 33)
  */
 
-static void dmi_64bit_memory_error_address(u64 code)
+static void dmi_64bit_memory_error_address(const char *attr, u64 code)
 {
 	if (code.h == 0x80000000 && code.l == 0x00000000)
-		printf(" Unknown");
+		pr_attr(attr, "Unknown");
 	else
-		printf(" 0x%08X%08X", code.h, code.l);
+		pr_attr(attr, "0x%08X%08X", code.h, code.l);
 }
 
 /*
@@ -3253,17 +3337,20 @@ static const char *dmi_memory_channel_type(u8 code)
 	return out_of_spec;
 }
 
-static void dmi_memory_channel_devices(u8 count, const u8 *p, const char *prefix)
+static void dmi_memory_channel_devices(u8 count, const u8 *p)
 {
+	char attr[18];
 	int i;
 
 	for (i = 1; i <= count; i++)
 	{
-		printf("%sDevice %u Load: %u\n",
-			prefix, i, p[3 * i]);
+		sprintf(attr, "Device %hu Load", i);
+		pr_attr(attr, "%u", p[3 * i]);
 		if (!(opt.flags & FLAG_QUIET))
-			printf("%sDevice %u Handle: 0x%04X\n",
-				prefix, i, WORD(p + 3 * i + 1));
+		{
+			sprintf(attr, "Device %hu Handle", i);
+			pr_attr(attr, "0x%04X", WORD(p + 3 * i + 1));
+		}
 	}
 }
 
@@ -3291,12 +3378,13 @@ static void dmi_ipmi_base_address(u8 type, const u8 *p, u8 lsb)
 {
 	if (type == 0x04) /* SSIF */
 	{
-		printf("0x%02X (SMBus)", (*p) >> 1);
+		pr_attr("Base Address", "0x%02X (SMBus)", (*p) >> 1);
 	}
 	else
 	{
 		u64 address = QWORD(p);
-		printf("0x%08X%08X (%s)", address.h, (address.l & ~1) | lsb,
+		pr_attr("Base Address", "0x%08X%08X (%s)",
+			address.h, (address.l & ~1) | lsb,
 			address.l & 1 ? "I/O" : "Memory-mapped");
 	}
 }
@@ -3322,9 +3410,9 @@ static const char *dmi_ipmi_register_spacing(u8 code)
 static void dmi_power_supply_power(u16 code)
 {
 	if (code == 0x8000)
-		printf(" Unknown");
+		pr_attr("Max Power Capacity", "Unknown");
 	else
-		printf(" %u W", (unsigned int)code);
+		pr_attr("Max Power Capacity", "%u W", (unsigned int)code);
 }
 
 static const char *dmi_power_supply_type(u8 code)
@@ -3387,7 +3475,7 @@ static const char *dmi_power_supply_range_switching(u8 code)
  * whether it's worth the effort.
  */
 
-static void dmi_additional_info(const struct dmi_header *h, const char *prefix)
+static void dmi_additional_info(const struct dmi_header *h)
 {
 	u8 *p = h->data + 4;
 	u8 count = *p++;
@@ -3403,30 +3491,28 @@ static void dmi_additional_info(const struct dmi_header *h, const char *prefix)
 		length = p[0x00];
 		if (length < 0x05 || h->length < offset + length) break;
 
-		printf("%s\tReferenced Handle: 0x%04x\n",
-			prefix, WORD(p + 0x01));
-		printf("%s\tReferenced Offset: 0x%02x\n",
-			prefix, p[0x03]);
-		printf("%s\tString: %s\n",
-			prefix, dmi_string(h, p[0x04]));
+		pr_attr("Referenced Handle", "0x%04x",
+			WORD(p + 0x01));
+		pr_attr("Referenced Offset", "0x%02x",
+			p[0x03]);
+		pr_attr("String", "%s",
+			dmi_string(h, p[0x04]));
 
-		printf("%s\tValue: ", prefix);
 		switch (length - 0x05)
 		{
 			case 1:
-				printf("0x%02x", p[0x05]);
+				pr_attr("Value", "0x%02x", p[0x05]);
 				break;
 			case 2:
-				printf("0x%04x", WORD(p + 0x05));
+				pr_attr("Value", "0x%04x", WORD(p + 0x05));
 				break;
 			case 4:
-				printf("0x%08x", DWORD(p + 0x05));
+				pr_attr("Value", "0x%08x", DWORD(p + 0x05));
 				break;
 			default:
-				printf("Unexpected size");
+				pr_attr("Value", "Unexpected size");
 				break;
 		}
-		printf("\n");
 
 		p += length;
 		offset += length;
@@ -3580,8 +3666,7 @@ static void dmi_parse_protocol_record(const char *prefix, u8 *rec)
 	 * we can just pick a sufficiently recent version here.
 	 */
 	printf("%s\tService UUID: ", prefix);
-	dmi_system_uuid(&rdata[0], 0x311);
-	printf("\n");
+	dmi_system_uuid(NULL, &rdata[0], 0x311);	/* FIXME */
 
 	/*
 	 * DSP0270: 8.6: Redfish Over IP Host IP Assignment Type
@@ -3710,7 +3795,7 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 		return;
 
 	type = data[0x4];
-	printf("%sHost Interface Type: %s\n", prefix,
+	pr_attr("Host Interface Type", "%s",
 		dmi_management_controller_host_type(type));
 
 	/*
@@ -3725,17 +3810,17 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 		/* DSP0270: 8.3 Table 2: Device Type */
 		type = data[0x6];
 
-		printf("%sDevice Type: %s\n", prefix,
+		pr_attr("Device Type", "%s",
 			dmi_parse_device_type(type));
 		if (type == 0x2 && len >= 5)
 		{
 			/* USB Device Type - need at least 6 bytes */
 			u8 *usbdata = &data[0x7];
 			/* USB Device Descriptor: idVendor */
-			printf("%sidVendor: 0x%04x\n", prefix,
+			pr_attr("idVendor", "0x%04x",
 				WORD(&usbdata[0x0]));
 			/* USB Device Descriptor: idProduct */
-			printf("%sidProduct: 0x%04x\n", prefix,
+			pr_attr("idProduct", "0x%04x",
 				WORD(&usbdata[0x2]));
 			/*
 			 * USB Serial number is here, but its useless, don't
@@ -3747,16 +3832,16 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 			/* PCI Device Type - Need at least 8 bytes */
 			u8 *pcidata = &data[0x7];
 			/* PCI Device Descriptor: VendorID */
-			printf("%sVendorID: 0x%04x\n", prefix,
+			pr_attr("VendorID", "0x%04x",
 				WORD(&pcidata[0x0]));
 			/* PCI Device Descriptor: DeviceID */
-			printf("%sDeviceID: 0x%04x\n", prefix,
+			pr_attr("DeviceID", "0x%04x",
 				WORD(&pcidata[0x2]));
 			/* PCI Device Descriptor: PCI SubvendorID */
-			printf("%sSubVendorID: 0x%04x\n", prefix,
+			pr_attr("SubVendorID", "0x%04x",
 				WORD(&pcidata[0x4]));
 			/* PCI Device Descriptor: PCI SubdeviceID */
-			printf("%sSubDeviceID: 0x%04x\n", prefix,
+			pr_attr("SubDeviceID", "0x%04x",
 				WORD(&pcidata[0x6]));
 		}
 		else if (type == 0x4 && len >= 5)
@@ -3764,8 +3849,8 @@ static void dmi_parse_controller_structure(const struct dmi_header *h,
 			/* OEM Device Type - Need at least 4 bytes */
 			u8 *oemdata = &data[0x7];
 			/* OEM Device Descriptor: IANA */
-			printf("%sVendor ID: 0x%02x:0x%02x:0x%02x:0x%02x\n",
-				prefix, oemdata[0x0], oemdata[0x1],
+			pr_attr("Vendor ID", "0x%02x:0x%02x:0x%02x:0x%02x",
+				oemdata[0x0], oemdata[0x1],
 				oemdata[0x2], oemdata[0x3]);
 		}
 		/* Don't mess with unknown types for now */
@@ -3848,7 +3933,7 @@ static void dmi_tpm_vendor_id(const u8 *p)
 	/* Terminate the string */
 	vendor_id[i] = '\0';
 
-	printf(" %s", vendor_id);
+	pr_attr("Vendor ID", "%s", vendor_id);
 }
 
 static void dmi_tpm_characteristics(u64 code, const char *prefix)
@@ -3894,11 +3979,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 0: /* 7.1 BIOS Information */
 			pr_handle_name("BIOS Information");
 			if (h->length < 0x12) break;
-			printf("\tVendor: %s\n",
+			pr_attr("Vendor", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tVersion: %s\n",
+			pr_attr("Version", "%s",
 				dmi_string(h, data[0x05]));
-			printf("\tRelease Date: %s\n",
+			pr_attr("Release Date", "%s",
 				dmi_string(h, data[0x08]));
 			/*
 			 * On IA-64, the BIOS base address will read 0 because
@@ -3907,15 +3992,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			 */
 			if (WORD(data + 0x06) != 0)
 			{
-				printf("\tAddress: 0x%04X0\n",
+				pr_attr("Address", "0x%04X0",
 					WORD(data + 0x06));
-				printf("\tRuntime Size:");
 				dmi_bios_runtime_size((0x10000 - WORD(data + 0x06)) << 4);
-				printf("\n");
 			}
-			printf("\tROM Size:");
 			dmi_bios_rom_size(data[0x09], h->length < 0x1A ? 16 : WORD(data + 0x18));
-			printf("\n");
 			printf("\tCharacteristics:\n");
 			dmi_bios_characteristics(QWORD(data + 0x0A), "\t\t");
 			if (h->length < 0x13) break;
@@ -3924,61 +4005,59 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_bios_characteristics_x2(data[0x13], "\t\t");
 			if (h->length < 0x18) break;
 			if (data[0x14] != 0xFF && data[0x15] != 0xFF)
-				printf("\tBIOS Revision: %u.%u\n",
+				pr_attr("BIOS Revision", "%u.%u",
 					data[0x14], data[0x15]);
 			if (data[0x16] != 0xFF && data[0x17] != 0xFF)
-				printf("\tFirmware Revision: %u.%u\n",
+				pr_attr("Firmware Revision", "%u.%u",
 					data[0x16], data[0x17]);
 			break;
 
 		case 1: /* 7.2 System Information */
 			pr_handle_name("System Information");
 			if (h->length < 0x08) break;
-			printf("\tManufacturer: %s\n",
+			pr_attr("Manufacturer", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tProduct Name: %s\n",
+			pr_attr("Product Name", "%s",
 				dmi_string(h, data[0x05]));
-			printf("\tVersion: %s\n",
+			pr_attr("Version", "%s",
 				dmi_string(h, data[0x06]));
-			printf("\tSerial Number: %s\n",
+			pr_attr("Serial Number", "%s",
 				dmi_string(h, data[0x07]));
 			if (h->length < 0x19) break;
-			printf("\tUUID: ");
-			dmi_system_uuid(data + 0x08, ver);
-			printf("\n");
-			printf("\tWake-up Type: %s\n",
+			dmi_system_uuid("UUID", data + 0x08, ver);
+			pr_attr("Wake-up Type", "%s",
 				dmi_system_wake_up_type(data[0x18]));
 			if (h->length < 0x1B) break;
-			printf("\tSKU Number: %s\n",
+			pr_attr("SKU Number", "%s",
 				dmi_string(h, data[0x19]));
-			printf("\tFamily: %s\n",
+			pr_attr("Family", "%s",
 				dmi_string(h, data[0x1A]));
 			break;
 
 		case 2: /* 7.3 Base Board Information */
 			pr_handle_name("Base Board Information");
 			if (h->length < 0x08) break;
-			printf("\tManufacturer: %s\n",
+			pr_attr("Manufacturer", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tProduct Name: %s\n",
+			pr_attr("Product Name", "%s",
 				dmi_string(h, data[0x05]));
-			printf("\tVersion: %s\n",
+			pr_attr("Version", "%s",
 				dmi_string(h, data[0x06]));
-			printf("\tSerial Number: %s\n",
+			pr_attr("Serial Number", "%s",
 				dmi_string(h, data[0x07]));
 			if (h->length < 0x09) break;
-			printf("\tAsset Tag: %s\n",
+			pr_attr("Asset Tag", "%s",
 				dmi_string(h, data[0x08]));
 			if (h->length < 0x0A) break;
 			printf("\tFeatures:");
 			dmi_base_board_features(data[0x09], "\t\t");
 			if (h->length < 0x0E) break;
-			printf("\tLocation In Chassis: %s\n",
+			pr_attr("Location In Chassis", "%s",
 				dmi_string(h, data[0x0A]));
 			if (!(opt.flags & FLAG_QUIET))
-				printf("\tChassis Handle: 0x%04X\n",
+				pr_attr("Chassis Handle", "0x%04X",
 					WORD(data + 0x0B));
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_base_board_type(data[0x0D]));
 			if (h->length < 0x0F) break;
 			if (h->length < 0x0F + data[0x0E] * sizeof(u16)) break;
@@ -3989,109 +4068,94 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 3: /* 7.4 Chassis Information */
 			pr_handle_name("Chassis Information");
 			if (h->length < 0x09) break;
-			printf("\tManufacturer: %s\n",
+			pr_attr("Manufacturer", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_chassis_type(data[0x05]));
-			printf("\tLock: %s\n",
+			pr_attr("Lock", "%s",
 				dmi_chassis_lock(data[0x05] >> 7));
-			printf("\tVersion: %s\n",
+			pr_attr("Version", "%s",
 				dmi_string(h, data[0x06]));
-			printf("\tSerial Number: %s\n",
+			pr_attr("Serial Number", "%s",
 				dmi_string(h, data[0x07]));
-			printf("\tAsset Tag: %s\n",
+			pr_attr("Asset Tag", "%s",
 				dmi_string(h, data[0x08]));
 			if (h->length < 0x0D) break;
-			printf("\tBoot-up State: %s\n",
+			pr_attr("Boot-up State", "%s",
 				dmi_chassis_state(data[0x09]));
-			printf("\tPower Supply State: %s\n",
+			pr_attr("Power Supply State", "%s",
 				dmi_chassis_state(data[0x0A]));
-			printf("\tThermal State: %s\n",
+			pr_attr("Thermal State", "%s",
 				dmi_chassis_state(data[0x0B]));
-			printf("\tSecurity Status: %s\n",
+			pr_attr("Security Status", "%s",
 				dmi_chassis_security_status(data[0x0C]));
 			if (h->length < 0x11) break;
-			printf("\tOEM Information: 0x%08X\n",
+			pr_attr("OEM Information", "0x%08X",
 				DWORD(data + 0x0D));
 			if (h->length < 0x13) break;
-			printf("\tHeight:");
 			dmi_chassis_height(data[0x11]);
-			printf("\n");
-			printf("\tNumber Of Power Cords:");
 			dmi_chassis_power_cords(data[0x12]);
-			printf("\n");
 			if (h->length < 0x15) break;
 			if (h->length < 0x15 + data[0x13] * data[0x14]) break;
 			dmi_chassis_elements(data[0x13], data[0x14], data + 0x15, "\t");
 			if (h->length < 0x16 + data[0x13] * data[0x14]) break;
-			printf("\tSKU Number: %s\n",
+			pr_attr("SKU Number", "%s",
 				dmi_string(h, data[0x15 + data[0x13] * data[0x14]]));
 			break;
 
 		case 4: /* 7.5 Processor Information */
 			pr_handle_name("Processor Information");
 			if (h->length < 0x1A) break;
-			printf("\tSocket Designation: %s\n",
+			pr_attr("Socket Designation", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_processor_type(data[0x05]));
-			printf("\tFamily: %s\n",
+			pr_attr("Family", "%s",
 				dmi_processor_family(h, ver));
-			printf("\tManufacturer: %s\n",
+			pr_attr("Manufacturer", "%s",
 				dmi_string(h, data[0x07]));
 			dmi_processor_id(h, "\t");
-			printf("\tVersion: %s\n",
+			pr_attr("Version", "%s",
 				dmi_string(h, data[0x10]));
-			printf("\tVoltage:");
-			dmi_processor_voltage(data[0x11]);
-			printf("\n");
-			printf("\tExternal Clock: ");
-			dmi_processor_frequency(data + 0x12);
-			printf("\n");
-			printf("\tMax Speed: ");
-			dmi_processor_frequency(data + 0x14);
-			printf("\n");
-			printf("\tCurrent Speed: ");
-			dmi_processor_frequency(data + 0x16);
-			printf("\n");
+			dmi_processor_voltage("Voltage", data[0x11]);
+			dmi_processor_frequency("External Clock", data + 0x12);
+			dmi_processor_frequency("Max Speed", data + 0x14);
+			dmi_processor_frequency("Current Speed", data + 0x16);
 			if (data[0x18] & (1 << 6))
-				printf("\tStatus: Populated, %s\n",
+				pr_attr("Status", "Populated, %s",
 					dmi_processor_status(data[0x18] & 0x07));
 			else
-				printf("\tStatus: Unpopulated\n");
-			printf("\tUpgrade: %s\n",
+				pr_attr("Status", "Unpopulated");
+			pr_attr("Upgrade", "%s",
 				dmi_processor_upgrade(data[0x19]));
 			if (h->length < 0x20) break;
 			if (!(opt.flags & FLAG_QUIET))
 			{
-				printf("\tL1 Cache Handle:");
-				dmi_processor_cache(WORD(data + 0x1A), "L1", ver);
-				printf("\n");
-				printf("\tL2 Cache Handle:");
-				dmi_processor_cache(WORD(data + 0x1C), "L2", ver);
-				printf("\n");
-				printf("\tL3 Cache Handle:");
-				dmi_processor_cache(WORD(data + 0x1E), "L3", ver);
-				printf("\n");
+				dmi_processor_cache("L1 Cache Handle",
+						    WORD(data + 0x1A), "L1", ver);
+				dmi_processor_cache("L2 Cache Handle",
+						    WORD(data + 0x1C), "L2", ver);
+				dmi_processor_cache("L3 Cache Handle",
+						    WORD(data + 0x1E), "L3", ver);
 			}
 			if (h->length < 0x23) break;
-			printf("\tSerial Number: %s\n",
+			pr_attr("Serial Number", "%s",
 				dmi_string(h, data[0x20]));
-			printf("\tAsset Tag: %s\n",
+			pr_attr("Asset Tag", "%s",
 				dmi_string(h, data[0x21]));
-			printf("\tPart Number: %s\n",
+			pr_attr("Part Number", "%s",
 				dmi_string(h, data[0x22]));
 			if (h->length < 0x28) break;
 			if (data[0x23] != 0)
-				printf("\tCore Count: %u\n",
+				pr_attr("Core Count", "%u",
 					h->length >= 0x2C && data[0x23] == 0xFF ?
 					WORD(data + 0x2A) : data[0x23]);
 			if (data[0x24] != 0)
-				printf("\tCore Enabled: %u\n",
+				pr_attr("Core Enabled", "%u",
 					h->length >= 0x2E && data[0x24] == 0xFF ?
 					WORD(data + 0x2C) : data[0x24]);
 			if (data[0x25] != 0)
-				printf("\tThread Count: %u\n",
+				pr_attr("Thread Count", "%u",
 					h->length >= 0x30 && data[0x25] == 0xFF ?
 					WORD(data + 0x2E) : data[0x25]);
 			printf("\tCharacteristics:");
@@ -4101,26 +4165,24 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 5: /* 7.6 Memory Controller Information */
 			pr_handle_name("Memory Controller Information");
 			if (h->length < 0x0F) break;
-			printf("\tError Detecting Method: %s\n",
+			pr_attr("Error Detecting Method", "%s",
 				dmi_memory_controller_ed_method(data[0x04]));
 			printf("\tError Correcting Capabilities:");
 			dmi_memory_controller_ec_capabilities(data[0x05], "\t\t");
-			printf("\tSupported Interleave: %s\n",
+			pr_attr("Supported Interleave", "%s",
 				dmi_memory_controller_interleave(data[0x06]));
-			printf("\tCurrent Interleave: %s\n",
+			pr_attr("Current Interleave", "%s",
 				dmi_memory_controller_interleave(data[0x07]));
-			printf("\tMaximum Memory Module Size: %u MB\n",
+			pr_attr("Maximum Memory Module Size", "%u MB",
 				1 << data[0x08]);
-			printf("\tMaximum Total Memory Size: %u MB\n",
+			pr_attr("Maximum Total Memory Size", "%u MB",
 				data[0x0E] * (1 << data[0x08]));
 			printf("\tSupported Speeds:");
 			dmi_memory_controller_speeds(WORD(data + 0x09), "\t\t");
 			printf("\tSupported Memory Types:");
 			dmi_memory_module_types(WORD(data + 0x0B), "\n\t\t");
 			printf("\n");
-			printf("\tMemory Module Voltage:");
-			dmi_processor_voltage(data[0x0D]);
-			printf("\n");
+			dmi_processor_voltage("Memory Module Voltage", data[0x0D]);
 			if (h->length < 0x0F + data[0x0E] * sizeof(u16)) break;
 			dmi_memory_controller_slots(data[0x0E], data + 0x0F, "\t");
 			if (h->length < 0x10 + data[0x0E] * sizeof(u16)) break;
@@ -4131,52 +4193,39 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 6: /* 7.7 Memory Module Information */
 			pr_handle_name("Memory Module Information");
 			if (h->length < 0x0C) break;
-			printf("\tSocket Designation: %s\n",
+			pr_attr("Socket Designation", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tBank Connections:");
 			dmi_memory_module_connections(data[0x05]);
-			printf("\n");
-			printf("\tCurrent Speed:");
-			dmi_memory_module_speed(data[0x06]);
-			printf("\n");
+			dmi_memory_module_speed("Current Speed", data[0x06]);
 			printf("\tType:");
 			dmi_memory_module_types(WORD(data + 0x07), " ");
 			printf("\n");
-			printf("\tInstalled Size:");
-			dmi_memory_module_size(data[0x09]);
-			printf("\n");
-			printf("\tEnabled Size:");
-			dmi_memory_module_size(data[0x0A]);
-			printf("\n");
-			printf("\tError Status:");
+			dmi_memory_module_size("Installed Size", data[0x09]);
+			dmi_memory_module_size("Enabled Size", data[0x0A]);
 			dmi_memory_module_error(data[0x0B]);
 			break;
 
 		case 7: /* 7.8 Cache Information */
 			pr_handle_name("Cache Information");
 			if (h->length < 0x0F) break;
-			printf("\tSocket Designation: %s\n",
+			pr_attr("Socket Designation", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tConfiguration: %s, %s, Level %u\n",
+			pr_attr("Configuration", "%s, %s, Level %u",
 				WORD(data + 0x05) & 0x0080 ? "Enabled" : "Disabled",
 				WORD(data + 0x05) & 0x0008 ? "Socketed" : "Not Socketed",
 				(WORD(data + 0x05) & 0x0007) + 1);
-			printf("\tOperational Mode: %s\n",
+			pr_attr("Operational Mode", "%s",
 				dmi_cache_mode((WORD(data + 0x05) >> 8) & 0x0003));
-			printf("\tLocation: %s\n",
+			pr_attr("Location", "%s",
 				dmi_cache_location((WORD(data + 0x05) >> 5) & 0x0003));
-			printf("\tInstalled Size:");
 			if (h->length >= 0x1B)
-				dmi_cache_size_2(DWORD(data + 0x17));
+				dmi_cache_size_2("Installed Size", DWORD(data + 0x17));
 			else
-				dmi_cache_size(WORD(data + 0x09));
-			printf("\n");
-			printf("\tMaximum Size:");
+				dmi_cache_size("Installed Size", WORD(data + 0x09));
 			if (h->length >= 0x17)
-				dmi_cache_size_2(DWORD(data + 0x13));
+				dmi_cache_size_2("Maximum Size", DWORD(data + 0x13));
 			else
-				dmi_cache_size(WORD(data + 0x07));
-			printf("\n");
+				dmi_cache_size("Maximum Size", WORD(data + 0x07));
 			printf("\tSupported SRAM Types:");
 			dmi_cache_types(WORD(data + 0x0B), "\n\t\t");
 			printf("\n");
@@ -4184,73 +4233,71 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_cache_types(WORD(data + 0x0D), " ");
 			printf("\n");
 			if (h->length < 0x13) break;
-			printf("\tSpeed:");
-			dmi_memory_module_speed(data[0x0F]);
-			printf("\n");
-			printf("\tError Correction Type: %s\n",
+			dmi_memory_module_speed("Speed", data[0x0F]);
+			pr_attr("Error Correction Type", "%s",
 				dmi_cache_ec_type(data[0x10]));
-			printf("\tSystem Type: %s\n",
+			pr_attr("System Type", "%s",
 				dmi_cache_type(data[0x11]));
-			printf("\tAssociativity: %s\n",
+			pr_attr("Associativity", "%s",
 				dmi_cache_associativity(data[0x12]));
 			break;
 
 		case 8: /* 7.9 Port Connector Information */
 			pr_handle_name("Port Connector Information");
 			if (h->length < 0x09) break;
-			printf("\tInternal Reference Designator: %s\n",
+			pr_attr("Internal Reference Designator", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tInternal Connector Type: %s\n",
+			pr_attr("Internal Connector Type", "%s",
 				dmi_port_connector_type(data[0x05]));
-			printf("\tExternal Reference Designator: %s\n",
+			pr_attr("External Reference Designator", "%s",
 				dmi_string(h, data[0x06]));
-			printf("\tExternal Connector Type: %s\n",
+			pr_attr("External Connector Type", "%s",
 				dmi_port_connector_type(data[0x07]));
-			printf("\tPort Type: %s\n",
+			pr_attr("Port Type", "%s",
 				dmi_port_type(data[0x08]));
 			break;
 
 		case 9: /* 7.10 System Slots */
 			pr_handle_name("System Slot Information");
 			if (h->length < 0x0C) break;
-			printf("\tDesignation: %s\n",
+			pr_attr("Designation", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tType: %s%s\n",
+			pr_attr("Type", "%s%s",
 				dmi_slot_bus_width(data[0x06]),
 				dmi_slot_type(data[0x05]));
-			printf("\tCurrent Usage: %s\n",
+			pr_attr("Current Usage", "%s",
 				dmi_slot_current_usage(data[0x07]));
-			printf("\tLength: %s\n",
+			pr_attr("Length", "%s",
 				dmi_slot_length(data[0x08]));
-			dmi_slot_id(data[0x09], data[0x0A], data[0x05], "\t");
+			dmi_slot_id(data[0x09], data[0x0A], data[0x05]);
 			printf("\tCharacteristics:");
 			if (h->length < 0x0D)
 				dmi_slot_characteristics(data[0x0B], 0x00, "\t\t");
 			else
 				dmi_slot_characteristics(data[0x0B], data[0x0C], "\t\t");
 			if (h->length < 0x11) break;
-			dmi_slot_segment_bus_func(WORD(data + 0x0D), data[0x0F], data[0x10], "\t");
+			dmi_slot_segment_bus_func(WORD(data + 0x0D), data[0x0F], data[0x10]);
 			if (h->length < 0x13) break;
-			printf("\tData Bus Width: %u\n", data[0x11]);
-			printf("\tPeer Devices: %u\n", data[0x12]);
+			pr_attr("Data Bus Width", "%u", data[0x11]);
+			pr_attr("Peer Devices", "%u", data[0x12]);
 			if (h->length - 0x13 >= data[0x12] * 5)
-				dmi_slot_peers(data[0x12], data + 0x13, "\t");
+				dmi_slot_peers(data[0x12], data + 0x13);
 			break;
 
 		case 10: /* 7.11 On Board Devices Information */
-			dmi_on_board_devices(h, "");
+			dmi_on_board_devices(h);
 			break;
 
 		case 11: /* 7.12 OEM Strings */
 			pr_handle_name("OEM Strings");
 			if (h->length < 0x05) break;
-			dmi_oem_strings(h, "\t");
+			dmi_oem_strings(h);
 			break;
 
 		case 12: /* 7.13 System Configuration Options */
 			pr_handle_name("System Configuration Options");
 			if (h->length < 0x05) break;
-			dmi_system_configuration_options(h, "\t");
+			dmi_system_configuration_options(h);
 			break;
 
 		case 13: /* 7.14 BIOS Language Information */
@@ -4258,19 +4305,19 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x16) break;
 			if (ver >= 0x0201)
 			{
-				printf("\tLanguage Description Format: %s\n",
+				pr_attr("Language Description Format", "%s",
 					dmi_bios_language_format(data[0x05]));
 			}
 			printf("\tInstallable Languages: %u\n", data[0x04]);
 			dmi_bios_languages(h, "\t\t");
-			printf("\tCurrently Installed Language: %s\n",
+			pr_attr("Currently Installed Language", "%s",
 				dmi_string(h, data[0x15]));
 			break;
 
 		case 14: /* 7.15 Group Associations */
 			pr_handle_name("Group Associations");
 			if (h->length < 0x05) break;
-			printf("\tName: %s\n",
+			pr_attr("Name", "%s",
 				dmi_string(h, data[0x04]));
 			printf("\tItems: %u\n",
 				(h->length - 0x05) / 3);
@@ -4280,51 +4327,47 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 15: /* 7.16 System Event Log */
 			pr_handle_name("System Event Log");
 			if (h->length < 0x14) break;
-			printf("\tArea Length: %u bytes\n",
+			pr_attr("Area Length", "%u bytes",
 				WORD(data + 0x04));
-			printf("\tHeader Start Offset: 0x%04X\n",
+			pr_attr("Header Start Offset", "0x%04X",
 				WORD(data + 0x06));
 			if (WORD(data + 0x08) - WORD(data + 0x06))
-				printf("\tHeader Length: %u byte%s\n",
+				pr_attr("Header Length", "%u byte%s",
 					WORD(data + 0x08) - WORD(data + 0x06),
 					WORD(data + 0x08) - WORD(data + 0x06) > 1 ? "s" : "");
-			printf("\tData Start Offset: 0x%04X\n",
+			pr_attr("Data Start Offset", "0x%04X",
 				WORD(data + 0x08));
-			printf("\tAccess Method: %s\n",
+			pr_attr("Access Method", "%s",
 				dmi_event_log_method(data[0x0A]));
-			printf("\tAccess Address:");
 			dmi_event_log_address(data[0x0A], data + 0x10);
-			printf("\n");
-			printf("\tStatus:");
 			dmi_event_log_status(data[0x0B]);
-			printf("\n");
-			printf("\tChange Token: 0x%08X\n",
+			pr_attr("Change Token", "0x%08X",
 				DWORD(data + 0x0C));
 			if (h->length < 0x17) break;
-			printf("\tHeader Format: %s\n",
+			pr_attr("Header Format", "%s",
 				dmi_event_log_header_type(data[0x14]));
-			printf("\tSupported Log Type Descriptors: %u\n",
+			pr_attr("Supported Log Type Descriptors", "%u",
 				data[0x15]);
 			if (h->length < 0x17 + data[0x15] * data[0x16]) break;
-			dmi_event_log_descriptors(data[0x15], data[0x16], data + 0x17, "\t");
+			dmi_event_log_descriptors(data[0x15], data[0x16], data + 0x17);
 			break;
 
 		case 16: /* 7.17 Physical Memory Array */
 			pr_handle_name("Physical Memory Array");
 			if (h->length < 0x0F) break;
-			printf("\tLocation: %s\n",
+			pr_attr("Location", "%s",
 				dmi_memory_array_location(data[0x04]));
-			printf("\tUse: %s\n",
+			pr_attr("Use", "%s",
 				dmi_memory_array_use(data[0x05]));
-			printf("\tError Correction Type: %s\n",
+			pr_attr("Error Correction Type", "%s",
 				dmi_memory_array_ec_type(data[0x06]));
-			printf("\tMaximum Capacity:");
 			if (DWORD(data + 0x07) == 0x80000000)
 			{
 				if (h->length < 0x17)
-					printf(" Unknown");
+					pr_attr("Maximum Capacity", "Unknown");
 				else
-					dmi_print_memory_size(QWORD(data + 0x0F), 0);
+					dmi_print_memory_size("Maximum Capacity",
+							      QWORD(data + 0x0F), 0);
 			}
 			else
 			{
@@ -4332,16 +4375,12 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 
 				capacity.h = 0;
 				capacity.l = DWORD(data + 0x07);
-				dmi_print_memory_size(capacity, 1);
+				dmi_print_memory_size("Maximum Capacity",
+						      capacity, 1);
 			}
-			printf("\n");
 			if (!(opt.flags & FLAG_QUIET))
-			{
-				printf("\tError Information Handle:");
 				dmi_memory_array_error_handle(WORD(data + 0x0B));
-				printf("\n");
-			}
-			printf("\tNumber Of Devices: %u\n",
+			pr_attr("Number Of Devices", "%u",
 				WORD(data + 0x0D));
 			break;
 
@@ -4350,132 +4389,91 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x15) break;
 			if (!(opt.flags & FLAG_QUIET))
 			{
-				printf("\tArray Handle: 0x%04X\n",
+				pr_attr("Array Handle", "0x%04X",
 					WORD(data + 0x04));
-				printf("\tError Information Handle:");
 				dmi_memory_array_error_handle(WORD(data + 0x06));
-				printf("\n");
 			}
-			printf("\tTotal Width:");
-			dmi_memory_device_width(WORD(data + 0x08));
-			printf("\n");
-			printf("\tData Width:");
-			dmi_memory_device_width(WORD(data + 0x0A));
-			printf("\n");
-			printf("\tSize:");
+			dmi_memory_device_width("Total Width", WORD(data + 0x08));
+			dmi_memory_device_width("Data Width", WORD(data + 0x0A));
 			if (h->length >= 0x20 && WORD(data + 0x0C) == 0x7FFF)
 				dmi_memory_device_extended_size(DWORD(data + 0x1C));
 			else
 				dmi_memory_device_size(WORD(data + 0x0C));
-			printf("\n");
-			printf("\tForm Factor: %s\n",
+			pr_attr("Form Factor", "%s",
 				dmi_memory_device_form_factor(data[0x0E]));
-			printf("\tSet:");
 			dmi_memory_device_set(data[0x0F]);
-			printf("\n");
-			printf("\tLocator: %s\n",
+			pr_attr("Locator", "%s",
 				dmi_string(h, data[0x10]));
-			printf("\tBank Locator: %s\n",
+			pr_attr("Bank Locator", "%s",
 				dmi_string(h, data[0x11]));
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_memory_device_type(data[0x12]));
-			printf("\tType Detail:");
 			dmi_memory_device_type_detail(WORD(data + 0x13));
-			printf("\n");
 			if (h->length < 0x17) break;
-			printf("\tSpeed:");
-			dmi_memory_device_speed(WORD(data + 0x15));
-			printf("\n");
+			dmi_memory_device_speed("Speed", WORD(data + 0x15));
 			if (h->length < 0x1B) break;
-			printf("\tManufacturer: %s\n",
+			pr_attr("Manufacturer", "%s",
 				dmi_string(h, data[0x17]));
-			printf("\tSerial Number: %s\n",
+			pr_attr("Serial Number", "%s",
 				dmi_string(h, data[0x18]));
-			printf("\tAsset Tag: %s\n",
+			pr_attr("Asset Tag", "%s",
 				dmi_string(h, data[0x19]));
-			printf("\tPart Number: %s\n",
+			pr_attr("Part Number", "%s",
 				dmi_string(h, data[0x1A]));
 			if (h->length < 0x1C) break;
-			printf("\tRank: ");
 			if ((data[0x1B] & 0x0F) == 0)
-				printf("Unknown");
+				pr_attr("Rank", "Unknown");
 			else
-				printf("%u", data[0x1B] & 0x0F);
-			printf("\n");
+				pr_attr("Rank", "%u", data[0x1B] & 0x0F);
 			if (h->length < 0x22) break;
-			printf("\tConfigured Memory Speed:");
-			dmi_memory_device_speed(WORD(data + 0x20));
-			printf("\n");
+			dmi_memory_device_speed("Configured Memory Speed",
+						WORD(data + 0x20));
 			if (h->length < 0x28) break;
-			printf("\tMinimum Voltage:");
-			dmi_memory_voltage_value(WORD(data + 0x22));
-			printf("\n");
-			printf("\tMaximum Voltage:");
-			dmi_memory_voltage_value(WORD(data + 0x24));
-			printf("\n");
-			printf("\tConfigured Voltage:");
-			dmi_memory_voltage_value(WORD(data + 0x26));
-			printf("\n");
+			dmi_memory_voltage_value("Minimum Voltage",
+						 WORD(data + 0x22));
+			dmi_memory_voltage_value("Maximum Voltage",
+						 WORD(data + 0x24));
+			dmi_memory_voltage_value("Configured Voltage",
+						 WORD(data + 0x26));
 			if (h->length < 0x34) break;
-			printf("\tMemory Technology:");
 			dmi_memory_technology(data[0x28]);
-			printf("\n");
-			printf("\tMemory Operating Mode Capability:");
 			dmi_memory_operating_mode_capability(WORD(data + 0x29));
-			printf("\n");
-			printf("\tFirmware Version: %s\n",
+			pr_attr("Firmware Version", "%s",
 				dmi_string(h, data[0x2B]));
-			printf("\tModule Manufacturer ID:");
-			dmi_memory_manufacturer_id(WORD(data + 0x2C));
-			printf("\n");
-			printf("\tModule Product ID:");
-			dmi_memory_product_id(WORD(data + 0x2E));
-			printf("\n");
-			printf("\tMemory Subsystem Controller Manufacturer ID:");
-			dmi_memory_manufacturer_id(WORD(data + 0x30));
-			printf("\n");
-			printf("\tMemory Subsystem Controller Product ID:");
-			dmi_memory_product_id(WORD(data + 0x32));
-			printf("\n");
+			dmi_memory_manufacturer_id("Module Manufacturer ID",
+						   WORD(data + 0x2C));
+			dmi_memory_product_id("Module Product ID",
+					      WORD(data + 0x2E));
+			dmi_memory_manufacturer_id("Memory Subsystem Controller Manufacturer ID",
+						   WORD(data + 0x30));
+			dmi_memory_product_id("Memory Subsystem Controller Product ID",
+					      WORD(data + 0x32));
 			if (h->length < 0x3C) break;
-			printf("\tNon-Volatile Size:");
-			dmi_memory_size(QWORD(data + 0x34));
-			printf("\n");
+			dmi_memory_size("Non-Volatile Size", QWORD(data + 0x34));
 			if (h->length < 0x44) break;
-			printf("\tVolatile Size:");
-			dmi_memory_size(QWORD(data + 0x3C));
-			printf("\n");
+			dmi_memory_size("Volatile Size", QWORD(data + 0x3C));
 			if (h->length < 0x4C) break;
-			printf("\tCache Size:");
-			dmi_memory_size(QWORD(data + 0x44));
-			printf("\n");
+			dmi_memory_size("Cache Size", QWORD(data + 0x44));
 			if (h->length < 0x54) break;
-			printf("\tLogical Size:");
-			dmi_memory_size(QWORD(data + 0x4C));
-			printf("\n");
+			dmi_memory_size("Logical Size", QWORD(data + 0x4C));
 			break;
 
 		case 18: /* 7.19 32-bit Memory Error Information */
 			pr_handle_name("32-bit Memory Error Information");
 			if (h->length < 0x17) break;
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_memory_error_type(data[0x04]));
-			printf("\tGranularity: %s\n",
+			pr_attr("Granularity", "%s",
 				dmi_memory_error_granularity(data[0x05]));
-			printf("\tOperation: %s\n",
+			pr_attr("Operation", "%s",
 				dmi_memory_error_operation(data[0x06]));
-			printf("\tVendor Syndrome:");
 			dmi_memory_error_syndrome(DWORD(data + 0x07));
-			printf("\n");
-			printf("\tMemory Array Address:");
-			dmi_32bit_memory_error_address(DWORD(data + 0x0B));
-			printf("\n");
-			printf("\tDevice Address:");
-			dmi_32bit_memory_error_address(DWORD(data + 0x0F));
-			printf("\n");
-			printf("\tResolution:");
-			dmi_32bit_memory_error_address(DWORD(data + 0x13));
-			printf("\n");
+			dmi_32bit_memory_error_address("Memory Array Address",
+						       DWORD(data + 0x0B));
+			dmi_32bit_memory_error_address("Device Address",
+						       DWORD(data + 0x0F));
+			dmi_32bit_memory_error_address("Resolution",
+						       DWORD(data + 0x13));
 			break;
 
 		case 19: /* 7.20 Memory Array Mapped Address */
@@ -4488,29 +4486,26 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				start = QWORD(data + 0x0F);
 				end = QWORD(data + 0x17);
 
-				printf("\tStarting Address: 0x%08X%08Xk\n",
+				pr_attr("Starting Address", "0x%08X%08Xk",
 					start.h, start.l);
-				printf("\tEnding Address: 0x%08X%08Xk\n",
+				pr_attr("Ending Address", "0x%08X%08Xk",
 					end.h, end.l);
-				printf("\tRange Size:");
 				dmi_mapped_address_extended_size(start, end);
 			}
 			else
 			{
-				printf("\tStarting Address: 0x%08X%03X\n",
+				pr_attr("Starting Address", "0x%08X%03X",
 					DWORD(data + 0x04) >> 2,
 					(DWORD(data + 0x04) & 0x3) << 10);
-				printf("\tEnding Address: 0x%08X%03X\n",
+				pr_attr("Ending Address", "0x%08X%03X",
 					DWORD(data + 0x08) >> 2,
 					((DWORD(data + 0x08) & 0x3) << 10) + 0x3FF);
-				printf("\tRange Size:");
 				dmi_mapped_address_size(DWORD(data + 0x08) - DWORD(data + 0x04) + 1);
 			}
-			printf("\n");
 			if (!(opt.flags & FLAG_QUIET))
-				printf("\tPhysical Array Handle: 0x%04X\n",
+				pr_attr("Physical Array Handle", "0x%04X",
 					WORD(data + 0x0C));
-			printf("\tPartition Width: %u\n",
+			pr_attr("Partition Width", "%u",
 				data[0x0E]);
 			break;
 
@@ -4524,344 +4519,288 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				start = QWORD(data + 0x13);
 				end = QWORD(data + 0x1B);
 
-				printf("\tStarting Address: 0x%08X%08Xk\n",
+				pr_attr("Starting Address", "0x%08X%08Xk",
 					start.h, start.l);
-				printf("\tEnding Address: 0x%08X%08Xk\n",
+				pr_attr("Ending Address", "0x%08X%08Xk",
 					end.h, end.l);
-				printf("\tRange Size:");
 				dmi_mapped_address_extended_size(start, end);
 			}
 			else
 			{
-				printf("\tStarting Address: 0x%08X%03X\n",
+				pr_attr("Starting Address", "0x%08X%03X",
 					DWORD(data + 0x04) >> 2,
 					(DWORD(data + 0x04) & 0x3) << 10);
-				printf("\tEnding Address: 0x%08X%03X\n",
+				pr_attr("Ending Address", "0x%08X%03X",
 					DWORD(data + 0x08) >> 2,
 					((DWORD(data + 0x08) & 0x3) << 10) + 0x3FF);
-				printf("\tRange Size:");
 				dmi_mapped_address_size(DWORD(data + 0x08) - DWORD(data + 0x04) + 1);
 			}
-			printf("\n");
 			if (!(opt.flags & FLAG_QUIET))
 			{
-				printf("\tPhysical Device Handle: 0x%04X\n",
+				pr_attr("Physical Device Handle", "0x%04X",
 					WORD(data + 0x0C));
-				printf("\tMemory Array Mapped Address Handle: 0x%04X\n",
+				pr_attr("Memory Array Mapped Address Handle", "0x%04X",
 					WORD(data + 0x0E));
 			}
-			printf("\tPartition Row Position:");
 			dmi_mapped_address_row_position(data[0x10]);
-			printf("\n");
-			dmi_mapped_address_interleave_position(data[0x11], "\t");
-			dmi_mapped_address_interleaved_data_depth(data[0x12], "\t");
+			dmi_mapped_address_interleave_position(data[0x11]);
+			dmi_mapped_address_interleaved_data_depth(data[0x12]);
 			break;
 
 		case 21: /* 7.22 Built-in Pointing Device */
 			pr_handle_name("Built-in Pointing Device");
 			if (h->length < 0x07) break;
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_pointing_device_type(data[0x04]));
-			printf("\tInterface: %s\n",
+			pr_attr("Interface", "%s",
 				dmi_pointing_device_interface(data[0x05]));
-			printf("\tButtons: %u\n",
+			pr_attr("Buttons", "%u",
 				data[0x06]);
 			break;
 
 		case 22: /* 7.23 Portable Battery */
 			pr_handle_name("Portable Battery");
 			if (h->length < 0x10) break;
-			printf("\tLocation: %s\n",
+			pr_attr("Location", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tManufacturer: %s\n",
+			pr_attr("Manufacturer", "%s",
 				dmi_string(h, data[0x05]));
 			if (data[0x06] || h->length < 0x1A)
-				printf("\tManufacture Date: %s\n",
+				pr_attr("Manufacture Date", "%s",
 					dmi_string(h, data[0x06]));
 			if (data[0x07] || h->length < 0x1A)
-				printf("\tSerial Number: %s\n",
+				pr_attr("Serial Number", "%s",
 					dmi_string(h, data[0x07]));
-			printf("\tName: %s\n",
+			pr_attr("Name", "%s",
 				dmi_string(h, data[0x08]));
 			if (data[0x09] != 0x02 || h->length < 0x1A)
-				printf("\tChemistry: %s\n",
+				pr_attr("Chemistry", "%s",
 					dmi_battery_chemistry(data[0x09]));
-			printf("\tDesign Capacity:");
 			if (h->length < 0x16)
 				dmi_battery_capacity(WORD(data + 0x0A), 1);
 			else
 				dmi_battery_capacity(WORD(data + 0x0A), data[0x15]);
-			printf("\n");
-			printf("\tDesign Voltage:");
 			dmi_battery_voltage(WORD(data + 0x0C));
-			printf("\n");
-			printf("\tSBDS Version: %s\n",
+			pr_attr("SBDS Version", "%s",
 				dmi_string(h, data[0x0E]));
-			printf("\tMaximum Error:");
 			dmi_battery_maximum_error(data[0x0F]);
-			printf("\n");
 			if (h->length < 0x1A) break;
 			if (data[0x07] == 0)
-				printf("\tSBDS Serial Number: %04X\n",
+				pr_attr("SBDS Serial Number", "%04X",
 					WORD(data + 0x10));
 			if (data[0x06] == 0)
-				printf("\tSBDS Manufacture Date: %u-%02u-%02u\n",
+				pr_attr("SBDS Manufacture Date", "%u-%02u-%02u",
 					1980 + (WORD(data + 0x12) >> 9),
 					(WORD(data + 0x12) >> 5) & 0x0F,
 					WORD(data + 0x12) & 0x1F);
 			if (data[0x09] == 0x02)
-				printf("\tSBDS Chemistry: %s\n",
+				pr_attr("SBDS Chemistry", "%s",
 					dmi_string(h, data[0x14]));
-			printf("\tOEM-specific Information: 0x%08X\n",
+			pr_attr("OEM-specific Information", "0x%08X",
 				DWORD(data + 0x16));
 			break;
 
 		case 23: /* 7.24 System Reset */
 			pr_handle_name("System Reset");
 			if (h->length < 0x0D) break;
-			printf("\tStatus: %s\n",
+			pr_attr("Status", "%s",
 				data[0x04] & (1 << 0) ? "Enabled" : "Disabled");
-			printf("\tWatchdog Timer: %s\n",
+			pr_attr("Watchdog Timer", "%s",
 				data[0x04] & (1 << 5) ? "Present" : "Not Present");
 			if (!(data[0x04] & (1 << 5)))
 				break;
-			printf("\tBoot Option: %s\n",
+			pr_attr("Boot Option", "%s",
 				dmi_system_reset_boot_option((data[0x04] >> 1) & 0x3));
-			printf("\tBoot Option On Limit: %s\n",
+			pr_attr("Boot Option On Limit", "%s",
 				dmi_system_reset_boot_option((data[0x04] >> 3) & 0x3));
-			printf("\tReset Count:");
-			dmi_system_reset_count(WORD(data + 0x05));
-			printf("\n");
-			printf("\tReset Limit:");
-			dmi_system_reset_count(WORD(data + 0x07));
-			printf("\n");
-			printf("\tTimer Interval:");
-			dmi_system_reset_timer(WORD(data + 0x09));
-			printf("\n");
-			printf("\tTimeout:");
-			dmi_system_reset_timer(WORD(data + 0x0B));
-			printf("\n");
+			dmi_system_reset_count("Reset Count", WORD(data + 0x05));
+			dmi_system_reset_count("Reset Limit", WORD(data + 0x07));
+			dmi_system_reset_timer("Timer Interval", WORD(data + 0x09));
+			dmi_system_reset_timer("Timeout", WORD(data + 0x0B));
 			break;
 
 		case 24: /* 7.25 Hardware Security */
 			pr_handle_name("Hardware Security");
 			if (h->length < 0x05) break;
-			printf("\tPower-On Password Status: %s\n",
+			pr_attr("Power-On Password Status", "%s",
 				dmi_hardware_security_status(data[0x04] >> 6));
-			printf("\tKeyboard Password Status: %s\n",
+			pr_attr("Keyboard Password Status", "%s",
 				dmi_hardware_security_status((data[0x04] >> 4) & 0x3));
-			printf("\tAdministrator Password Status: %s\n",
+			pr_attr("Administrator Password Status", "%s",
 				dmi_hardware_security_status((data[0x04] >> 2) & 0x3));
-			printf("\tFront Panel Reset Status: %s\n",
+			pr_attr("Front Panel Reset Status", "%s",
 				dmi_hardware_security_status(data[0x04] & 0x3));
 			break;
 
 		case 25: /* 7.26 System Power Controls */
 			pr_handle_name("System Power Controls");
 			if (h->length < 0x09) break;
-			printf("\tNext Scheduled Power-on:");
 			dmi_power_controls_power_on(data + 0x04);
-			printf("\n");
 			break;
 
 		case 26: /* 7.27 Voltage Probe */
 			pr_handle_name("Voltage Probe");
 			if (h->length < 0x14) break;
-			printf("\tDescription: %s\n",
+			pr_attr("Description", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tLocation: %s\n",
+			pr_attr("Location", "%s",
 				dmi_voltage_probe_location(data[0x05] & 0x1f));
-			printf("\tStatus: %s\n",
+			pr_attr("Status", "%s",
 				dmi_probe_status(data[0x05] >> 5));
-			printf("\tMaximum Value:");
-			dmi_voltage_probe_value(WORD(data + 0x06));
-			printf("\n");
-			printf("\tMinimum Value:");
-			dmi_voltage_probe_value(WORD(data + 0x08));
-			printf("\n");
-			printf("\tResolution:");
+			dmi_voltage_probe_value("Maximum Value", WORD(data + 0x06));
+			dmi_voltage_probe_value("Minimum Value", WORD(data + 0x08));
 			dmi_voltage_probe_resolution(WORD(data + 0x0A));
-			printf("\n");
-			printf("\tTolerance:");
-			dmi_voltage_probe_value(WORD(data + 0x0C));
-			printf("\n");
-			printf("\tAccuracy:");
+			dmi_voltage_probe_value("Tolerance", WORD(data + 0x0C));
 			dmi_probe_accuracy(WORD(data + 0x0E));
-			printf("\n");
-			printf("\tOEM-specific Information: 0x%08X\n",
+			pr_attr("OEM-specific Information", "0x%08X",
 				DWORD(data + 0x10));
 			if (h->length < 0x16) break;
-			printf("\tNominal Value:");
-			dmi_voltage_probe_value(WORD(data + 0x14));
-			printf("\n");
+			dmi_voltage_probe_value("Nominal Value", WORD(data + 0x14));
 			break;
 
 		case 27: /* 7.28 Cooling Device */
 			pr_handle_name("Cooling Device");
 			if (h->length < 0x0C) break;
 			if (!(opt.flags & FLAG_QUIET) && WORD(data + 0x04) != 0xFFFF)
-				printf("\tTemperature Probe Handle: 0x%04X\n",
+				pr_attr("Temperature Probe Handle", "0x%04X",
 					WORD(data + 0x04));
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_cooling_device_type(data[0x06] & 0x1f));
-			printf("\tStatus: %s\n",
+			pr_attr("Status", "%s",
 				dmi_probe_status(data[0x06] >> 5));
 			if (data[0x07] != 0x00)
-				printf("\tCooling Unit Group: %u\n",
+				pr_attr("Cooling Unit Group", "%u",
 					data[0x07]);
-			printf("\tOEM-specific Information: 0x%08X\n",
+			pr_attr("OEM-specific Information", "0x%08X",
 				DWORD(data + 0x08));
 			if (h->length < 0x0E) break;
-			printf("\tNominal Speed:");
 			dmi_cooling_device_speed(WORD(data + 0x0C));
-			printf("\n");
 			if (h->length < 0x0F) break;
-			printf("\tDescription: %s\n", dmi_string(h, data[0x0E]));
+			pr_attr("Description", "%s", dmi_string(h, data[0x0E]));
 			break;
 
 		case 28: /* 7.29 Temperature Probe */
 			pr_handle_name("Temperature Probe");
 			if (h->length < 0x14) break;
-			printf("\tDescription: %s\n",
+			pr_attr("Description", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tLocation: %s\n",
+			pr_attr("Location", "%s",
 				dmi_temperature_probe_location(data[0x05] & 0x1F));
-			printf("\tStatus: %s\n",
+			pr_attr("Status", "%s",
 				dmi_probe_status(data[0x05] >> 5));
-			printf("\tMaximum Value:");
-			dmi_temperature_probe_value(WORD(data + 0x06));
-			printf("\n");
-			printf("\tMinimum Value:");
-			dmi_temperature_probe_value(WORD(data + 0x08));
-			printf("\n");
-			printf("\tResolution:");
+			dmi_temperature_probe_value("Maximum Value",
+						    WORD(data + 0x06));
+			dmi_temperature_probe_value("Minimum Value",
+						    WORD(data + 0x08));
 			dmi_temperature_probe_resolution(WORD(data + 0x0A));
-			printf("\n");
-			printf("\tTolerance:");
-			dmi_temperature_probe_value(WORD(data + 0x0C));
-			printf("\n");
-			printf("\tAccuracy:");
+			dmi_temperature_probe_value("Tolerance",
+						    WORD(data + 0x0C));
 			dmi_probe_accuracy(WORD(data + 0x0E));
-			printf("\n");
-			printf("\tOEM-specific Information: 0x%08X\n",
+			pr_attr("OEM-specific Information", "0x%08X",
 				DWORD(data + 0x10));
 			if (h->length < 0x16) break;
-			printf("\tNominal Value:");
-			dmi_temperature_probe_value(WORD(data + 0x14));
-			printf("\n");
+			dmi_temperature_probe_value("Nominal Value",
+						    WORD(data + 0x14));
 			break;
 
 		case 29: /* 7.30 Electrical Current Probe */
 			pr_handle_name("Electrical Current Probe");
 			if (h->length < 0x14) break;
-			printf("\tDescription: %s\n",
+			pr_attr("Description", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tLocation: %s\n",
+			pr_attr("Location", "%s",
 				dmi_voltage_probe_location(data[5] & 0x1F));
-			printf("\tStatus: %s\n",
+			pr_attr("Status", "%s",
 				dmi_probe_status(data[0x05] >> 5));
-			printf("\tMaximum Value:");
-			dmi_current_probe_value(WORD(data + 0x06));
-			printf("\n");
-			printf("\tMinimum Value:");
-			dmi_current_probe_value(WORD(data + 0x08));
-			printf("\n");
-			printf("\tResolution:");
+			dmi_current_probe_value("Maximum Value",
+						WORD(data + 0x06));
+			dmi_current_probe_value("Minimum Value",
+						WORD(data + 0x08));
 			dmi_current_probe_resolution(WORD(data + 0x0A));
-			printf("\n");
-			printf("\tTolerance:");
-			dmi_current_probe_value(WORD(data + 0x0C));
-			printf("\n");
-			printf("\tAccuracy:");
+			dmi_current_probe_value("Tolerance",
+						WORD(data + 0x0C));
 			dmi_probe_accuracy(WORD(data + 0x0E));
-			printf("\n");
-			printf("\tOEM-specific Information: 0x%08X\n",
+			pr_attr("OEM-specific Information", "0x%08X",
 				DWORD(data + 0x10));
 			if (h->length < 0x16) break;
-			printf("\tNominal Value:");
-			dmi_current_probe_value(WORD(data + 0x14));
-			printf("\n");
+			dmi_current_probe_value("Nominal Value",
+						WORD(data + 0x14));
 			break;
 
 		case 30: /* 7.31 Out-of-band Remote Access */
 			pr_handle_name("Out-of-band Remote Access");
 			if (h->length < 0x06) break;
-			printf("\tManufacturer Name: %s\n",
+			pr_attr("Manufacturer Name", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tInbound Connection: %s\n",
+			pr_attr("Inbound Connection", "%s",
 				data[0x05] & (1 << 0) ? "Enabled" : "Disabled");
-			printf("\tOutbound Connection: %s\n",
+			pr_attr("Outbound Connection", "%s",
 				data[0x05] & (1 << 1) ? "Enabled" : "Disabled");
 			break;
 
 		case 31: /* 7.32 Boot Integrity Services Entry Point */
 			pr_handle_name("Boot Integrity Services Entry Point");
 			if (h->length < 0x1C) break;
-			printf("\tChecksum: %s\n",
+			pr_attr("Checksum", "%s",
 				checksum(data, h->length) ? "OK" : "Invalid");
-			printf("\t16-bit Entry Point Address: %04X:%04X\n",
+			pr_attr("16-bit Entry Point Address", "%04X:%04X",
 				DWORD(data + 0x08) >> 16,
 				DWORD(data + 0x08) & 0xFFFF);
-			printf("\t32-bit Entry Point Address: 0x%08X\n",
+			pr_attr("32-bit Entry Point Address", "0x%08X",
 				DWORD(data + 0x0C));
 			break;
 
 		case 32: /* 7.33 System Boot Information */
 			pr_handle_name("System Boot Information");
 			if (h->length < 0x0B) break;
-			printf("\tStatus: %s\n",
+			pr_attr("Status", "%s",
 				dmi_system_boot_status(data[0x0A]));
 			break;
 
 		case 33: /* 7.34 64-bit Memory Error Information */
 			pr_handle_name("64-bit Memory Error Information");
 			if (h->length < 0x1F) break;
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_memory_error_type(data[0x04]));
-			printf("\tGranularity: %s\n",
+			pr_attr("Granularity", "%s",
 				dmi_memory_error_granularity(data[0x05]));
-			printf("\tOperation: %s\n",
+			pr_attr("Operation", "%s",
 				dmi_memory_error_operation(data[0x06]));
-			printf("\tVendor Syndrome:");
 			dmi_memory_error_syndrome(DWORD(data + 0x07));
-			printf("\n");
-			printf("\tMemory Array Address:");
-			dmi_64bit_memory_error_address(QWORD(data + 0x0B));
-			printf("\n");
-			printf("\tDevice Address:");
-			dmi_64bit_memory_error_address(QWORD(data + 0x13));
-			printf("\n");
-			printf("\tResolution:");
-			dmi_32bit_memory_error_address(DWORD(data + 0x1B));
-			printf("\n");
+			dmi_64bit_memory_error_address("Memory Array Address",
+						       QWORD(data + 0x0B));
+			dmi_64bit_memory_error_address("Device Address",
+						       QWORD(data + 0x13));
+			dmi_32bit_memory_error_address("Resolution",
+						       DWORD(data + 0x1B));
 			break;
 
 		case 34: /* 7.35 Management Device */
 			pr_handle_name("Management Device");
 			if (h->length < 0x0B) break;
-			printf("\tDescription: %s\n",
+			pr_attr("Description", "%s",
 				dmi_string(h, data[0x04]));
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_management_device_type(data[0x05]));
-			printf("\tAddress: 0x%08X\n",
+			pr_attr("Address", "0x%08X",
 				DWORD(data + 0x06));
-			printf("\tAddress Type: %s\n",
+			pr_attr("Address Type", "%s",
 				dmi_management_device_address_type(data[0x0A]));
 			break;
 
 		case 35: /* 7.36 Management Device Component */
 			pr_handle_name("Management Device Component");
 			if (h->length < 0x0B) break;
-			printf("\tDescription: %s\n",
+			pr_attr("Description", "%s",
 				dmi_string(h, data[0x04]));
 			if (!(opt.flags & FLAG_QUIET))
 			{
-				printf("\tManagement Device Handle: 0x%04X\n",
+				pr_attr("Management Device Handle", "0x%04X",
 					WORD(data + 0x05));
-				printf("\tComponent Handle: 0x%04X\n",
+				pr_attr("Component Handle", "0x%04X",
 					WORD(data + 0x07));
 				if (WORD(data + 0x09) != 0xFFFF)
-					printf("\tThreshold Handle: 0x%04X\n",
+					pr_attr("Threshold Handle", "0x%04X",
 						WORD(data + 0x09));
 			}
 			break;
@@ -4870,36 +4809,36 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			pr_handle_name("Management Device Threshold Data");
 			if (h->length < 0x10) break;
 			if (WORD(data + 0x04) != 0x8000)
-				printf("\tLower Non-critical Threshold: %d\n",
+				pr_attr("Lower Non-critical Threshold", "%d",
 					(i16)WORD(data + 0x04));
 			if (WORD(data + 0x06) != 0x8000)
-				printf("\tUpper Non-critical Threshold: %d\n",
+				pr_attr("Upper Non-critical Threshold", "%d",
 					(i16)WORD(data + 0x06));
 			if (WORD(data + 0x08) != 0x8000)
-				printf("\tLower Critical Threshold: %d\n",
+				pr_attr("Lower Critical Threshold", "%d",
 					(i16)WORD(data + 0x08));
 			if (WORD(data + 0x0A) != 0x8000)
-				printf("\tUpper Critical Threshold: %d\n",
+				pr_attr("Upper Critical Threshold", "%d",
 					(i16)WORD(data + 0x0A));
 			if (WORD(data + 0x0C) != 0x8000)
-				printf("\tLower Non-recoverable Threshold: %d\n",
+				pr_attr("Lower Non-recoverable Threshold", "%d",
 					(i16)WORD(data + 0x0C));
 			if (WORD(data + 0x0E) != 0x8000)
-				printf("\tUpper Non-recoverable Threshold: %d\n",
+				pr_attr("Upper Non-recoverable Threshold", "%d",
 					(i16)WORD(data + 0x0E));
 			break;
 
 		case 37: /* 7.38 Memory Channel */
 			pr_handle_name("Memory Channel");
 			if (h->length < 0x07) break;
-			printf("\tType: %s\n",
+			pr_attr("Type", "%s",
 				dmi_memory_channel_type(data[0x04]));
-			printf("\tMaximal Load: %u\n",
+			pr_attr("Maximal Load", "%u",
 				data[0x05]);
-			printf("\tDevices: %u\n",
+			pr_attr("Devices", "%u",
 				data[0x06]);
 			if (h->length < 0x07 + 3 * data[0x06]) break;
-			dmi_memory_channel_devices(data[0x06], data + 0x07, "\t");
+			dmi_memory_channel_devices(data[0x06], data + 0x07);
 			break;
 
 		case 38: /* 7.39 IPMI Device Information */
@@ -4909,37 +4848,35 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			 */
 			pr_handle_name("IPMI Device Information");
 			if (h->length < 0x10) break;
-			printf("\tInterface Type: %s\n",
+			pr_attr("Interface Type", "%s",
 				dmi_ipmi_interface_type(data[0x04]));
-			printf("\tSpecification Version: %u.%u\n",
+			pr_attr("Specification Version", "%u.%u",
 				data[0x05] >> 4, data[0x05] & 0x0F);
-			printf("\tI2C Slave Address: 0x%02x\n",
+			pr_attr("I2C Slave Address", "0x%02x",
 				data[0x06] >> 1);
 			if (data[0x07] != 0xFF)
-				printf("\tNV Storage Device Address: %u\n",
+				pr_attr("NV Storage Device Address", "%u",
 					data[0x07]);
 			else
-				printf("\tNV Storage Device: Not Present\n");
-			printf("\tBase Address: ");
+				pr_attr("NV Storage Device", "Not Present");
 			dmi_ipmi_base_address(data[0x04], data + 0x08,
 				h->length < 0x11 ? 0 : (data[0x10] >> 4) & 1);
-			printf("\n");
 			if (h->length < 0x12) break;
 			if (data[0x04] != 0x04)
 			{
-				printf("\tRegister Spacing: %s\n",
+				pr_attr("Register Spacing", "%s",
 					dmi_ipmi_register_spacing(data[0x10] >> 6));
 				if (data[0x10] & (1 << 3))
 				{
-					printf("\tInterrupt Polarity: %s\n",
+					pr_attr("Interrupt Polarity", "%s",
 						data[0x10] & (1 << 1) ? "Active High" : "Active Low");
-					printf("\tInterrupt Trigger Mode: %s\n",
+					pr_attr("Interrupt Trigger Mode", "%s",
 						data[0x10] & (1 << 0) ? "Level" : "Edge");
 				}
 			}
 			if (data[0x11] != 0x00)
 			{
-				printf("\tInterrupt Number: %u\n",
+				pr_attr("Interrupt Number", "%u",
 					data[0x11]);
 			}
 			break;
@@ -4948,51 +4885,47 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			pr_handle_name("System Power Supply");
 			if (h->length < 0x10) break;
 			if (data[0x04] != 0x00)
-				printf("\tPower Unit Group: %u\n",
+				pr_attr("Power Unit Group", "%u",
 					data[0x04]);
-			printf("\tLocation: %s\n",
+			pr_attr("Location", "%s",
 				dmi_string(h, data[0x05]));
-			printf("\tName: %s\n",
+			pr_attr("Name", "%s",
 				dmi_string(h, data[0x06]));
-			printf("\tManufacturer: %s\n",
+			pr_attr("Manufacturer", "%s",
 				dmi_string(h, data[0x07]));
-			printf("\tSerial Number: %s\n",
+			pr_attr("Serial Number", "%s",
 				dmi_string(h, data[0x08]));
-			printf("\tAsset Tag: %s\n",
+			pr_attr("Asset Tag", "%s",
 				dmi_string(h, data[0x09]));
-			printf("\tModel Part Number: %s\n",
+			pr_attr("Model Part Number", "%s",
 				dmi_string(h, data[0x0A]));
-			printf("\tRevision: %s\n",
+			pr_attr("Revision", "%s",
 				dmi_string(h, data[0x0B]));
-			printf("\tMax Power Capacity:");
 			dmi_power_supply_power(WORD(data + 0x0C));
-			printf("\n");
-			printf("\tStatus:");
 			if (WORD(data + 0x0E) & (1 << 1))
-				printf(" Present, %s",
+				pr_attr("Status", "Present, %s",
 					dmi_power_supply_status((WORD(data + 0x0E) >> 7) & 0x07));
 			else
-				printf(" Not Present");
-			printf("\n");
-			printf("\tType: %s\n",
+				pr_attr("Status", "Not Present");
+			pr_attr("Type", "%s",
 				dmi_power_supply_type((WORD(data + 0x0E) >> 10) & 0x0F));
-			printf("\tInput Voltage Range Switching: %s\n",
+			pr_attr("Input Voltage Range Switching", "%s",
 				dmi_power_supply_range_switching((WORD(data + 0x0E) >> 3) & 0x0F));
-			printf("\tPlugged: %s\n",
+			pr_attr("Plugged", "%s",
 				WORD(data + 0x0E) & (1 << 2) ? "No" : "Yes");
-			printf("\tHot Replaceable: %s\n",
+			pr_attr("Hot Replaceable", "%s",
 				WORD(data + 0x0E) & (1 << 0) ? "Yes" : "No");
 			if (h->length < 0x16) break;
 			if (!(opt.flags & FLAG_QUIET))
 			{
 				if (WORD(data + 0x10) != 0xFFFF)
-					printf("\tInput Voltage Probe Handle: 0x%04X\n",
+					pr_attr("Input Voltage Probe Handle", "0x%04X",
 						WORD(data + 0x10));
 				if (WORD(data + 0x12) != 0xFFFF)
-					printf("\tCooling Device Handle: 0x%04X\n",
+					pr_attr("Cooling Device Handle", "0x%04X",
 						WORD(data + 0x12));
 				if (WORD(data + 0x14) != 0xFFFF)
-					printf("\tInput Current Probe Handle: 0x%04X\n",
+					pr_attr("Input Current Probe Handle", "0x%04X",
 						WORD(data + 0x14));
 			}
 			break;
@@ -5001,19 +4934,19 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x0B) break;
 			if (opt.flags & FLAG_QUIET)
 				return;
-			dmi_additional_info(h, "");
+			dmi_additional_info(h);
 			break;
 
 		case 41: /* 7.42 Onboard Device Extended Information */
 			pr_handle_name("Onboard Device");
 			if (h->length < 0x0B) break;
-			printf("\tReference Designation: %s\n", dmi_string(h, data[0x04]));
-			printf("\tType: %s\n",
+			pr_attr("Reference Designation", "%s", dmi_string(h, data[0x04]));
+			pr_attr("Type", "%s",
 				dmi_on_board_devices_type(data[0x05] & 0x7F));
-			printf("\tStatus: %s\n",
+			pr_attr("Status", "%s",
 				data[0x05] & 0x80 ? "Enabled" : "Disabled");
-			printf("\tType Instance: %u\n", data[0x06]);
-			dmi_slot_segment_bus_func(WORD(data + 0x07), data[0x09], data[0x0A], "\t");
+			pr_attr("Type Instance", "%u", data[0x06]);
+			dmi_slot_segment_bus_func(WORD(data + 0x07), data[0x09], data[0x0A]);
 			break;
 
 		case 42: /* 7.43 Management Controller Host Interface */
@@ -5021,7 +4954,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (ver < 0x0302)
 			{
 				if (h->length < 0x05) break;
-				printf("\tInterface Type: %s\n",
+				pr_attr("Interface Type", "%s",
 					dmi_management_controller_host_type(data[0x04]));
 				/*
 				 * There you have a type-dependent, variable-length
@@ -5032,7 +4965,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				if (h->length < 0x09) break;
 				if (data[0x04] == 0xF0)		/* OEM */
 				{
-					printf("\tVendor ID: 0x%02X%02X%02X%02X\n",
+					pr_attr("Vendor ID", "0x%02X%02X%02X%02X",
 						data[0x05], data[0x06], data[0x07],
 						data[0x08]);
 				}
@@ -5044,10 +4977,8 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 		case 43: /* 7.44 TPM Device */
 			pr_handle_name("TPM Device");
 			if (h->length < 0x1B) break;
-			printf("\tVendor ID:");
 			dmi_tpm_vendor_id(data + 0x04);
-			printf("\n");
-			printf("\tSpecification Version: %d.%d\n", data[0x08], data[0x09]);
+			pr_attr("Specification Version", "%d.%d", data[0x08], data[0x09]);
 			switch (data[0x08])
 			{
 				case 0x01:
@@ -5056,11 +4987,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					 * redundant with the above, and uncoded
 					 * in a silly way.
 					 */
-					printf("\tFirmware Revision: %u.%u\n",
+					pr_attr("Firmware Revision", "%u.%u",
 						data[0x0C], data[0x0D]);
 					break;
 				case 0x02:
-					printf("\tFirmware Revision: %u.%u\n",
+					pr_attr("Firmware Revision", "%u.%u",
 						DWORD(data + 0x0A) >> 16,
 						DWORD(data + 0x0A) & 0xFFFF);
 					/*
@@ -5070,11 +5001,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 					 */
 					break;
 			}
-			printf("\tDescription: %s\n", dmi_string(h, data[0x12]));
+			pr_attr("Description", "%s", dmi_string(h, data[0x12]));
 			printf("\tCharacteristics:\n");
 			dmi_tpm_characteristics(QWORD(data + 0x13), "\t\t");
 			if (h->length < 0x1F) break;
-			printf("\tOEM-specific Information: 0x%08X\n",
+			pr_attr("OEM-specific Information", "0x%08X",
 				DWORD(data + 0x1B));
 			break;
 
@@ -5141,8 +5072,7 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 				printf("%u.%u\n", data[key - 1], data[key]);
 			break;
 		case 0x108:
-			dmi_system_uuid(data + offset, ver);
-			printf("\n");
+			dmi_system_uuid(NULL, data + offset, ver);
 			break;
 		case 0x305:
 			printf("%s\n", dmi_chassis_type(data[offset]));
@@ -5151,8 +5081,7 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 			printf("%s\n", dmi_processor_family(h, ver));
 			break;
 		case 0x416:
-			dmi_processor_frequency(data + offset);
-			printf("\n");
+			dmi_processor_frequency(NULL, data + offset);
 			break;
 		default:
 			printf("%s\n", dmi_string(h, data[offset]));

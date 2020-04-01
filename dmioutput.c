@@ -59,3 +59,15 @@ void pr_handle_name(const char *format, ...)
 	va_end(args);
 	printf("\n");
 }
+
+void pr_attr(const char *name, const char *format, ...)
+{
+	va_list args;
+
+	printf("\t%s: ", name);
+
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+	printf("\n");
+}
