@@ -220,43 +220,49 @@ static int dmi_bcd_range(u8 value, u8 low, u8 high)
 	return 1;
 }
 
-static void dmi_dump(const struct dmi_header *h, const char *prefix)
+static void dmi_dump(const struct dmi_header *h)
 {
+	static char raw_data[48];
 	int row, i;
+	unsigned int off;
 	char *s;
 
-	printf("%sHeader and Data:\n", prefix);
+	pr_list_start("Header and Data", NULL);
 	for (row = 0; row < ((h->length - 1) >> 4) + 1; row++)
 	{
-		printf("%s\t", prefix);
+		off = 0;
 		for (i = 0; i < 16 && i < h->length - (row << 4); i++)
-			printf("%s%02X", i ? " " : "",
+			off += sprintf(raw_data + off, i ? " %02X" : "%02X",
 			       (h->data)[(row << 4) + i]);
-		printf("\n");
+		pr_list_item(raw_data);
 	}
+	pr_list_end();
 
 	if ((h->data)[h->length] || (h->data)[h->length + 1])
 	{
-		printf("%sStrings:\n", prefix);
+		pr_list_start("Strings", NULL);
 		i = 1;
 		while ((s = _dmi_string(h, i++, !(opt.flags & FLAG_DUMP))))
 		{
 			if (opt.flags & FLAG_DUMP)
 			{
 				int j, l = strlen(s) + 1;
+
+				off = 0;
 				for (row = 0; row < ((l - 1) >> 4) + 1; row++)
 				{
-					printf("%s\t", prefix);
 					for (j = 0; j < 16 && j < l - (row << 4); j++)
-						printf("%s%02X", j ? " " : "",
+						off += sprintf(raw_data + off,
+						       j ? " %02X" : "%02X",
 						       (unsigned char)s[(row << 4) + j]);
-					printf("\n");
+					pr_list_item(raw_data);
 				}
 				/* String isn't filtered yet so do it now */
 				ascii_filter(s, l - 1);
 			}
-			printf("%s\t%s\n", prefix, s);
+			pr_list_item("%s", s);
 		}
+		pr_list_end();
 	}
 }
 
@@ -5060,7 +5066,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				return;
 			pr_handle_name("%s Type",
 				h->type >= 128 ? "OEM-specific" : "Unknown");
-			dmi_dump(h, "\t");
+			dmi_dump(h);
 	}
 	printf("\n");
 }
@@ -5206,7 +5212,7 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 		{
 			if (opt.flags & FLAG_DUMP)
 			{
-				dmi_dump(&h, "\t");
+				dmi_dump(&h);
 				printf("\n");
 			}
 			else
