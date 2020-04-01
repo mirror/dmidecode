@@ -118,3 +118,8 @@ void pr_list_end(void)
 {
 	/* a no-op for text output */
 }
+
+void pr_sep(void)
+{
+	printf("\n");
+}

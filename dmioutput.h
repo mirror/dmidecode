@@ -30,3 +30,4 @@ void pr_subattr(const char *name, const char *format, ...);
 void pr_list_start(const char *name, const char *format, ...);
 void pr_list_item(const char *format, ...);
 void pr_list_end(void);
+void pr_sep(void);
