@@ -5296,11 +5296,11 @@ static void dmi_table(off_t base, u32 len, u16 num, u32 ver, const char *devmem,
 		if (opt.type == NULL)
 		{
 			if (num)
-				printf("%u structures occupying %u bytes.\n",
-				       num, len);
+				pr_info("%u structures occupying %u bytes.",
+					num, len);
 			if (!(opt.flags & FLAG_FROM_DUMP))
-				printf("Table at 0x%08llX.\n",
-				       (unsigned long long)base);
+				pr_info("Table at 0x%08llX.",
+					(unsigned long long)base);
 		}
 		printf("\n");
 	}
@@ -5397,8 +5397,8 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 
 	ver = (buf[0x07] << 16) + (buf[0x08] << 8) + buf[0x09];
 	if (!(opt.flags & FLAG_QUIET))
-		printf("SMBIOS %u.%u.%u present.\n",
-		       buf[0x07], buf[0x08], buf[0x09]);
+		pr_info("SMBIOS %u.%u.%u present.",
+			buf[0x07], buf[0x08], buf[0x09]);
 
 	offset = QWORD(buf + 0x10);
 	if (!(flags & FLAG_NO_FILE_OFFSET) && offset.h && sizeof(off_t) < 8)
@@ -5465,7 +5465,7 @@ static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
 			break;
 	}
 	if (!(opt.flags & FLAG_QUIET))
-		printf("SMBIOS %u.%u present.\n",
+		pr_info("SMBIOS %u.%u present.",
 			ver >> 8, ver & 0xFF);
 
 	dmi_table(DWORD(buf + 0x18), WORD(buf + 0x16), WORD(buf + 0x1C),
@@ -5493,7 +5493,7 @@ static int legacy_decode(u8 *buf, const char *devmem, u32 flags)
 		return 0;
 
 	if (!(opt.flags & FLAG_QUIET))
-		printf("Legacy DMI %u.%u present.\n",
+		pr_info("Legacy DMI %u.%u present.",
 			buf[0x0E] >> 4, buf[0x0E] & 0x0F);
 
 	dmi_table(DWORD(buf + 0x08), WORD(buf + 0x06), WORD(buf + 0x0C),
@@ -5645,8 +5645,8 @@ int main(int argc, char * const argv[])
 	if (opt.flags & FLAG_FROM_DUMP)
 	{
 		if (!(opt.flags & FLAG_QUIET))
-			printf("Reading SMBIOS/DMI data from file %s.\n",
-			       opt.dumpfile);
+			pr_info("Reading SMBIOS/DMI data from file %s.",
+				opt.dumpfile);
 		if ((buf = mem_chunk(0, 0x20, opt.dumpfile)) == NULL)
 		{
 			ret = 1;
@@ -5681,7 +5681,7 @@ int main(int argc, char * const argv[])
 	 && (buf = read_file(0, &size, SYS_ENTRY_FILE)) != NULL)
 	{
 		if (!(opt.flags & FLAG_QUIET))
-			printf("Getting SMBIOS data from sysfs.\n");
+			pr_info("Getting SMBIOS data from sysfs.");
 		if (size >= 24 && memcmp(buf, "_SM3_", 5) == 0)
 		{
 			if (smbios3_decode(buf, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
@@ -5701,7 +5701,7 @@ int main(int argc, char * const argv[])
 		if (found)
 			goto done;
 		if (!(opt.flags & FLAG_QUIET))
-			printf("Failed to get SMBIOS data from sysfs.\n");
+			pr_info("Failed to get SMBIOS data from sysfs.");
 	}
 
 	/* Next try EFI (ia64, Intel-based Mac, arm64) */
@@ -5716,8 +5716,8 @@ int main(int argc, char * const argv[])
 	}
 
 	if (!(opt.flags & FLAG_QUIET))
-		printf("Found SMBIOS entry point in EFI, reading table from %s.\n",
-		       opt.devmem);
+		pr_info("Found SMBIOS entry point in EFI, reading table from %s.",
+			opt.devmem);
 	if ((buf = mem_chunk(fp, 0x20, opt.devmem)) == NULL)
 	{
 		ret = 1;
@@ -5739,7 +5739,7 @@ int main(int argc, char * const argv[])
 memory_scan:
 #if defined __i386__ || defined __x86_64__
 	if (!(opt.flags & FLAG_QUIET))
-		printf("Scanning %s for entry point.\n", opt.devmem);
+		pr_info("Scanning %s for entry point.", opt.devmem);
 	/* Fallback to memory scan (x86, x86_64) */
 	if ((buf = mem_chunk(0xF0000, 0x10000, opt.devmem)) == NULL)
 	{

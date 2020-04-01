@@ -20,3 +20,4 @@
  */
 
 void pr_comment(const char *format, ...);
+void pr_info(const char *format, ...);
