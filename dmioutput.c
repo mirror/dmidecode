@@ -43,3 +43,9 @@ void pr_info(const char *format, ...)
 	va_end(args);
 	printf("\n");
 }
+
+void pr_handle(const struct dmi_header *h)
+{
+	printf("Handle 0x%04X, DMI type %d, %d bytes\n",
+	       h->handle, h->type, h->length);
+}

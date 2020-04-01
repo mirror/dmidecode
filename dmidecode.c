@@ -5212,8 +5212,7 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 
 		if (display
 		 && (!(opt.flags & FLAG_QUIET) || (opt.flags & FLAG_DUMP)))
-			printf("Handle 0x%04X, DMI type %d, %d bytes\n",
-				h.handle, h.type, h.length);
+			pr_handle(&h);
 
 		/* Look for the next handle */
 		next = data + h.length;
