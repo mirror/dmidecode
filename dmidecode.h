@@ -18,6 +18,9 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
+#ifndef DMIDECODE_H
+#define DMIDECODE_H
+
 #include "types.h"
 
 struct dmi_header
@@ -30,3 +33,5 @@ struct dmi_header
 
 int is_printable(const u8 *data, int len);
 const char *dmi_string(const struct dmi_header *dm, u8 s);
+
+#endif
