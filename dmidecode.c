@@ -3312,7 +3312,7 @@ static void dmi_fixup_type_34(struct dmi_header *h, int display)
 {
 	u8 *p = h->data;
 
- 	/* Make sure the hidden data is ASCII only */
+	/* Make sure the hidden data is ASCII only */
 	if (h->length == 0x10
 	 && is_printable(p + 0x0B, 0x10 - 0x0B))
 	{
@@ -3603,7 +3603,7 @@ static const char *dmi_protocol_record_type(u8 type)
 		"Reserved",
 		"IPMI",
 		"MCTP",
-		"Redfish over IP", 	/* 0x4 */
+		"Redfish over IP",	/* 0x4 */
 	};
 
 	if (type <= 0x4)
