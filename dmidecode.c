@@ -80,6 +80,7 @@
 #include "dmidecode.h"
 #include "dmiopt.h"
 #include "dmioem.h"
+#include "dmioutput.h"
 
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
@@ -5162,7 +5163,7 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 static void dmi_table_dump(const u8 *buf, u32 len)
 {
 	if (!(opt.flags & FLAG_QUIET))
-		printf("# Writing %d bytes to %s.\n", len, opt.dumpfile);
+		pr_comment("Writing %d bytes to %s.", len, opt.dumpfile);
 	write_dump(32, len, buf, opt.dumpfile, 0);
 }
 
@@ -5283,11 +5284,11 @@ static void dmi_table(off_t base, u32 len, u16 num, u32 ver, const char *devmem,
 
 	if (ver > SUPPORTED_SMBIOS_VER && !(opt.flags & FLAG_QUIET))
 	{
-		printf("# SMBIOS implementations newer than version %u.%u.%u are not\n"
-		       "# fully supported by this version of dmidecode.\n",
-		       SUPPORTED_SMBIOS_VER >> 16,
-		       (SUPPORTED_SMBIOS_VER >> 8) & 0xFF,
-		       SUPPORTED_SMBIOS_VER & 0xFF);
+		pr_comment("SMBIOS implementations newer than version %u.%u.%u are not",
+			   SUPPORTED_SMBIOS_VER >> 16,
+			   (SUPPORTED_SMBIOS_VER >> 8) & 0xFF,
+			   SUPPORTED_SMBIOS_VER & 0xFF);
+		pr_comment("fully supported by this version of dmidecode.");
 	}
 
 	if (!(opt.flags & FLAG_QUIET))
@@ -5417,8 +5418,8 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 		overwrite_smbios3_address(crafted);
 
 		if (!(opt.flags & FLAG_QUIET))
-			printf("# Writing %d bytes to %s.\n", crafted[0x06],
-			       opt.dumpfile);
+			pr_comment("Writing %d bytes to %s.", crafted[0x06],
+				   opt.dumpfile);
 		write_dump(0, crafted[0x06], crafted, opt.dumpfile, 1);
 	}
 
@@ -5478,8 +5479,8 @@ static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
 		overwrite_dmi_address(crafted + 0x10);
 
 		if (!(opt.flags & FLAG_QUIET))
-			printf("# Writing %d bytes to %s.\n", crafted[0x05],
-				opt.dumpfile);
+			pr_comment("Writing %d bytes to %s.", crafted[0x05],
+				   opt.dumpfile);
 		write_dump(0, crafted[0x05], crafted, opt.dumpfile, 1);
 	}
 
@@ -5507,8 +5508,8 @@ static int legacy_decode(u8 *buf, const char *devmem, u32 flags)
 		overwrite_dmi_address(crafted);
 
 		if (!(opt.flags & FLAG_QUIET))
-			printf("# Writing %d bytes to %s.\n", 0x0F,
-				opt.dumpfile);
+			pr_comment("Writing %d bytes to %s.", 0x0F,
+				   opt.dumpfile);
 		write_dump(0, 0x0F, crafted, opt.dumpfile, 1);
 	}
 
@@ -5586,8 +5587,8 @@ static int address_from_efi(off_t *address)
 #endif
 
 	if (ret == 0 && !(opt.flags & FLAG_QUIET))
-		printf("# %s entry point at 0x%08llx\n",
-		       eptype, (unsigned long long)*address);
+		pr_comment("%s entry point at 0x%08llx",
+			   eptype, (unsigned long long)*address);
 
 	return ret;
 }
@@ -5638,7 +5639,7 @@ int main(int argc, char * const argv[])
 	}
 
 	if (!(opt.flags & FLAG_QUIET))
-		printf("# dmidecode %s\n", VERSION);
+		pr_comment("dmidecode %s", VERSION);
 
 	/* Read from dump if so instructed */
 	if (opt.flags & FLAG_FROM_DUMP)
@@ -5783,7 +5784,7 @@ memory_scan:
 
 done:
 	if (!found && !(opt.flags & FLAG_QUIET))
-		printf("# No SMBIOS nor DMI entry point found, sorry.\n");
+		pr_comment("No SMBIOS nor DMI entry point found, sorry.");
 
 	free(buf);
 exit_free:

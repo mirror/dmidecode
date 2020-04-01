@@ -61,8 +61,8 @@ all : $(PROGRAMS)
 # Programs
 #
 
-dmidecode : dmidecode.o dmiopt.o dmioem.o util.o
-	$(CC) $(LDFLAGS) dmidecode.o dmiopt.o dmioem.o util.o -o $@
+dmidecode : dmidecode.o dmiopt.o dmioem.o dmioutput.o util.o
+	$(CC) $(LDFLAGS) dmidecode.o dmiopt.o dmioem.o dmioutput.o util.o -o $@
 
 biosdecode : biosdecode.o util.o
 	$(CC) $(LDFLAGS) biosdecode.o util.o -o $@
@@ -85,6 +85,9 @@ dmiopt.o : dmiopt.c config.h types.h util.h dmidecode.h dmiopt.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 dmioem.o : dmioem.c types.h dmidecode.h dmioem.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+dmioutput.o : dmioutput.c types.h dmioutput.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 biosdecode.o : biosdecode.c version.h types.h util.h config.h 
