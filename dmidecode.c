@@ -5195,7 +5195,7 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 		if ((unsigned long)(next - buf) > len)
 		{
 			if (display && !(opt.flags & FLAG_QUIET))
-				printf("\t<TRUNCATED>\n");
+				pr_struct_err("<TRUNCATED>");
 			pr_sep();
 			data = next;
 			break;

@@ -31,3 +31,4 @@ void pr_list_start(const char *name, const char *format, ...);
 void pr_list_item(const char *format, ...);
 void pr_list_end(void);
 void pr_sep(void);
+void pr_struct_err(const char *format, ...);

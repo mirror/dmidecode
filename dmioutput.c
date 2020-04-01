@@ -123,3 +123,15 @@ void pr_sep(void)
 {
 	printf("\n");
 }
+
+void pr_struct_err(const char *format, ...)
+{
+	va_list args;
+
+	printf("\t");
+
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+	printf("\n");
+}
