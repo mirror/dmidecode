@@ -12,8 +12,13 @@
 #   (at your option) any later version.
 #
 
-CC      = gcc
-CFLAGS  = -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
+CC     ?= gcc
+# Base CFLAGS can be overridden by environment
+CFLAGS ?= -O2
+# When debugging, disable -O2 and enable -g
+#CFLAGS ?= -g
+
+CFLAGS += -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
           -Wcast-align -Wwrite-strings -Wmissing-prototypes -Winline -Wundef
 
 # Let lseek and mmap support 64-bit wide offsets
@@ -22,12 +27,8 @@ CFLAGS += -D_FILE_OFFSET_BITS=64
 #CFLAGS += -DBIGENDIAN
 #CFLAGS += -DALIGNMENT_WORKAROUND
 
-# When debugging, disable -O2 and enable -g.
-CFLAGS += -O2
-#CFLAGS += -g
-
-# Pass linker flags here
-LDFLAGS =
+# Pass linker flags here (can be set from environment too)
+LDFLAGS ?=
 
 DESTDIR =
 prefix  = /usr/local
