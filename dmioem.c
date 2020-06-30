@@ -23,7 +23,7 @@
 #include <string.h>
 
 #include "types.h"
-#include "dmidecode.h"
+#include "libdmi.h"
 #include "dmioem.h"
 #include "dmioutput.h"
 

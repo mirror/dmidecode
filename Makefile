@@ -19,7 +19,7 @@ CFLAGS ?= -O2
 #CFLAGS ?= -g
 
 CFLAGS += -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
-          -Wcast-align -Wwrite-strings -Wmissing-prototypes -Winline -Wundef
+          -Wcast-align -Wwrite-strings -Wmissing-prototypes -Winline -Wundef -g
 
 # Let lseek and mmap support 64-bit wide offsets
 CFLAGS += -D_FILE_OFFSET_BITS=64
@@ -62,8 +62,8 @@ all : $(PROGRAMS)
 # Programs
 #
 
-dmidecode : dmidecode.o dmiopt.o dmioem.o dmioutput.o util.o
-	$(CC) $(LDFLAGS) dmidecode.o dmiopt.o dmioem.o dmioutput.o util.o -o $@
+dmidecode : dmidecode.o libdmi.o dmiopt.o dmioem.o dmioutput.o util.o dmistringoutput.o
+	$(CC) $(LDFLAGS) dmidecode.o libdmi.o dmiopt.o dmioem.o dmioutput.o util.o dmistringoutput.o -o $@
 
 biosdecode : biosdecode.o util.o
 	$(CC) $(LDFLAGS) biosdecode.o util.o -o $@
@@ -78,17 +78,24 @@ vpddecode : vpddecode.o vpdopt.o util.o
 # Objects
 #
 
-dmidecode.o : dmidecode.c version.h types.h util.h config.h dmidecode.h \
+libdmi.o : libdmi.c version.h types.h util.h config.h libdmi.h \
 	      dmiopt.h dmioem.h dmioutput.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-dmiopt.o : dmiopt.c config.h types.h util.h dmidecode.h dmiopt.h
+dmidecode.o : dmidecode.c libdmi.c version.h types.h util.h config.h libdmi.h \
+	      dmiopt.h dmioem.h dmioutput.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-dmioem.o : dmioem.c types.h dmidecode.h dmioem.h dmioutput.h
+dmiopt.o : dmiopt.c config.h types.h util.h dmiopt.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+dmioem.o : dmioem.c types.h dmioem.h dmioutput.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 dmioutput.o : dmioutput.c types.h dmioutput.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+dpmistringoutut.o : dmistringoutput.c types.h dmistringoutput.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 biosdecode.o : biosdecode.c version.h types.h util.h config.h 

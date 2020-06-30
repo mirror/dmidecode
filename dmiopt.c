@@ -28,7 +28,7 @@
 #include "config.h"
 #include "types.h"
 #include "util.h"
-#include "dmidecode.h"
+#include "libdmi.h"
 #include "dmiopt.h"
 
 
