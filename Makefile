@@ -22,7 +22,7 @@ CFLAGS += -W -Wall -Wshadow -Wstrict-prototypes -Wpointer-arith -Wcast-qual \
           -Wcast-align -Wwrite-strings -Wmissing-prototypes -Winline -Wundef
 
 # Let lseek and mmap support 64-bit wide offsets
-CFLAGS += -D_FILE_OFFSET_BITS=64
+CFLAGS += -D_FILE_OFFSET_BITS=64 -fPIC
 
 #CFLAGS += -DBIGENDIAN
 #CFLAGS += -DALIGNMENT_WORKAROUND
@@ -31,11 +31,12 @@ CFLAGS += -D_FILE_OFFSET_BITS=64
 LDFLAGS ?=
 
 DESTDIR =
-prefix  = /usr/local
+prefix  = /usr
 sbindir = $(prefix)/sbin
 mandir  = $(prefix)/share/man
 man8dir = $(mandir)/man8
 docdir  = $(prefix)/share/doc/dmidecode
+libdmidir = /libdmi
 
 INSTALL         := install
 INSTALL_DATA    := $(INSTALL) -m 644
@@ -47,6 +48,9 @@ RM              := rm -f
 MACHINE ?= $(shell uname -m 2>/dev/null)
 
 # These programs are only useful on x86
+LIB-FILES := libdmi.so libdmi.a
+OBJS := libdmi.o dmiopt.o dmioem.o dmioutput.o util.o
+LIB-HEADERS := libdmi.h types.h
 PROGRAMS-i386 := biosdecode ownership vpddecode
 PROGRAMS-i486 := $(PROGRAMS-i386)
 PROGRAMS-i586 := $(PROGRAMS-i386)
@@ -56,14 +60,14 @@ PROGRAMS-amd64 := $(PROGRAMS-x86_64)
 
 PROGRAMS := dmidecode $(PROGRAMS-$(MACHINE))
 
-all : $(PROGRAMS)
+all : $(PROGRAMS) libdmi.so libdmi.a
 
 #
 # Programs
 #
 
-dmidecode : dmidecode.o dmiopt.o dmioem.o dmioutput.o util.o
-	$(CC) $(LDFLAGS) dmidecode.o dmiopt.o dmioem.o dmioutput.o util.o -o $@
+dmidecode : dmidecode.o libdmi.o dmiopt.o dmioem.o util.o dmioutput.o
+	$(CC) $(LDFLAGS) dmidecode.o libdmi.o dmiopt.o dmioem.o util.o dmioutput.o -o $@
 
 biosdecode : biosdecode.o util.o
 	$(CC) $(LDFLAGS) biosdecode.o util.o -o $@
@@ -78,14 +82,18 @@ vpddecode : vpddecode.o vpdopt.o util.o
 # Objects
 #
 
-dmidecode.o : dmidecode.c version.h types.h util.h config.h dmidecode.h \
+libdmi.o : libdmi.c version.h types.h util.h config.h libdmi.h \
 	      dmiopt.h dmioem.h dmioutput.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-dmiopt.o : dmiopt.c config.h types.h util.h dmidecode.h dmiopt.h
+dmidecode.o : main.c libdmi.c version.h types.h util.h config.h libdmi.h \
+	      dmiopt.h dmioem.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-dmioem.o : dmioem.c types.h dmidecode.h dmioem.h dmioutput.h
+dmiopt.o : dmiopt.c config.h types.h util.h dmiopt.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+dmioem.o : dmioem.c types.h dmioem.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 dmioutput.o : dmioutput.c types.h dmioutput.h
@@ -106,6 +114,12 @@ vpdopt.o : vpdopt.c config.h util.h vpdopt.h
 util.o : util.c types.h util.h config.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
+libdmi.so : $(OBJS)
+	$(CC) $(CFLAGS) -shared $^ -o $@
+
+libdmi.a : $(OBJS)
+	ar rcs $@ $^
+
 #
 # Commands
 #
@@ -113,9 +127,9 @@ util.o : util.c types.h util.h config.h
 strip : $(PROGRAMS)
 	strip $(PROGRAMS)
 
-install : install-bin install-man install-doc
+install : install-bin install-man install-doc install-lib
 
-uninstall : uninstall-bin uninstall-man uninstall-doc
+uninstall : uninstall-bin uninstall-man uninstall-doc uninstall-lib
 
 install-bin : $(PROGRAMS)
 	$(INSTALL_DIR) $(DESTDIR)$(sbindir)
@@ -125,6 +139,20 @@ install-bin : $(PROGRAMS)
 uninstall-bin :
 	for program in $(PROGRAMS) ; do \
 	$(RM) $(DESTDIR)$(sbindir)/$$program ; done
+
+install-lib:
+	$(INSTALL_DIR) $(DESTDIR)$(prefix)/lib$(libdmidir)
+	$(INSTALL_DIR) $(DESTDIR)$(prefix)/include$(libdmidir)
+	for program in $(LIB-FILES) ; do \
+	$(INSTALL_PROGRAM) $$program $(DESTDIR)$(prefix)/lib$(libdmidir)/ ; done
+	for program in $(LIB-HEADERS) ; do \
+	$(INSTALL_PROGRAM) $$program $(DESTDIR)$(prefix)/include$(libdmidir)/ ; done
+
+uninstall-lib:
+	for program in $(LIB-FILES) ; do \
+	$(RM) $(DESTDIR)$(prefix)/lib$(libdmidir)/$$program ; done
+	for program in $(LIB-HEADERS) ; do \
+	$(RM) $(DESTDIR)$(prefix)/include$(libdmidir)/$$program ; done
 
 install-man :
 	$(INSTALL_DIR) $(DESTDIR)$(man8dir)
@@ -145,4 +173,4 @@ uninstall-doc :
 	$(RM) -r $(DESTDIR)$(docdir)
 
 clean :
-	$(RM) *.o $(PROGRAMS) core
+	$(RM) *.a *.so *.o $(PROGRAMS) core

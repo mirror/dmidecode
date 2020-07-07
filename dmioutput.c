@@ -21,97 +21,130 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "dmioutput.h"
+
+const size_t output_size = 4096 * sizeof(char);
+const size_t outout_threshold = 4096;
+size_t next_realloc_ratio = 1;
+char* output;
+
+void pr_init()
+{
+	output = malloc(output_size);
+	output[0] = '\0';
+}
+void pr_free()
+{
+	free(output);
+}
+
+void output_realloc()
+{
+	if ( (next_realloc_ratio * output_size) - strlen(output) < outout_threshold)
+	{
+		next_realloc_ratio++;
+		output = realloc(output, next_realloc_ratio * output_size);
+	}
+}
 
 void pr_comment(const char *format, ...)
 {
+	output_realloc();
 	va_list args;
 
-	printf("# ");
+	sprintf(output + strlen(output), "# ");
 	va_start(args, format);
-	vprintf(format, args);
+	vsprintf(output + strlen(output), format, args);
 	va_end(args);
-	printf("\n");
+	sprintf(output + strlen(output), "\n");
 }
 
 void pr_info(const char *format, ...)
 {
+	output_realloc();
 	va_list args;
 
 	va_start(args, format);
-	vprintf(format, args);
+	vsprintf(output + strlen(output), format, args);
 	va_end(args);
-	printf("\n");
+	sprintf(output + strlen(output), "\n");
 }
 
 void pr_handle(const struct dmi_header *h)
 {
-	printf("Handle 0x%04X, DMI type %d, %d bytes\n",
-	       h->handle, h->type, h->length);
+	output_realloc();
+	sprintf(output + strlen(output), "Handle 0x%04X, DMI type %d, %d bytes\n",
+	       h->handle, h->type, h->length);		   
 }
 
 void pr_handle_name(const char *format, ...)
 {
+	output_realloc();
 	va_list args;
 
 	va_start(args, format);
-	vprintf(format, args);
+	vsprintf(output + strlen(output), format, args);
 	va_end(args);
-	printf("\n");
+	sprintf(output + strlen(output), "\n");
 }
 
 void pr_attr(const char *name, const char *format, ...)
 {
+	output_realloc();
 	va_list args;
 
-	printf("\t%s: ", name);
+	sprintf(output + strlen(output), "\t%s: ", name);
 
 	va_start(args, format);
-	vprintf(format, args);
+	vsprintf(output + strlen(output), format, args);
 	va_end(args);
-	printf("\n");
+	sprintf(output + strlen(output), "\n");
 }
 
 void pr_subattr(const char *name, const char *format, ...)
 {
+	output_realloc();
 	va_list args;
 
-	printf("\t\t%s: ", name);
+	sprintf(output + strlen(output), "\t\t%s: ", name);
 
 	va_start(args, format);
-	vprintf(format, args);
+	vsprintf(output + strlen(output), format, args);
 	va_end(args);
-	printf("\n");
+	sprintf(output + strlen(output), "\n");
 }
 
 void pr_list_start(const char *name, const char *format, ...)
 {
+	output_realloc();
 	va_list args;
 
-	printf("\t%s:", name);
+	sprintf(output + strlen(output), "\t%s:", name);
 
 	/* format is optional, skip value if not provided */
 	if (format)
 	{
-		printf(" ");
+		sprintf(output + strlen(output), " ");
 		va_start(args, format);
-		vprintf(format, args);
+		vsprintf(output + strlen(output), format, args);
 		va_end(args);
 	}
-	printf("\n");
-
+	sprintf(output + strlen(output), "\n");
 }
 
 void pr_list_item(const char *format, ...)
 {
+	output_realloc();
 	va_list args;
 
-	printf("\t\t");
+	sprintf(output + strlen(output), "\t\t");
 
 	va_start(args, format);
-	vprintf(format, args);
+	vsprintf(output + strlen(output), format, args);
 	va_end(args);
-	printf("\n");
+	sprintf(output + strlen(output), "\n");
 }
 
 void pr_list_end(void)
@@ -121,17 +154,24 @@ void pr_list_end(void)
 
 void pr_sep(void)
 {
-	printf("\n");
+	output_realloc();
+	sprintf(output + strlen(output), "\n");
 }
 
 void pr_struct_err(const char *format, ...)
 {
+	output_realloc();
 	va_list args;
 
-	printf("\t");
+	sprintf(output + strlen(output), "\t");
 
 	va_start(args, format);
-	vprintf(format, args);
+	vsprintf(output + strlen(output), format, args);
 	va_end(args);
-	printf("\n");
+	sprintf(output + strlen(output), "\n");
+}
+
+char* get_output()
+{
+	return output;
 }
