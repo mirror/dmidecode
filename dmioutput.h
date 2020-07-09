@@ -19,8 +19,10 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-#include "dmidecode.h"
+#include "libdmi.h"
 
+void pr_init();
+void pr_free();
 void pr_comment(const char *format, ...);
 void pr_info(const char *format, ...);
 void pr_handle(const struct dmi_header *h);
@@ -32,3 +34,4 @@ void pr_list_item(const char *format, ...);
 void pr_list_end(void);
 void pr_sep(void);
 void pr_struct_err(const char *format, ...);
+char* get_output();

@@ -77,7 +77,7 @@
 #include "config.h"
 #include "types.h"
 #include "util.h"
-#include "dmidecode.h"
+#include "libdmi.h"
 #include "dmiopt.h"
 #include "dmioem.h"
 #include "dmioutput.h"
@@ -5563,8 +5563,9 @@ static int address_from_efi(off_t *address)
 	return ret;
 }
 
-int main(int argc, char * const argv[])
+int procces(int argc, char * const argv[])
 {
+	pr_init();
 	int ret = 0;                /* Returned value */
 	int found = 0;
 	off_t fp;
@@ -5751,14 +5752,26 @@ memory_scan:
 		}
 	}
 #endif
-
+	
 done:
 	if (!found && !(opt.flags & FLAG_QUIET))
 		pr_comment("No SMBIOS nor DMI entry point found, sorry.");
-
 	free(buf);
 exit_free:
 	free(opt.type);
-
 	return ret;
+}
+
+char* decode_types(int argc, int* argv)
+{
+	char* args[3] = {"dmidecode", "-t", ""};
+	char* type_ids = malloc(1000);
+	type_ids[0] = '\0';
+	for (int i=0; i < argc; i++)
+	{
+		sprintf(type_ids + strlen(type_ids), "%d,", argv[i]);
+	}
+	args[2] = type_ids;
+	procces(3,args);
+	return get_output();
 }

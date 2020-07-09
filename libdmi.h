@@ -33,5 +33,6 @@ struct dmi_header
 
 int is_printable(const u8 *data, int len);
 const char *dmi_string(const struct dmi_header *dm, u8 s);
+char* decode_types(int argc, int* argv);
 
 #endif
