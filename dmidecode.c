@@ -1935,15 +1935,10 @@ static const char *dmi_slot_type(u8 code)
 		"PCI Express 3 SFF-8639",
 		"PCI Express Mini 52-pin with bottom-side keep-outs",
 		"PCI Express Mini 52-pin without bottom-side keep-outs",
-		"PCI Express Mini 76-pin" 
-		"PCI Express Gen 4 SFF-8639 (U.2)",
-		"PCI Express Gen 5 SFF-8639 (U.2)",
-		"OCP NIC 3.0 Small Form Factor (SFF)",
-		"OCP NIC 3.0 Large Form Factor (LFF)",
-		"OCP NIC Prior to 3.0",
-		out_of_spec,  /* 0x29 */
+		"PCI Express Mini 76-pin" /* 0x23 */
+	};
+	static const char *type_0x30[] = {
 		"CXL FLexbus 1.0" /* 0x30 */
-
 	};
 	static const char *type_0xA0[] = {
 		"PC-98/C20", /* 0xA0 */
@@ -1982,8 +1977,10 @@ static const char *dmi_slot_type(u8 code)
 	 * function dmi_slot_id below needs updating too.
 	 */
 
-	if (code >= 0x01 && code <= 0x30)
+	if (code >= 0x01 && code <= 0x23)
 		return type[code - 0x01];
+	if (code == 0x30)
+		return type_0x30[code - 0x30];
 	if (code >= 0xA0 && code <= 0xBD)
 		return type_0xA0[code - 0xA0];
 	return out_of_spec;
