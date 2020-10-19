@@ -1355,10 +1355,12 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket LGA2066",
 		"Socket BGA1392",
 		"Socket BGA1510",
-		"Socket BGA1528" /* 0x3C */
+		"Socket BGA1528",
+		"Socket LGA4189",
+		"Socket LGA1200" /* 0x3E */
 	};
 
-	if (code >= 0x01 && code <= 0x3C)
+	if (code >= 0x01 && code <= 0x3E)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }
