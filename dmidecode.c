@@ -2639,10 +2639,12 @@ static const char *dmi_memory_device_type(u8 code)
 		"LPDDR4",
 		"Logical non-volatile device",
 		"HBM",
-		"HBM2" /* 0x21 */
+		"HBM2",
+		"DDR5",
+		"LPDDR5" /* 0x23 */
 	};
 
-	if (code >= 0x01 && code <= 0x21)
+	if (code >= 0x01 && code <= 0x23)
 		return type[code - 0x01];
 	return out_of_spec;
 }
