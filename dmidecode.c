@@ -2118,7 +2118,10 @@ static void dmi_slot_characteristics(const char *attr, u8 code1, u8 code2)
 		"PME signal is supported", /* 0 */
 		"Hot-plug devices are supported",
 		"SMBus signal is supported",
-		"PCIe slot bifurcation is supported" /* 3 */
+		"PCIe slot bifurcation is supported",
+		"Async/surprise removal is supported",
+		"Flexbus slot, CXL 1.0 capable",
+		"Flexbus slot, CXL 2.0 capable" /* 6 */
 	};
 
 	if (code1 & (1 << 0))
@@ -2133,7 +2136,7 @@ static void dmi_slot_characteristics(const char *attr, u8 code1, u8 code2)
 		for (i = 1; i <= 7; i++)
 			if (code1 & (1 << i))
 				pr_list_item("%s", characteristics1[i - 1]);
-		for (i = 0; i <= 3; i++)
+		for (i = 0; i <= 6; i++)
 			if (code2 & (1 << i))
 				pr_list_item("%s", characteristics2[i]);
 		pr_list_end();
