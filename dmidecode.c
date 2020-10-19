@@ -1107,7 +1107,7 @@ static void dmi_processor_id(const struct dmi_header *h)
 		u16 dx = WORD(p);
 		/*
 		 * Not all 80486 CPU support the CPUID instruction, we have to find
-		 * wether the one we have here does or not. Note that this trick
+		 * whether the one we have here does or not. Note that this trick
 		 * works only because we know that 80486 must be little-endian.
 		 */
 		if ((dx & 0x0F00) == 0x0400
@@ -3707,16 +3707,16 @@ static void dmi_parse_protocol_record(u8 *rec)
 	 * convenience.  It could get passed from the SMBIOS
 	 * header, but that's a lot of passing of pointers just
 	 * to get that info, and the only thing it is used for is
-	 * to determine the endianess of the field.  Since we only
+	 * to determine the endianness of the field.  Since we only
 	 * do this parsing on versions of SMBIOS after 3.1.1, and the
-	 * endianess of the field is always little after version 2.6.0
+	 * endianness of the field is always little after version 2.6.0
 	 * we can just pick a sufficiently recent version here.
 	 */
 	dmi_system_uuid(pr_subattr, "Service UUID", &rdata[0], 0x311);
 
 	/*
 	 * DSP0270: 8.6: Redfish Over IP Host IP Assignment Type
-	 * Note, using decimal indicies here, as the DSP0270
+	 * Note, using decimal indices here, as the DSP0270
 	 * uses decimal, so as to make it more comparable
 	 */
 	assign_val = rdata[16];
