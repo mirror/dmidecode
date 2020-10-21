@@ -2691,12 +2691,22 @@ static void dmi_memory_device_type_detail(u16 code)
 	}
 }
 
-static void dmi_memory_device_speed(const char *attr, u16 code)
+static void dmi_memory_device_speed(const char *attr, u16 code1, u32 code2)
 {
-	if (code == 0)
-		pr_attr(attr, "Unknown");
+	if (code1 == 0xFFFF)
+	{
+		if (code2 == 0)
+			pr_attr(attr, "Unknown");
+		else
+			pr_attr(attr, "%lu MT/s", code2);
+	}
 	else
-		pr_attr(attr, "%u MT/s", code);
+	{
+		if (code1 == 0)
+			pr_attr(attr, "Unknown");
+		else
+			pr_attr(attr, "%u MT/s", code1);
+	}
 }
 
 static void dmi_memory_technology(u8 code)
@@ -4458,7 +4468,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_memory_device_type(data[0x12]));
 			dmi_memory_device_type_detail(WORD(data + 0x13));
 			if (h->length < 0x17) break;
-			dmi_memory_device_speed("Speed", WORD(data + 0x15));
+			dmi_memory_device_speed("Speed", WORD(data + 0x15),
+						h->length >= 0x5C ?
+						DWORD(data + 0x54) : 0);
 			if (h->length < 0x1B) break;
 			pr_attr("Manufacturer", "%s",
 				dmi_string(h, data[0x17]));
@@ -4475,7 +4487,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				pr_attr("Rank", "%u", data[0x1B] & 0x0F);
 			if (h->length < 0x22) break;
 			dmi_memory_device_speed("Configured Memory Speed",
-						WORD(data + 0x20));
+						WORD(data + 0x20),
+						h->length >= 0x5C ?
+						DWORD(data + 0x58) : 0);
 			if (h->length < 0x28) break;
 			dmi_memory_voltage_value("Minimum Voltage",
 						 WORD(data + 0x22));
