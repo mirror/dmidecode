@@ -1933,11 +1933,16 @@ static const char *dmi_slot_type(u8 code)
 		"MXM Type IV",
 		"MXM 3.0 Type A",
 		"MXM 3.0 Type B",
-		"PCI Express 2 SFF-8639",
-		"PCI Express 3 SFF-8639",
+		"PCI Express 2 SFF-8639 (U.2)",
+		"PCI Express 3 SFF-8639 (U.2)",
 		"PCI Express Mini 52-pin with bottom-side keep-outs",
 		"PCI Express Mini 52-pin without bottom-side keep-outs",
-		"PCI Express Mini 76-pin" /* 0x23 */
+		"PCI Express Mini 76-pin"
+		"PCI Express 4 SFF-8639 (U.2)",
+		"PCI Express 5 SFF-8639 (U.2)",
+		"OCP NIC 3.0 Small Form Factor (SFF)",
+		"OCP NIC 3.0 Large Form Factor (LFF)",
+		"OCP NIC Prior to 3.0" /* 0x28 */
 	};
 	static const char *type_0x30[] = {
 		"CXL FLexbus 1.0" /* 0x30 */
@@ -1972,18 +1977,27 @@ static const char *dmi_slot_type(u8 code)
 		"PCI Express 4 x2",
 		"PCI Express 4 x4",
 		"PCI Express 4 x8",
-		"PCI Express 4 x16" /* 0xBD */
+		"PCI Express 4 x16",
+		"PCI Express 5",
+		"PCI Express 5 x1",
+		"PCI Express 5 x2",
+		"PCI Express 5 x4",
+		"PCI Express 5 x8",
+		"PCI Express 5 x16",
+		"PCI Express 6+",
+		"EDSFF E1",
+		"EDSFF E3" /* 0xC6 */
 	};
 	/*
 	 * Note to developers: when adding entries to these lists, check if
 	 * function dmi_slot_id below needs updating too.
 	 */
 
-	if (code >= 0x01 && code <= 0x23)
+	if (code >= 0x01 && code <= 0x28)
 		return type[code - 0x01];
 	if (code == 0x30)
 		return type_0x30[code - 0x30];
-	if (code >= 0xA0 && code <= 0xBD)
+	if (code >= 0xA0 && code <= 0xC6)
 		return type_0xA0[code - 0xA0];
 	return out_of_spec;
 }
