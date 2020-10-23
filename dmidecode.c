@@ -1388,7 +1388,9 @@ static void dmi_processor_characteristics(const char *attr, u16 code)
 		"Hardware Thread",
 		"Execute Protection",
 		"Enhanced Virtualization",
-		"Power/Performance Control" /* 7 */
+		"Power/Performance Control",
+		"128-bit Capable"
+		"Arm64 SoC ID" /* 9 */
 	};
 
 	if ((code & 0x00FC) == 0)
@@ -1398,7 +1400,7 @@ static void dmi_processor_characteristics(const char *attr, u16 code)
 		int i;
 
 		pr_list_start(attr, NULL);
-		for (i = 2; i <= 7; i++)
+		for (i = 2; i <= 9; i++)
 			if (code & (1 << i))
 				pr_list_item("%s", characteristics[i - 2]);
 		pr_list_end();
