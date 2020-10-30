@@ -4484,6 +4484,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_memory_device_type(data[0x12]));
 			dmi_memory_device_type_detail(WORD(data + 0x13));
 			if (h->length < 0x17) break;
+			/* If no module is present, the remaining fields are irrelevant */
+			if (WORD(data + 0x0C) == 0)
+				break;
 			dmi_memory_device_speed("Speed", WORD(data + 0x15),
 						h->length >= 0x5C ?
 						DWORD(data + 0x54) : 0);
