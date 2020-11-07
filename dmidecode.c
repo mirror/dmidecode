@@ -1939,7 +1939,7 @@ static const char *dmi_slot_type(u8 code)
 		"PCI Express 3 SFF-8639 (U.2)",
 		"PCI Express Mini 52-pin with bottom-side keep-outs",
 		"PCI Express Mini 52-pin without bottom-side keep-outs",
-		"PCI Express Mini 76-pin"
+		"PCI Express Mini 76-pin",
 		"PCI Express 4 SFF-8639 (U.2)",
 		"PCI Express 5 SFF-8639 (U.2)",
 		"OCP NIC 3.0 Small Form Factor (SFF)",
