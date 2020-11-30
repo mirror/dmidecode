@@ -5242,8 +5242,8 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 		}
 
 		/* assign vendor for vendor-specific decodes later */
-		if (h.type == 1 && h.length >= 5)
-			dmi_set_vendor(dmi_string(&h, data[0x04]));
+		if (h.type == 1 && h.length >= 6)
+			dmi_set_vendor(dmi_string(&h, data[0x04]), dmi_string(&h, data[0x5]));
 
 		/* Fixup a common mistake */
 		if (h.type == 34)

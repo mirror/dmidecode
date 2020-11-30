@@ -42,13 +42,14 @@ enum DMI_VENDORS
 };
 
 static enum DMI_VENDORS dmi_vendor = VENDOR_UNKNOWN;
+static const char *dmi_product = NULL;
 
 /*
  * Remember the system vendor for later use. We only actually store the
  * value if we know how to decode at least one specific entry type for
  * that vendor.
  */
-void dmi_set_vendor(const char *s)
+void dmi_set_vendor(const char *s, const char *p)
 {
 	int len;
 
@@ -70,6 +71,8 @@ void dmi_set_vendor(const char *s)
 		dmi_vendor = VENDOR_IBM;
 	else if (strncmp(s, "LENOVO", len) == 0)
 		dmi_vendor = VENDOR_LENOVO;
+
+	dmi_product = p;
 }
 
 /*
