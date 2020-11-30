@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "types.h"
+#include "util.h"
 #include "dmidecode.h"
 #include "dmioem.h"
 #include "dmioutput.h"
@@ -150,12 +151,43 @@ static void dmi_print_hp_net_iface_rec(u8 id, u8 bus, u8 dev, const u8 *mac)
 	}
 }
 
+typedef enum { G6 = 6, G7, G8, G9, G10, G10P } dmi_hpegen_t;
+
+static int dmi_hpegen(const char *s)
+{
+	struct { const char *name; dmi_hpegen_t gen; } table[] = {
+		{ "Gen10 Plus",	G10P },
+		{ "Gen10",	G10 },
+		{ "Gen9",	G9 },
+		{ "Gen8",	G8 },
+		{ "G7",		G7 },
+		{ "G6",		G6 },
+	};
+	unsigned int i;
+
+	if (!strstr(s, "ProLiant") && !strstr(s, "Apollo") &&
+	    !strstr(s, "Synergy")  && !strstr(s, "Edgeline"))
+		return -1;
+
+	for (i = 0; i < ARRAY_SIZE(table); i++) {
+		if (strstr(s, table[i].name))
+			return(table[i].gen);
+	}
+
+	return (dmi_vendor == VENDOR_HPE) ? G10P : G6;
+}
+
 static int dmi_decode_hp(const struct dmi_header *h)
 {
 	u8 *data = h->data;
 	int nic, ptr;
 	u32 feat;
 	const char *company = (dmi_vendor == VENDOR_HP) ? "HP" : "HPE";
+	int gen;
+
+	gen = dmi_hpegen(dmi_product);
+	if (gen < 0)
+		return 0;
 
 	switch (h->type)
 	{
