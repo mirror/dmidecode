@@ -317,6 +317,41 @@ static int dmi_decode_hp(const struct dmi_header *h)
 						   &data[0x08]);
 			break;
 
+		case 236:
+			/*
+			 * Vendor Specific: HPE ProLiant HDD Backplane
+			 *
+			 * Offset |  Name      | Width | Description
+			 * ---------------------------------------
+			 *  0x00  | Type       | BYTE  | 0xEC, HDD Backplane
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | I2C Address| BYTE  | Backplane FRU I2C Address
+			 *  0x05  | Box Number | WORD  | Backplane Box Number
+			 *  0x07  | NVRAM ID   | WORD  | Backplane NVRAM ID
+			 *  0x09  | WWID       | QWORD | SAS Expander WWID
+			 *  0x11  | Total Bays | BYTE  | Total SAS Bays
+			 *  0x12  | A0 Bays    | BYTE  | (deprecated) Number of SAS drive bays behind port 0xA0
+			 *  0x13  | A2 Bays    | BYTE  | (deprecated) Number of SAS drive bays behind port 0xA2
+			 *  0x14  | Name       | STRING| (deprecated) Backplane Name
+			 */
+			pr_handle_name("%s HDD Backplane FRU Information", company);
+
+			pr_attr("FRU I2C Address", "0x%X raw(0x%X)", data[0x4] >> 1, data[0x4]);
+			pr_attr("Box Number", "%d", WORD(data + 0x5));
+			pr_attr("NVRAM ID", "0x%X", WORD(data + 0x7));
+			if (h->length < 0x11) break;
+			pr_attr("SAS Expander WWID", "0x%X", QWORD(data + 0x9));
+			if (h->length < 0x12) break;
+			pr_attr("Total SAS Bays", "%d", data[0x11]);
+			if (h->length < 0x15) break;
+			if (gen < G10P) {
+				pr_attr("A0 Bay Count", "%d", data[0x12]);
+				pr_attr("A2 Bay Count", "%d", data[0x13]);
+				pr_attr("Backplane Name", "%s", dmi_string(h, data[0x14]));
+			}
+			break;
+
 		default:
 			return 0;
 	}
