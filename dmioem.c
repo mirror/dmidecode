@@ -208,35 +208,6 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			}
 			break;
 
-		case 233:
-			/*
-			 * Vendor Specific: HPE ProLiant NIC MAC Information
-			 *
-			 * This prints the BIOS NIC number,
-			 * PCI bus/device/function, and MAC address
-			 *
-			 * Offset |  Name  | Width | Description
-			 * -------------------------------------
-			 *  0x00  |  Type  | BYTE  | 0xE9, NIC structure
-			 *  0x01  | Length | BYTE  | Length of structure
-			 *  0x02  | Handle | WORD  | Unique handle
-			 *  0x04  | Grp No | WORD  | 0 for single segment
-			 *  0x06  | Bus No | BYTE  | PCI Bus
-			 *  0x07  | Dev No | BYTE  | PCI Device/Function No
-			 *  0x08  |   MAC  | 32B   | MAC addr padded w/ 0s
-			 *  0x28  | Port No| BYTE  | Each NIC maps to a Port
-			 */
-			pr_handle_name("%s BIOS PXE NIC PCI and MAC Information",
-				       company);
-			if (h->length < 0x0E) break;
-			/* If the record isn't long enough, we don't have an ID
-			 * use 0xFF to use the internal counter.
-			 * */
-			nic = h->length > 0x28 ? data[0x28] : 0xFF;
-			dmi_print_hp_net_iface_rec(nic, data[0x06], data[0x07],
-						   &data[0x08]);
-			break;
-
 		case 212:
 			/*
 			 * Vendor Specific: HPE 64-bit CRU Information
@@ -280,6 +251,35 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			pr_attr("Misc. Features", "0x%08x", feat);
 			pr_subattr("iCRU", "%s", feat & 0x0001 ? "Yes" : "No");
 			pr_subattr("UEFI", "%s", feat & 0x1400 ? "Yes" : "No");
+			break;
+
+		case 233:
+			/*
+			 * Vendor Specific: HPE ProLiant NIC MAC Information
+			 *
+			 * This prints the BIOS NIC number,
+			 * PCI bus/device/function, and MAC address
+			 *
+			 * Offset |  Name  | Width | Description
+			 * -------------------------------------
+			 *  0x00  |  Type  | BYTE  | 0xE9, NIC structure
+			 *  0x01  | Length | BYTE  | Length of structure
+			 *  0x02  | Handle | WORD  | Unique handle
+			 *  0x04  | Grp No | WORD  | 0 for single segment
+			 *  0x06  | Bus No | BYTE  | PCI Bus
+			 *  0x07  | Dev No | BYTE  | PCI Device/Function No
+			 *  0x08  |   MAC  | 32B   | MAC addr padded w/ 0s
+			 *  0x28  | Port No| BYTE  | Each NIC maps to a Port
+			 */
+			pr_handle_name("%s BIOS PXE NIC PCI and MAC Information",
+				       company);
+			if (h->length < 0x0E) break;
+			/* If the record isn't long enough, we don't have an ID
+			 * use 0xFF to use the internal counter.
+			 * */
+			nic = h->length > 0x28 ? data[0x28] : 0xFF;
+			dmi_print_hp_net_iface_rec(nic, data[0x06], data[0x07],
+						   &data[0x08]);
 			break;
 
 		default:
