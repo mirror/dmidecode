@@ -68,7 +68,7 @@ void dmi_set_vendor(const char *v, const char *p)
 	 * Often DMI strings have trailing spaces. Ignore these
 	 * when checking for known vendor names.
 	 */
-	len = strlen(v);
+	len = v ? strlen(v) : 0;
 	while (len && v[len - 1] == ' ')
 		len--;
 
