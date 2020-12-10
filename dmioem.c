@@ -52,7 +52,17 @@ static const char *dmi_product = NULL;
  */
 void dmi_set_vendor(const char *s, const char *p)
 {
-	int len;
+	const struct { const char *str; enum DMI_VENDORS id; } vendor[] = {
+		{ "Acer",			VENDOR_ACER },
+		{ "HP",				VENDOR_HP },
+		{ "Hewlett-Packard",		VENDOR_HP },
+		{ "HPE",			VENDOR_HPE },
+		{ "Hewlett Packard Enterprise",	VENDOR_HPE },
+		{ "IBM",			VENDOR_IBM },
+		{ "LENOVO",			VENDOR_LENOVO },
+	};
+	unsigned int i;
+	size_t len;
 
 	/*
 	 * Often DMI strings have trailing spaces. Ignore these
@@ -62,16 +72,15 @@ void dmi_set_vendor(const char *s, const char *p)
 	while (len && s[len - 1] == ' ')
 		len--;
 
-	if (strncmp(s, "Acer", len) == 0)
-		dmi_vendor = VENDOR_ACER;
-	else if (strncmp(s, "HP", len) == 0 || strncmp(s, "Hewlett-Packard", len) == 0)
-		dmi_vendor = VENDOR_HP;
-	else if (strncmp(s, "HPE", len) == 0 || strncmp(s, "Hewlett Packard Enterprise", len) == 0)
-		dmi_vendor = VENDOR_HPE;
-	else if (strncmp(s, "IBM", len) == 0)
-		dmi_vendor = VENDOR_IBM;
-	else if (strncmp(s, "LENOVO", len) == 0)
-		dmi_vendor = VENDOR_LENOVO;
+	for (i = 0; i < ARRAY_SIZE(vendor); i++)
+	{
+		if (strlen(vendor[i].str) == len &&
+		    strncmp(s, vendor[i].str, len) == 0)
+		{
+			dmi_vendor = vendor[i].id;
+			break;
+		}
+	}
 
 	dmi_product = p;
 }
