@@ -50,7 +50,7 @@ static const char *dmi_product = NULL;
  * value if we know how to decode at least one specific entry type for
  * that vendor.
  */
-void dmi_set_vendor(const char *s, const char *p)
+void dmi_set_vendor(const char *v, const char *p)
 {
 	const struct { const char *str; enum DMI_VENDORS id; } vendor[] = {
 		{ "Acer",			VENDOR_ACER },
@@ -68,14 +68,14 @@ void dmi_set_vendor(const char *s, const char *p)
 	 * Often DMI strings have trailing spaces. Ignore these
 	 * when checking for known vendor names.
 	 */
-	len = strlen(s);
-	while (len && s[len - 1] == ' ')
+	len = strlen(v);
+	while (len && v[len - 1] == ' ')
 		len--;
 
 	for (i = 0; i < ARRAY_SIZE(vendor); i++)
 	{
 		if (strlen(vendor[i].str) == len &&
-		    strncmp(s, vendor[i].str, len) == 0)
+		    strncmp(v, vendor[i].str, len) == 0)
 		{
 			dmi_vendor = vendor[i].id;
 			break;
