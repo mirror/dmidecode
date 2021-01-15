@@ -267,7 +267,7 @@ static void dmi_dump(const struct dmi_header *h)
 }
 
 /* shift is 0 if the value is in bytes, 1 if it is in kilobytes */
-static void dmi_print_memory_size(const char *attr, u64 code, int shift)
+void dmi_print_memory_size(const char *attr, u64 code, int shift)
 {
 	unsigned long capacity;
 	u16 split[7];
