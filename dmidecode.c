@@ -5182,6 +5182,51 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 	u8 *data;
 	int i = 0;
 
+	/* First pass: Save the vendor so that so that we can decode OEM types */
+	data = buf;
+	while ((i < num || !num)
+	    && data + 4 <= buf + len) /* 4 is the length of an SMBIOS structure header */
+	{
+		u8 *next;
+		struct dmi_header h;
+
+		to_dmi_header(&h, data);
+
+		/*
+		 * If a short entry is found (less than 4 bytes), not only it
+		 * is invalid, but we cannot reliably locate the next entry.
+		 * Also stop at end-of-table marker if so instructed.
+		 */
+		if (h.length < 4 ||
+		    (h.type == 127 &&
+		     (opt.flags & (FLAG_QUIET | FLAG_STOP_AT_EOT))))
+			break;
+		i++;
+
+		/* Look for the next handle */
+		next = data + h.length;
+		while ((unsigned long)(next - buf + 1) < len
+		    && (next[0] != 0 || next[1] != 0))
+			next++;
+		next += 2;
+
+		/* Make sure the whole structure fits in the table */
+		if ((unsigned long)(next - buf) > len)
+			break;
+
+		/* Assign vendor for vendor-specific decodes later */
+		if (h.type == 1 && h.length >= 6)
+		{
+			dmi_set_vendor(_dmi_string(&h, data[0x04], 0),
+				       _dmi_string(&h, data[0x05], 0));
+			break;
+		}
+
+		data = next;
+	}
+
+	/* Second pass: Actually decode the data */
+	i = 0;
 	data = buf;
 	while ((i < num || !num)
 	    && data + 4 <= buf + len) /* 4 is the length of an SMBIOS structure header */
@@ -5240,11 +5285,6 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 			data = next;
 			break;
 		}
-
-		/* assign vendor for vendor-specific decodes later */
-		if (h.type == 1 && h.length >= 6)
-			dmi_set_vendor(_dmi_string(&h, data[0x04], 0),
-				       _dmi_string(&h, data[0x05], 0));
 
 		/* Fixup a common mistake */
 		if (h.type == 34)
