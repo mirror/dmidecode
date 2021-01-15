@@ -26,6 +26,7 @@
 #include "util.h"
 #include "dmidecode.h"
 #include "dmioem.h"
+#include "dmiopt.h"
 #include "dmioutput.h"
 
 /*
@@ -184,6 +185,23 @@ static int dmi_hpegen(const char *s)
 	}
 
 	return (dmi_vendor == VENDOR_HPE) ? G10P : G6;
+}
+
+static void dmi_hp_240_attr(const char *fname, u64 code)
+{
+	char attr[80] = "";
+
+	if (code.l & (1ULL << 0))
+		strcat(attr, "Updatable ");
+	if (code.l & (1ULL << 1))
+		strcat(attr, "ResetRequired ");
+	if (code.l & (1ULL << 2))
+		strcat(attr, "AuthenticationRequired ");
+	if (code.l & (1ULL << 3))
+		strcat(attr, "InUse ");
+	if (code.l & (1ULL << 4))
+		strcat(attr, "UefiImage");
+	pr_attr(fname, "%s", attr);
 }
 
 static int dmi_decode_hp(const struct dmi_header *h)
@@ -359,6 +377,49 @@ static int dmi_decode_hp(const struct dmi_header *h)
 				pr_attr("A2 Bay Count", "%d", data[0x13]);
 				pr_attr("Backplane Name", "%s", dmi_string(h, data[0x14]));
 			}
+			break;
+
+		case 240:
+			/*
+			 * Vendor Specific: HPE Proliant Inventory Record
+			 *
+			 * Reports firmware version information for devices that report their
+			 * firmware using their UEFI drivers. Additionally provides association
+			 * with other SMBIOS records, such as Type 203 (which in turn is
+			 * associated with Types 9, 41, and 228).
+			 *
+			 * Offset |  Name      | Width | Description
+			 * ---------------------------------------
+			 *  0x00  | Type       | BYTE  | 0xF0, HP Firmware Inventory Record
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | Hndl Assoc | WORD  | Handle to map to Type 203
+			 *  0x06  | Pkg Vers   | DWORD | FW Vers Release of All FW in Device
+			 *  0x0A  | Ver String | STRING| FW Version String
+			 *  0x0B  | Image Size | QWORD | FW image size (bytes)
+			 *  0x13  | Attributes | QWORD | Bitfield: Is attribute defined?
+			 *  0x1B  | Attr Set   | QWORD | BitField: If defined, is attribute set?
+			 *  0x23  | Version    | DWORD | Lowest supported version.
+			 */
+			pr_handle_name("%s Proliant Inventory Record", company);
+			if (h->length < 0x27) break;
+			if (!(opt.flags & FLAG_QUIET))
+				pr_attr("Associated Handle", "0x%04X", WORD(data + 0x4));
+			pr_attr("Package Version", "0x%08X", DWORD(data + 0x6));
+			pr_attr("Version String", "%s", dmi_string(h, data[0x0A]));
+
+			if (DWORD(data + 0x0B))
+				dmi_print_memory_size("Image Size", QWORD(data + 0xB), 0);
+			else
+				pr_attr("Image Size", "Not Available");
+
+			dmi_hp_240_attr("Attributes Def", QWORD(data + 0x13));
+			dmi_hp_240_attr("Attributes Set", QWORD(data + 0x1B));
+
+			if (DWORD(data + 0x23))
+				pr_attr("Lowest Supported Version", "0x%08X", DWORD(data + 0x23));
+			else
+				pr_attr("Lowest Supported Version", "Not Available");
 			break;
 
 		default:
