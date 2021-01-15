@@ -541,7 +541,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *  0x14  | Name       | STRING| (deprecated) Backplane Name
 			 */
 			pr_handle_name("%s HDD Backplane FRU Information", company);
-
+			if (h->length < 0x08) break;
 			pr_attr("FRU I2C Address", "0x%X raw(0x%X)", data[0x4] >> 1, data[0x4]);
 			pr_attr("Box Number", "%d", WORD(data + 0x5));
 			pr_attr("NVRAM ID", "0x%X", WORD(data + 0x7));
