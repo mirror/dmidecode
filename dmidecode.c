@@ -248,9 +248,9 @@ static void dmi_dump(const struct dmi_header *h)
 			{
 				int j, l = strlen(s) + 1;
 
-				off = 0;
 				for (row = 0; row < ((l - 1) >> 4) + 1; row++)
 				{
+					off = 0;
 					for (j = 0; j < 16 && j < l - (row << 4); j++)
 						off += sprintf(raw_data + off,
 						       j ? " %02X" : "%02X",
