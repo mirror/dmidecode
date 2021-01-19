@@ -187,21 +187,24 @@ static int dmi_hpegen(const char *s)
 	return (dmi_vendor == VENDOR_HPE) ? G10P : G6;
 }
 
-static void dmi_hp_240_attr(const char *fname, u64 code)
+static void dmi_hp_240_attr(u64 defined, u64 set)
 {
-	char attr[80] = "";
+	static const char *attributes[] = {
+		"Updatable",
+		"Reset Required",
+		"Authentication Required",
+		"In Use",
+		"UEFI Image",
+	};
+	unsigned int i;
 
-	if (code.l & (1ULL << 0))
-		strcat(attr, "Updatable ");
-	if (code.l & (1ULL << 1))
-		strcat(attr, "ResetRequired ");
-	if (code.l & (1ULL << 2))
-		strcat(attr, "AuthenticationRequired ");
-	if (code.l & (1ULL << 3))
-		strcat(attr, "InUse ");
-	if (code.l & (1ULL << 4))
-		strcat(attr, "UefiImage");
-	pr_attr(fname, "%s", attr);
+	pr_attr("Attributes Defined/Set", NULL);
+	for (i = 0; i < ARRAY_SIZE(attributes); i++)
+	{
+		if (!(defined.l & (1UL << i)))
+			continue;
+		pr_subattr(attributes[i], "%s", set.l & (1UL << i) ? "Yes" : "No");
+	}
 }
 
 static void dmi_hp_203_assoc_hndl(const char *fname, u16 num)
@@ -591,8 +594,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			else
 				pr_attr("Image Size", "Not Available");
 
-			dmi_hp_240_attr("Attributes Def", QWORD(data + 0x13));
-			dmi_hp_240_attr("Attributes Set", QWORD(data + 0x1B));
+			dmi_hp_240_attr(QWORD(data + 0x13), QWORD(data + 0x1B));
 
 			if (DWORD(data + 0x23))
 				pr_attr("Lowest Supported Version", "0x%08X", DWORD(data + 0x23));
