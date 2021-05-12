@@ -213,9 +213,9 @@ void *mem_chunk(off_t base, size_t len, const char *devmem)
 	}
 
 #ifdef _SC_PAGESIZE
-	mmoffset = base % sysconf(_SC_PAGESIZE);
+	mmoffset = base & (sysconf(_SC_PAGESIZE) - 1);
 #else
-	mmoffset = base % getpagesize();
+	mmoffset = base & (getpagesize() - 1);
 #endif /* _SC_PAGESIZE */
 	/*
 	 * Please note that we don't use mmap() for performance reasons here,
