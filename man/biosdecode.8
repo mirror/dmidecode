@@ -5,7 +5,7 @@ biosdecode \- \s-1BIOS\s0 information decoder
 .\"
 .SH SYNOPSIS
 .B biosdecode
-.RB [ OPTIONS ]
+.RI [ OPTIONS ]
 .\"
 .SH DESCRIPTION
 .B biosdecode
@@ -59,11 +59,12 @@ program.
 .\"
 .SH OPTIONS
 .TP
-.BR "-d" ", " "--dev-mem FILE"
-Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
+.BR "-d" ", " "--dev-mem \fIFILE\fP"
+Read memory from device \fIFILE\fP (default: \fI/dev/mem\fP)
 .TP
-.BR "  " "  " "--pir full"
-Decode the details of the PCI IRQ routing table
+.BR "  " "  " "--pir \fBfull\fP"
+Decode the details of the PCI IRQ routing table.
+Only \fBfull\fP mode is supported.
 .TP
 .BR "-h" ", " "--help"
 Display usage information and exit

@@ -5,7 +5,7 @@ vpddecode \- \s-1VPD\s0 structure decoder
 .\"
 .SH SYNOPSIS
 .B vpddecode
-.RB [ OPTIONS ]
+.RI [ OPTIONS ]
 .\"
 .SH DESCRIPTION
 .B vpddecode
@@ -32,30 +32,35 @@ the accuracy of these labels is welcome.
 .\"
 .SH OPTIONS
 .TP
-.BR "-d" ", " "--dev-mem FILE"
-Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
+.BR "-d" ", " "--dev-mem \fIFILE\fP"
+Read memory from device \fIFILE\fP (default: \fI/dev/mem\fP)
 .TP
-.BR "-s" ", " "--string KEYWORD"
-Only display the value of the \s-1VPD\s0 string identified by \fBKEYWORD\fR.
-\fBKEYWORD\fR must be a keyword from the following list: \fBbios-build-id\fR,
-\fBbox-serial-number\fR, \fBmotherboard-serial-number\fR,
-\fBmachine-type-model\fR, \fBbios-release-date\fR.
+.BR "-s" ", " "--string \fIKEYWORD\fP"
+Only display the value of the \s-1VPD\s0 string identified by \fIKEYWORD\fP.
+It must be a keyword from the following list:
+.nh
+.BR bios-build-id ,
+.BR box-serial-number ,
+.BR motherboard-serial-number ,
+.BR machine-type-model ,
+.BR bios-release-date .
+.hy
 Each keyword corresponds to an offset and a length within the \s-1VPD\s0
 record.
 Not all strings may be defined on all \s-1VPD\s0-enabled systems.
-If \fBKEYWORD\fR is not provided or not valid, a list of all valid
+If \fIKEYWORD\fP is not provided or not valid, a list of all valid
 keywords is printed and
 .B vpddecode
 exits with an error.
 This option cannot be used more than once.
-Mutually exclusive with \fB--dump\fR.
+Mutually exclusive with \fB--dump\fP.
 .TP
 .BR "-u" ", " "--dump"
 Do not decode the VPD records, dump their contents as hexadecimal instead.
 Note that this is still a text output, no binary data will be thrown upon
 you. ASCII equivalent is displayed when possible. This option is mainly
 useful for debugging.
-Mutually exclusive with \fB--string\fR.
+Mutually exclusive with \fB--string\fP.
 .TP
 .BR "-h" ", " "--help"
 Display usage information and exit

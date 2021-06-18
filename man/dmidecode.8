@@ -5,7 +5,7 @@ dmidecode \- \s-1DMI\s0 table decoder
 .\"
 .SH SYNOPSIS
 .B dmidecode
-.RB [ OPTIONS ]
+.RI [ OPTIONS ]
 .\"
 .SH DESCRIPTION
 .B dmidecode
@@ -63,35 +63,53 @@ and serial number.
 .\"
 .SH OPTIONS
 .TP
-.BR "-d" ", " "--dev-mem FILE"
-Read memory from device \fBFILE\fR (default: \fB/dev/mem\fR)
+.BR "-d" ", " "--dev-mem \fIFILE\fP"
+Read memory from device \fIFILE\fP (default: \fI/dev/mem\fP)
 .TP
 .BR "-q" ", " "--quiet"
 Be less verbose. Unknown, inactive and \s-1OEM\s0-specific entries are not
 displayed. Meta-data and handle references are hidden.
 .TP
-.BR "-s" ", " "--string KEYWORD"
-Only display the value of the \s-1DMI\s0 string identified by \fBKEYWORD\fR.
-\fBKEYWORD\fR must be a keyword from the following list: \fBbios-vendor\fR,
-\fBbios-version\fR, \fBbios-release-date\fR,
-\fBbios-revision\fR, \fBfirmware-revision\fR,
-\fBsystem-manufacturer\fR, \fBsystem-product-name\fR,
-\fBsystem-version\fR, \fBsystem-serial-number\fR,
-\fBsystem-uuid\fR, \fBsystem-sku-number\fR, \fBsystem-family\fR,
-\fBbaseboard-manufacturer\fR, \fBbaseboard-product-name\fR,
-\fBbaseboard-version\fR, \fBbaseboard-serial-number\fR,
-\fBbaseboard-asset-tag\fR, \fBchassis-manufacturer\fR,
-\fBchassis-type\fR,
-\fBchassis-version\fR, \fBchassis-serial-number\fR,
-\fBchassis-asset-tag\fR, \fBprocessor-family\fR,
-\fBprocessor-manufacturer\fR,
-\fBprocessor-version\fR, \fBprocessor-frequency\fR.
+.BR "-s" ", " "--string \fIKEYWORD\fP"
+Only display the value of the \s-1DMI\s0 string identified by \fIKEYWORD\fP.
+It must be a keyword from the following list:
+.nh
+.BR bios\-vendor ,
+.BR bios\-version ,
+.BR bios\-release\-date ,
+.BR bios\-revision ,
+.BR firmware\-revision ,
+.BR system\-manufacturer ,
+.BR system\-product\-name ,
+.BR system\-version ,
+.BR system\-serial\-number ,
+.BR system\-uuid ,
+.BR system\-sku\-number ,
+.BR system\-family ,
+.BR baseboard\-manufacturer ,
+.BR baseboard\-product\-name ,
+.BR baseboard\-version ,
+.BR baseboard\-serial\-number ,
+.BR baseboard\-asset\-tag ,
+.BR chassis\-manufacturer ,
+.BR chassis\-type ,
+.BR chassis\-version ,
+.BR chassis\-serial\-number ,
+.BR chassis\-asset\-tag ,
+.BR processor\-family ,
+.BR processor\-manufacturer ,
+.BR processor\-version ,
+.BR processor\-frequency .
+.hy
 Each keyword corresponds to a given \s-1DMI\s0 type and a given offset
 within this entry type.
 Not all strings may be meaningful or even defined on all systems. Some
 keywords may return more than one result on some systems (e.g.
-\fBprocessor-version\fR on a multi-processor system).
-If \fBKEYWORD\fR is not provided or not valid, a list of all valid
+.nh
+.B processor\-version
+.hy
+on a multi-processor system).
+If \fIKEYWORD\fP is not provided or not valid, a list of all valid
 keywords is printed and
 .B dmidecode
 exits with an error.
@@ -104,23 +122,32 @@ typically from files under
 .IR /sys/devices/virtual/dmi/id .
 Most of these files are even readable by regular users.
 .TP
-.BR "-t" ", " "--type TYPE"
-Only display the entries of type \fBTYPE\fR. \fBTYPE\fR can be either a
+.BR "-t" ", " "--type \fITYPE\fP"
+Only display the entries of type \fITYPE\fP. It can be either a
 \s-1DMI\s0 type number, or a comma-separated list of type numbers, or a
-keyword from the following list: \fBbios\fR, \fBsystem\fR,
-\fBbaseboard\fR, \fBchassis\fR, \fBprocessor\fR, \fBmemory\fR,
-\fBcache\fR, \fBconnector\fR, \fBslot\fR. Refer to the DMI TYPES section
-below for details.
+keyword from the following list:
+.nh
+.BR bios ,
+.BR system ,
+.BR baseboard ,
+.BR chassis ,
+.BR processor ,
+.BR memory ,
+.BR cache ,
+.BR connector ,
+.BR slot .
+.hy
+Refer to the DMI TYPES section below for details.
 If this option is used more than once, the set of displayed entries will be
 the union of all the given types.
-If \fBTYPE\fR is not provided or not valid, a list of all valid keywords
+If \fITYPE\fP is not provided or not valid, a list of all valid keywords
 is printed and
 .B dmidecode
 exits with an error.
 .TP
-.BR "-H" ", " "--handle HANDLE"
-Only display the entry whose handle matches \fBHANDLE\fR.  \fBHANDLE\fR
-is a 16-bit integer.
+.BR "-H" ", " "--handle \fIHANDLE\fP"
+Only display the entry whose handle matches \fIHANDLE\fP.
+\fIHANDLE\fP is a 16-bit integer.
 .TP
 .BR "-u" ", " "--dump"
 Do not decode the entries, dump their contents as hexadecimal instead.
@@ -128,22 +155,22 @@ Note that this is still a text output, no binary data will be thrown upon
 you. The strings attached to each entry are displayed as both
 hexadecimal and \s-1ASCII\s0. This option is mainly useful for debugging.
 .TP
-.BR "  " "  " "--dump-bin FILE"
+.BR "  " "  " "--dump-bin \fIFILE\fP"
 Do not decode the entries, instead dump the DMI data to a file in binary
-form. The generated file is suitable to pass to \fB--from-dump\fR
+form. The generated file is suitable to pass to \fB--from-dump\fP
 later.
 .TP
-.BR "  " "  " "--from-dump FILE"
-Read the DMI data from a binary file previously generated using 
-\fB--dump-bin\fR.
+.BR "  " "  " "--from-dump \fIFILE\fP"
+Read the DMI data from a binary file previously generated using
+\fB--dump-bin\fP.
 .TP
 .BR "  " "  " "--no-sysfs"
 Do not attempt to read DMI data from sysfs files. This is mainly useful for
 debugging.
 .TP
-.BR "  " "  " "--oem-string N"
-Only display the value of the \s-1OEM\s0 string number \fBN\fR. The first
-\s-1OEM\s0 string has number 1. With special value "count", return the
+.BR "  " "  " "--oem-string \fIN\fP"
+Only display the value of the \s-1OEM\s0 string number \fIN\fP. The first
+\s-1OEM\s0 string has number \fB1\fP. With special value \fBcount\fP, return the
 number of OEM strings instead.
 .TP
 .BR "-h" ", " "--help"
@@ -152,7 +179,10 @@ Display usage information and exit
 .BR "-V" ", " "--version"
 Display the version and exit
 .P
-Options --string, --type, --dump-bin and --oem-string
+Options
+.BR --string ,
+.BR --type,
+.BR --dump-bin " and " --oem-string
 determine the output format and are mutually exclusive.
 .P
 Please note in case of
@@ -220,7 +250,7 @@ end-of-table marker. Types 128 to 255 are for \s-1OEM\s0-specific data.
 will display these entries by default, but it can only decode them
 when the vendors have contributed documentation or code for them.
 
-Keywords can be used instead of type numbers with \fB--type\fR.
+Keywords can be used instead of type numbers with \fB--type\fP.
 Each keyword is equivalent to a list of type numbers:
 
 .TS
@@ -250,7 +280,7 @@ dmidecode --type bios
 dmidecode --type BIOS
 .\"
 .SH BINARY DUMP FILE FORMAT
-The binary dump files generated by --dump-bin and read using --from-dump
+The binary dump files generated by \fB--dump-bin\fP and read using \fB--from-dump\fP
 are formatted as follows:
 .IP \(bu "\w'\(bu'u+1n"
 The SMBIOS or DMI entry point is located at offset 0x00.
