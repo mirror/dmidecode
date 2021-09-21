@@ -1126,18 +1126,55 @@ static void dmi_processor_id(const struct dmi_header *h)
 	else if ((type >= 0x100 && type <= 0x101) /* ARM */
 	      || (type >= 0x118 && type <= 0x119)) /* ARM */
 	{
-		u32 midr = DWORD(p);
 		/*
-		 * The format of this field was not defined for ARM processors
-		 * before version 3.1.0 of the SMBIOS specification, so we
-		 * silently skip it if it reads all zeroes.
+		 * The field's format depends on the processor's support of
+		 * the SMCCC_ARCH_SOC_ID architectural call. Software can determine
+		 * the support for SoC ID by examining the Processor Characteristics field
+		 * for "Arm64 SoC ID" bit.
 		 */
-		if (midr == 0)
-			return;
-		pr_attr("Signature",
-			"Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u",
-			midr >> 24, (midr >> 20) & 0xF,
-			(midr >> 16) & 0xF, (midr >> 4) & 0xFFF, midr & 0xF);
+		if (h->length >= 0x28
+		 && (WORD(data + 0x26) & (1 << 9)))
+		{
+			/*
+			 * If Soc ID is supported, the first DWORD is the JEP-106 code;
+			 * the second DWORD is the SoC revision value.
+			 */
+			u32 jep106 = DWORD(p);
+			u32 soc_revision = DWORD(p + 4);
+			/*
+			 * According to SMC Calling Convention (SMCCC) v1.3 specification
+			 * (https://developer.arm.com/documentation/den0028/d/), the format
+			 * of the values returned by the SMCCC_ARCH_SOC_ID call is as follows:
+			 *
+			 * JEP-106 code for the SiP (SoC_ID_type == 0)
+			 *   Bit[31] must be zero
+			 *   Bits[30:24] JEP-106 bank index for the SiP
+			 *   Bits[23:16] JEP-106 identification code with parity bit for the SiP
+			 *   Bits[15:0] Implementation defined SoC ID
+			 *
+			 * SoC revision (SoC_ID_type == 1)
+			 *   Bit[31] must be zero
+			 *   Bits[30:0] SoC revision
+			 */
+			pr_attr("Signature",
+				"JEP-106 Bank 0x%02x Manufacturer 0x%02x, SoC ID 0x%04x, SoC Revision 0x%08x",
+				(jep106 >> 24) & 0x7F, (jep106 >> 16) & 0x7F, jep106 & 0xFFFF, soc_revision);
+		}
+		else
+		{
+			u32 midr = DWORD(p);
+			/*
+			 * The format of this field was not defined for ARM processors
+			 * before version 3.1.0 of the SMBIOS specification, so we
+			 * silently skip it if it reads all zeroes.
+			 */
+			if (midr == 0)
+				return;
+			pr_attr("Signature",
+				"Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u",
+				midr >> 24, (midr >> 20) & 0xF,
+				(midr >> 16) & 0xF, (midr >> 4) & 0xFFF, midr & 0xF);
+		}
 		return;
 	}
 	else if ((type >= 0x0B && type <= 0x15) /* Intel, Cyrix */
