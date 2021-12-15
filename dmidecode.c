@@ -626,7 +626,8 @@ static const char *dmi_chassis_type(u8 code)
 		"IoT Gateway",
 		"Embedded PC",
 		"Mini PC",
-		"Stick PC" /* 0x24 */
+		"Stick PC",
+		"Computer" /* 0x25 */
 	};
 
 	code &= 0x7F; /* bits 6:0 are chassis type, 7th bit is the lock bit */
