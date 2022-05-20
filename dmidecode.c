@@ -85,6 +85,8 @@
 #define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
+enum cpuid_type cpuid_type = cpuid_none;
+
 #define SUPPORTED_SMBIOS_VER 0x030300
 
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
@@ -5250,7 +5252,7 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 	u8 *data;
 	int i = 0;
 
-	/* First pass: Save the vendor so that so that we can decode OEM types */
+	/* First pass: Save specific values needed to decode OEM types */
 	data = buf;
 	while ((i < num || !num)
 	    && data + 4 <= buf + len) /* 4 is the length of an SMBIOS structure header */
@@ -5284,12 +5286,12 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 
 		/* Assign vendor for vendor-specific decodes later */
 		if (h.type == 1 && h.length >= 6)
-		{
 			dmi_set_vendor(_dmi_string(&h, data[0x04], 0),
 				       _dmi_string(&h, data[0x05], 0));
-			break;
-		}
 
+		/* Remember CPUID type for HPE type 199 */
+		if (h.type == 4 && h.length >= 0x1A && cpuid_type == cpuid_none)
+			cpuid_type = dmi_get_cpuid_type(&h);
 		data = next;
 	}
 
