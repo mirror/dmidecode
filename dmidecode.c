@@ -1225,7 +1225,6 @@ static void dmi_processor_id(const struct dmi_header *h)
 	 * DMI doesn't support this yet.
 	 */
 	eax = DWORD(p);
-	edx = DWORD(p + 4);
 	switch (sig)
 	{
 		case 1: /* Intel */
