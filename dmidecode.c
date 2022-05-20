@@ -1121,7 +1121,8 @@ static enum cpuid_type dmi_get_cpuid_type(const struct dmi_header *h)
 	return cpuid_none;
 }
 
-void dmi_print_cpuid(const char *label, enum cpuid_type sig, const u8 *p)
+void dmi_print_cpuid(void (*print_cb)(const char *name, const char *format, ...),
+		     const char *label, enum cpuid_type sig, const u8 *p)
 {
 	u32 eax, midr, jep106, soc_revision;
 	u16 dx;
@@ -1133,18 +1134,18 @@ void dmi_print_cpuid(const char *label, enum cpuid_type sig, const u8 *p)
 			/*
 			 * 80386 have a different signature.
 			 */
-			pr_attr(label,
-				"Type %u, Family %u, Major Stepping %u, Minor Stepping %u",
-				dx >> 12, (dx >> 8) & 0xF,
-				(dx >> 4) & 0xF, dx & 0xF);
+			print_cb(label,
+				 "Type %u, Family %u, Major Stepping %u, Minor Stepping %u",
+				 dx >> 12, (dx >> 8) & 0xF,
+				 (dx >> 4) & 0xF, dx & 0xF);
 			return;
 
 		case cpuid_80486:
 			dx = WORD(p);
-			pr_attr(label,
-				"Type %u, Family %u, Model %u, Stepping %u",
-				(dx >> 12) & 0x3, (dx >> 8) & 0xF,
-				(dx >> 4) & 0xF, dx & 0xF);
+			print_cb(label,
+				 "Type %u, Family %u, Model %u, Stepping %u",
+				 (dx >> 12) & 0x3, (dx >> 8) & 0xF,
+				 (dx >> 4) & 0xF, dx & 0xF);
 			return;
 
 		case cpuid_arm_legacy: /* ARM before SOC ID */
@@ -1156,10 +1157,10 @@ void dmi_print_cpuid(const char *label, enum cpuid_type sig, const u8 *p)
 			 */
 			if (midr == 0)
 				return;
-			pr_attr(label,
-				"Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u",
-				midr >> 24, (midr >> 20) & 0xF,
-				(midr >> 16) & 0xF, (midr >> 4) & 0xFFF, midr & 0xF);
+			print_cb(label,
+				 "Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u",
+				 midr >> 24, (midr >> 20) & 0xF,
+				 (midr >> 16) & 0xF, (midr >> 4) & 0xFFF, midr & 0xF);
 			return;
 
 		case cpuid_arm_soc_id: /* ARM with SOC ID */
@@ -1197,20 +1198,20 @@ void dmi_print_cpuid(const char *label, enum cpuid_type sig, const u8 *p)
 			 * explained in table 3-5, but DMI doesn't support this
 			 * yet.
 			 */
-			pr_attr(label,
-				"Type %u, Family %u, Model %u, Stepping %u",
-				(eax >> 12) & 0x3,
-				((eax >> 20) & 0xFF) + ((eax >> 8) & 0x0F),
-				((eax >> 12) & 0xF0) + ((eax >> 4) & 0x0F),
-				eax & 0xF);
+			print_cb(label,
+				 "Type %u, Family %u, Model %u, Stepping %u",
+				 (eax >> 12) & 0x3,
+				 ((eax >> 20) & 0xFF) + ((eax >> 8) & 0x0F),
+				 ((eax >> 12) & 0xF0) + ((eax >> 4) & 0x0F),
+				 eax & 0xF);
 			break;
 
 		case cpuid_x86_amd: /* AMD, publication #25481 revision 2.28 */
 			eax = DWORD(p);
-			pr_attr(label, "Family %u, Model %u, Stepping %u",
-				((eax >> 8) & 0xF) + (((eax >> 8) & 0xF) == 0xF ? (eax >> 20) & 0xFF : 0),
-				((eax >> 4) & 0xF) | (((eax >> 8) & 0xF) == 0xF ? (eax >> 12) & 0xF0 : 0),
-				eax & 0xF);
+			print_cb(label, "Family %u, Model %u, Stepping %u",
+				 ((eax >> 8) & 0xF) + (((eax >> 8) & 0xF) == 0xF ? (eax >> 20) & 0xFF : 0),
+				 ((eax >> 4) & 0xF) | (((eax >> 8) & 0xF) == 0xF ? (eax >> 12) & 0xF0 : 0),
+				 eax & 0xF);
 			break;
 		default:
 			return;
@@ -1267,7 +1268,7 @@ static void dmi_processor_id(const struct dmi_header *h)
 		pr_attr("ID", "%02X %02X %02X %02X %02X %02X %02X %02X",
 			p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
 
-	dmi_print_cpuid("Signature", sig, p);
+	dmi_print_cpuid(pr_attr, "Signature", sig, p);
 
 	if (sig != cpuid_x86_intel && sig != cpuid_x86_amd)
 		return;
