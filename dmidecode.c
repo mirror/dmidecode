@@ -1087,8 +1087,9 @@ static void dmi_processor_id(const struct dmi_header *h)
 	 * This might help learn about new processors supporting the
 	 * CPUID instruction or another form of identification.
 	 */
-	pr_attr("ID", "%02X %02X %02X %02X %02X %02X %02X %02X",
-		p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+	if (!(opt.flags & FLAG_QUIET))
+		pr_attr("ID", "%02X %02X %02X %02X %02X %02X %02X %02X",
+			p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
 
 	if (type == 0x05) /* 80386 */
 	{
