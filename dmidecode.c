@@ -1121,56 +1121,10 @@ static enum cpuid_type dmi_get_cpuid_type(const struct dmi_header *h)
 	return cpuid_none;
 }
 
-static void dmi_processor_id(const struct dmi_header *h)
+void dmi_print_cpuid(const char *label, enum cpuid_type sig, const u8 *p)
 {
-	/* Intel AP-485 revision 36, table 2-4 */
-	static const char *flags[32] = {
-		"FPU (Floating-point unit on-chip)", /* 0 */
-		"VME (Virtual mode extension)",
-		"DE (Debugging extension)",
-		"PSE (Page size extension)",
-		"TSC (Time stamp counter)",
-		"MSR (Model specific registers)",
-		"PAE (Physical address extension)",
-		"MCE (Machine check exception)",
-		"CX8 (CMPXCHG8 instruction supported)",
-		"APIC (On-chip APIC hardware supported)",
-		NULL, /* 10 */
-		"SEP (Fast system call)",
-		"MTRR (Memory type range registers)",
-		"PGE (Page global enable)",
-		"MCA (Machine check architecture)",
-		"CMOV (Conditional move instruction supported)",
-		"PAT (Page attribute table)",
-		"PSE-36 (36-bit page size extension)",
-		"PSN (Processor serial number present and enabled)",
-		"CLFSH (CLFLUSH instruction supported)",
-		NULL, /* 20 */
-		"DS (Debug store)",
-		"ACPI (ACPI supported)",
-		"MMX (MMX technology supported)",
-		"FXSR (FXSAVE and FXSTOR instructions supported)",
-		"SSE (Streaming SIMD extensions)",
-		"SSE2 (Streaming SIMD extensions 2)",
-		"SS (Self-snoop)",
-		"HTT (Multi-threading)",
-		"TM (Thermal monitor supported)",
-		NULL, /* 30 */
-		"PBE (Pending break enabled)" /* 31 */
-	};
-	const u8 *data = h->data;
-	const u8 *p = data + 0x08;
-	enum cpuid_type sig = dmi_get_cpuid_type(h);
-	u32 eax, edx, midr, jep106, soc_revision;
+	u32 eax, midr, jep106, soc_revision;
 	u16 dx;
-
-	/*
-	 * This might help learn about new processors supporting the
-	 * CPUID instruction or another form of identification.
-	 */
-	if (!(opt.flags & FLAG_QUIET))
-		pr_attr("ID", "%02X %02X %02X %02X %02X %02X %02X %02X",
-			p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
 
 	switch (sig)
 	{
@@ -1179,7 +1133,7 @@ static void dmi_processor_id(const struct dmi_header *h)
 			/*
 			 * 80386 have a different signature.
 			 */
-			pr_attr("Signature",
+			pr_attr(label,
 				"Type %u, Family %u, Major Stepping %u, Minor Stepping %u",
 				dx >> 12, (dx >> 8) & 0xF,
 				(dx >> 4) & 0xF, dx & 0xF);
@@ -1187,7 +1141,7 @@ static void dmi_processor_id(const struct dmi_header *h)
 
 		case cpuid_80486:
 			dx = WORD(p);
-			pr_attr("Signature",
+			pr_attr(label,
 				"Type %u, Family %u, Model %u, Stepping %u",
 				(dx >> 12) & 0x3, (dx >> 8) & 0xF,
 				(dx >> 4) & 0xF, dx & 0xF);
@@ -1202,7 +1156,7 @@ static void dmi_processor_id(const struct dmi_header *h)
 			 */
 			if (midr == 0)
 				return;
-			pr_attr("Signature",
+			pr_attr(label,
 				"Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u",
 				midr >> 24, (midr >> 20) & 0xF,
 				(midr >> 16) & 0xF, (midr >> 4) & 0xFFF, midr & 0xF);
@@ -1243,7 +1197,7 @@ static void dmi_processor_id(const struct dmi_header *h)
 			 * explained in table 3-5, but DMI doesn't support this
 			 * yet.
 			 */
-			pr_attr("Signature",
+			pr_attr(label,
 				"Type %u, Family %u, Model %u, Stepping %u",
 				(eax >> 12) & 0x3,
 				((eax >> 20) & 0xFF) + ((eax >> 8) & 0x0F),
@@ -1253,7 +1207,7 @@ static void dmi_processor_id(const struct dmi_header *h)
 
 		case cpuid_x86_amd: /* AMD, publication #25481 revision 2.28 */
 			eax = DWORD(p);
-			pr_attr("Signature", "Family %u, Model %u, Stepping %u",
+			pr_attr(label, "Family %u, Model %u, Stepping %u",
 				((eax >> 8) & 0xF) + (((eax >> 8) & 0xF) == 0xF ? (eax >> 20) & 0xFF : 0),
 				((eax >> 4) & 0xF) | (((eax >> 8) & 0xF) == 0xF ? (eax >> 12) & 0xF0 : 0),
 				eax & 0xF);
@@ -1261,6 +1215,62 @@ static void dmi_processor_id(const struct dmi_header *h)
 		default:
 			return;
 	}
+}
+
+static void dmi_processor_id(const struct dmi_header *h)
+{
+	/* Intel AP-485 revision 36, table 2-4 */
+	static const char *flags[32] = {
+		"FPU (Floating-point unit on-chip)", /* 0 */
+		"VME (Virtual mode extension)",
+		"DE (Debugging extension)",
+		"PSE (Page size extension)",
+		"TSC (Time stamp counter)",
+		"MSR (Model specific registers)",
+		"PAE (Physical address extension)",
+		"MCE (Machine check exception)",
+		"CX8 (CMPXCHG8 instruction supported)",
+		"APIC (On-chip APIC hardware supported)",
+		NULL, /* 10 */
+		"SEP (Fast system call)",
+		"MTRR (Memory type range registers)",
+		"PGE (Page global enable)",
+		"MCA (Machine check architecture)",
+		"CMOV (Conditional move instruction supported)",
+		"PAT (Page attribute table)",
+		"PSE-36 (36-bit page size extension)",
+		"PSN (Processor serial number present and enabled)",
+		"CLFSH (CLFLUSH instruction supported)",
+		NULL, /* 20 */
+		"DS (Debug store)",
+		"ACPI (ACPI supported)",
+		"MMX (MMX technology supported)",
+		"FXSR (FXSAVE and FXSTOR instructions supported)",
+		"SSE (Streaming SIMD extensions)",
+		"SSE2 (Streaming SIMD extensions 2)",
+		"SS (Self-snoop)",
+		"HTT (Multi-threading)",
+		"TM (Thermal monitor supported)",
+		NULL, /* 30 */
+		"PBE (Pending break enabled)" /* 31 */
+	};
+	const u8 *data = h->data;
+	const u8 *p = data + 0x08;
+	enum cpuid_type sig = dmi_get_cpuid_type(h);
+	u32 edx;
+
+	/*
+	 * This might help learn about new processors supporting the
+	 * CPUID instruction or another form of identification.
+	 */
+	if (!(opt.flags & FLAG_QUIET))
+		pr_attr("ID", "%02X %02X %02X %02X %02X %02X %02X %02X",
+			p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+
+	dmi_print_cpuid("Signature", sig, p);
+
+	if (sig != cpuid_x86_intel && sig != cpuid_x86_amd)
+		return;
 
 	edx = DWORD(p + 4);
 	if ((edx & 0xBFEFFBFF) == 0)
