@@ -1037,6 +1037,90 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 	}
 }
 
+static enum cpuid_type dmi_get_cpuid_type(const struct dmi_header *h)
+{
+	const u8 *data = h->data;
+	const u8 *p = data + 0x08;
+	u16 type;
+
+	type = (data[0x06] == 0xFE && h->length >= 0x2A) ?
+		WORD(data + 0x28) : data[0x06];
+
+	if (type == 0x05) /* 80386 */
+	{
+		return cpuid_80386;
+	}
+	else if (type == 0x06) /* 80486 */
+	{
+		u16 dx = WORD(p);
+		/*
+		 * Not all 80486 CPU support the CPUID instruction, we have to find
+		 * whether the one we have here does or not. Note that this trick
+		 * works only because we know that 80486 must be little-endian.
+		 */
+		if ((dx & 0x0F00) == 0x0400
+		 && ((dx & 0x00F0) == 0x0040 || (dx & 0x00F0) >= 0x0070)
+		 && ((dx & 0x000F) >= 0x0003))
+			return cpuid_x86_intel;
+		else
+			return cpuid_80486;
+	}
+	else if ((type >= 0x100 && type <= 0x101) /* ARM */
+	      || (type >= 0x118 && type <= 0x119)) /* ARM */
+	{
+		/*
+		 * The field's format depends on the processor's support of
+		 * the SMCCC_ARCH_SOC_ID architectural call. Software can determine
+		 * the support for SoC ID by examining the Processor Characteristics field
+		 * for "Arm64 SoC ID" bit.
+		 */
+		if (h->length >= 0x28
+		 && (WORD(data + 0x26) & (1 << 9)))
+			return cpuid_arm_soc_id;
+		else
+			return cpuid_arm_legacy;
+	}
+	else if ((type >= 0x0B && type <= 0x15) /* Intel, Cyrix */
+	      || (type >= 0x28 && type <= 0x2F) /* Intel */
+	      || (type >= 0xA1 && type <= 0xB3) /* Intel */
+	      || type == 0xB5 /* Intel */
+	      || (type >= 0xB9 && type <= 0xC7) /* Intel */
+	      || (type >= 0xCD && type <= 0xCF) /* Intel */
+	      || (type >= 0xD2 && type <= 0xDB) /* VIA, Intel */
+	      || (type >= 0xDD && type <= 0xE0)) /* Intel */
+		return cpuid_x86_intel;
+	else if ((type >= 0x18 && type <= 0x1D) /* AMD */
+	      || type == 0x1F /* AMD */
+	      || (type >= 0x38 && type <= 0x3F) /* AMD */
+	      || (type >= 0x46 && type <= 0x4F) /* AMD */
+	      || (type >= 0x66 && type <= 0x6B) /* AMD */
+	      || (type >= 0x83 && type <= 0x8F) /* AMD */
+	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
+	      || (type >= 0xE4 && type <= 0xEF)) /* AMD */
+		return cpuid_x86_amd;
+	else if (type == 0x01 || type == 0x02)
+	{
+		const char *version = dmi_string(h, data[0x10]);
+		/*
+		 * Some X86-class CPU have family "Other" or "Unknown". In this case,
+		 * we use the version string to determine if they are known to
+		 * support the CPUID instruction.
+		 */
+		if (strncmp(version, "Pentium III MMX", 15) == 0
+		 || strncmp(version, "Intel(R) Core(TM)2", 18) == 0
+		 || strncmp(version, "Intel(R) Pentium(R)", 19) == 0
+		 || strcmp(version, "Genuine Intel(R) CPU U1400") == 0)
+			return cpuid_x86_intel;
+		else if (strncmp(version, "AMD Athlon(TM)", 14) == 0
+		      || strncmp(version, "AMD Opteron(tm)", 15) == 0
+		      || strncmp(version, "Dual-Core AMD Opteron(tm)", 25) == 0)
+			return cpuid_x86_amd;
+	}
+
+	/* neither X86 nor ARM */
+	return cpuid_none;
+}
+
 static void dmi_processor_id(const struct dmi_header *h)
 {
 	/* Intel AP-485 revision 36, table 2-4 */
@@ -1076,12 +1160,9 @@ static void dmi_processor_id(const struct dmi_header *h)
 	};
 	const u8 *data = h->data;
 	const u8 *p = data + 0x08;
-	u32 eax, edx;
-	int sig = 0;
-	u16 type;
-
-	type = (data[0x06] == 0xFE && h->length >= 0x2A) ?
-		WORD(data + 0x28) : data[0x06];
+	enum cpuid_type sig = dmi_get_cpuid_type(h);
+	u32 eax, edx, midr, jep106, soc_revision;
+	u16 dx;
 
 	/*
 	 * This might help learn about new processors supporting the
@@ -1091,57 +1172,49 @@ static void dmi_processor_id(const struct dmi_header *h)
 		pr_attr("ID", "%02X %02X %02X %02X %02X %02X %02X %02X",
 			p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
 
-	if (type == 0x05) /* 80386 */
+	switch (sig)
 	{
-		u16 dx = WORD(p);
-		/*
-		 * 80386 have a different signature.
-		 */
-		pr_attr("Signature",
-			"Type %u, Family %u, Major Stepping %u, Minor Stepping %u",
-			dx >> 12, (dx >> 8) & 0xF,
-			(dx >> 4) & 0xF, dx & 0xF);
-		return;
-	}
-	if (type == 0x06) /* 80486 */
-	{
-		u16 dx = WORD(p);
-		/*
-		 * Not all 80486 CPU support the CPUID instruction, we have to find
-		 * whether the one we have here does or not. Note that this trick
-		 * works only because we know that 80486 must be little-endian.
-		 */
-		if ((dx & 0x0F00) == 0x0400
-		 && ((dx & 0x00F0) == 0x0040 || (dx & 0x00F0) >= 0x0070)
-		 && ((dx & 0x000F) >= 0x0003))
-			sig = 1;
-		else
-		{
+		case cpuid_80386:
+			dx = WORD(p);
+			/*
+			 * 80386 have a different signature.
+			 */
+			pr_attr("Signature",
+				"Type %u, Family %u, Major Stepping %u, Minor Stepping %u",
+				dx >> 12, (dx >> 8) & 0xF,
+				(dx >> 4) & 0xF, dx & 0xF);
+			return;
+
+		case cpuid_80486:
+			dx = WORD(p);
 			pr_attr("Signature",
 				"Type %u, Family %u, Model %u, Stepping %u",
 				(dx >> 12) & 0x3, (dx >> 8) & 0xF,
 				(dx >> 4) & 0xF, dx & 0xF);
 			return;
-		}
-	}
-	else if ((type >= 0x100 && type <= 0x101) /* ARM */
-	      || (type >= 0x118 && type <= 0x119)) /* ARM */
-	{
-		/*
-		 * The field's format depends on the processor's support of
-		 * the SMCCC_ARCH_SOC_ID architectural call. Software can determine
-		 * the support for SoC ID by examining the Processor Characteristics field
-		 * for "Arm64 SoC ID" bit.
-		 */
-		if (h->length >= 0x28
-		 && (WORD(data + 0x26) & (1 << 9)))
-		{
+
+		case cpuid_arm_legacy: /* ARM before SOC ID */
+			midr = DWORD(p);
+			/*
+			 * The format of this field was not defined for ARM processors
+			 * before version 3.1.0 of the SMBIOS specification, so we
+			 * silently skip it if it reads all zeroes.
+			 */
+			if (midr == 0)
+				return;
+			pr_attr("Signature",
+				"Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u",
+				midr >> 24, (midr >> 20) & 0xF,
+				(midr >> 16) & 0xF, (midr >> 4) & 0xFFF, midr & 0xF);
+			return;
+
+		case cpuid_arm_soc_id: /* ARM with SOC ID */
 			/*
 			 * If Soc ID is supported, the first DWORD is the JEP-106 code;
 			 * the second DWORD is the SoC revision value.
 			 */
-			u32 jep106 = DWORD(p);
-			u32 soc_revision = DWORD(p + 4);
+			jep106 = DWORD(p);
+			soc_revision = DWORD(p + 4);
 			/*
 			 * According to SMC Calling Convention (SMCCC) v1.3 specification
 			 * (https://developer.arm.com/documentation/den0028/d/), the format
@@ -1160,74 +1233,16 @@ static void dmi_processor_id(const struct dmi_header *h)
 			pr_attr("Signature",
 				"JEP-106 Bank 0x%02x Manufacturer 0x%02x, SoC ID 0x%04x, SoC Revision 0x%08x",
 				(jep106 >> 24) & 0x7F, (jep106 >> 16) & 0x7F, jep106 & 0xFFFF, soc_revision);
-		}
-		else
-		{
-			u32 midr = DWORD(p);
-			/*
-			 * The format of this field was not defined for ARM processors
-			 * before version 3.1.0 of the SMBIOS specification, so we
-			 * silently skip it if it reads all zeroes.
-			 */
-			if (midr == 0)
-				return;
-			pr_attr("Signature",
-				"Implementor 0x%02x, Variant 0x%x, Architecture %u, Part 0x%03x, Revision %u",
-				midr >> 24, (midr >> 20) & 0xF,
-				(midr >> 16) & 0xF, (midr >> 4) & 0xFFF, midr & 0xF);
-		}
-		return;
-	}
-	else if ((type >= 0x0B && type <= 0x15) /* Intel, Cyrix */
-	      || (type >= 0x28 && type <= 0x2F) /* Intel */
-	      || (type >= 0xA1 && type <= 0xB3) /* Intel */
-	      || type == 0xB5 /* Intel */
-	      || (type >= 0xB9 && type <= 0xC7) /* Intel */
-	      || (type >= 0xCD && type <= 0xCF) /* Intel */
-	      || (type >= 0xD2 && type <= 0xDB) /* VIA, Intel */
-	      || (type >= 0xDD && type <= 0xE0)) /* Intel */
-		sig = 1;
-	else if ((type >= 0x18 && type <= 0x1D) /* AMD */
-	      || type == 0x1F /* AMD */
-	      || (type >= 0x38 && type <= 0x3F) /* AMD */
-	      || (type >= 0x46 && type <= 0x4F) /* AMD */
-	      || (type >= 0x66 && type <= 0x6B) /* AMD */
-	      || (type >= 0x83 && type <= 0x8F) /* AMD */
-	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
-	      || (type >= 0xE4 && type <= 0xEF)) /* AMD */
-		sig = 2;
-	else if (type == 0x01 || type == 0x02)
-	{
-		const char *version = dmi_string(h, data[0x10]);
-		/*
-		 * Some X86-class CPU have family "Other" or "Unknown". In this case,
-		 * we use the version string to determine if they are known to
-		 * support the CPUID instruction.
-		 */
-		if (strncmp(version, "Pentium III MMX", 15) == 0
-		 || strncmp(version, "Intel(R) Core(TM)2", 18) == 0
-		 || strncmp(version, "Intel(R) Pentium(R)", 19) == 0
-		 || strcmp(version, "Genuine Intel(R) CPU U1400") == 0)
-			sig = 1;
-		else if (strncmp(version, "AMD Athlon(TM)", 14) == 0
-		      || strncmp(version, "AMD Opteron(tm)", 15) == 0
-		      || strncmp(version, "Dual-Core AMD Opteron(tm)", 25) == 0)
-			sig = 2;
-		else
 			return;
-	}
-	else /* neither X86 nor ARM */
-		return;
 
-	/*
-	 * Extra flags are now returned in the ECX register when one calls
-	 * the CPUID instruction. Their meaning is explained in table 3-5, but
-	 * DMI doesn't support this yet.
-	 */
-	eax = DWORD(p);
-	switch (sig)
-	{
-		case 1: /* Intel */
+		case cpuid_x86_intel: /* Intel */
+			eax = DWORD(p);
+			/*
+			 * Extra flags are now returned in the ECX register when
+			 * one calls the CPUID instruction. Their meaning is
+			 * explained in table 3-5, but DMI doesn't support this
+			 * yet.
+			 */
 			pr_attr("Signature",
 				"Type %u, Family %u, Model %u, Stepping %u",
 				(eax >> 12) & 0x3,
@@ -1235,12 +1250,16 @@ static void dmi_processor_id(const struct dmi_header *h)
 				((eax >> 12) & 0xF0) + ((eax >> 4) & 0x0F),
 				eax & 0xF);
 			break;
-		case 2: /* AMD, publication #25481 revision 2.28 */
+
+		case cpuid_x86_amd: /* AMD, publication #25481 revision 2.28 */
+			eax = DWORD(p);
 			pr_attr("Signature", "Family %u, Model %u, Stepping %u",
 				((eax >> 8) & 0xF) + (((eax >> 8) & 0xF) == 0xF ? (eax >> 20) & 0xFF : 0),
 				((eax >> 4) & 0xF) | (((eax >> 8) & 0xF) == 0xF ? (eax >> 12) & 0xF0 : 0),
 				eax & 0xF);
 			break;
+		default:
+			return;
 	}
 
 	edx = DWORD(p + 4);
