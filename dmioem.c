@@ -313,6 +313,37 @@ static int dmi_decode_hp(const struct dmi_header *h)
 
 	switch (h->type)
 	{
+		case 199:
+			/*
+			 * Vendor Specific: CPU Microcode Patch
+			 *
+			 * Offset |  Name      | Width | Description
+			 * -------------------------------------
+			 *  0x00  | Type       | BYTE  | 0xC7, CPU Microcode Patch
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | Patch Info | Varies| { <DWORD: ID, DWORD Date, DWORD CPUID> ...}
+			 */
+			if (gen < G9) return 0;
+			pr_handle_name("%s ProLiant CPU Microcode Patch Support Info", company);
+
+			for (ptr = 0x4; ptr + 12 <= h->length; ptr += 12) {
+				u32 cpuid = DWORD(data + ptr + 2 * 4);
+				u32 date;
+
+				/* AMD omits BaseFamily. Reconstruction valid on family >= 15. */
+				if (cpuid_type == cpuid_x86_amd)
+					cpuid = ((cpuid & 0xfff00) << 8) | 0x0f00 | (cpuid & 0xff);
+
+				dmi_print_cpuid(pr_attr, "CPU ID", cpuid_type, (u8 *) &cpuid);
+
+				date = DWORD(data + ptr + 4);
+				pr_subattr("Date", "%04x-%02x-%02x",
+					date & 0xffff, (date >> 24) & 0xff, (date >> 16) & 0xff);
+				pr_subattr("Patch", "0x%X", DWORD(data + ptr));
+			}
+			break;
+
 		case 203:
 			/*
 			 * Vendor Specific: HP Device Correlation Record
