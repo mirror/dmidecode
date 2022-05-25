@@ -380,9 +380,9 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *  0x26  | Bus Number   | BYTE  | PCI Device Bus Number
 			 *  0x27  | Func Number  | BTYE  | PCI Device and Function Number
 			 */
-			if (gen < G9) break;
+			if (gen < G9) return 0;
+			pr_handle_name("%s Device Correlation Record", company);
 			if (h->length < 0x1F) break;
-			pr_handle_name("%s HP Device Correlation Record", company);
 			dmi_hp_203_assoc_hndl("Associated Device Record", WORD(data + 0x04));
 			dmi_hp_203_assoc_hndl("Associated SMBus Record",  WORD(data + 0x06));
 			if (WORD(data + 0x08) == 0xffff && WORD(data + 0x0A) == 0xffff &&
