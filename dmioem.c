@@ -299,6 +299,57 @@ static void dmi_hp_203_devloc(const char *fname, unsigned int code)
 	pr_attr(fname, "%s", str);
 }
 
+static void dmi_hp_238_loc(const char *fname, unsigned int code)
+{
+	static const char *str = "Reserved";
+	static const char *location[] = {
+		"Internal", /* 0x00 */
+		"Front of Server",
+		"Rear of Server",
+		"Embedded internal SD Card",
+		"iLO USB",
+		"HP NAND Controller (USX 2065 or other)",
+		"Reserved",
+		"Debug Port", /* 0x07 */
+	};
+
+	if (code < ARRAY_SIZE(location))
+		str = location[code];
+
+	pr_attr(fname, "%s", str);
+}
+
+static void dmi_hp_238_flags(const char *fname, unsigned int code)
+{
+	static const char *str = "Reserved";
+	static const char *flags[] = {
+		"Not Shared", /* 0x00 */
+		"Shared with physical switch",
+		"Shared with automatic control", /* 0x02 */
+	};
+
+	if (code < ARRAY_SIZE(flags))
+		str = flags[code];
+
+	pr_attr(fname, "%s", str);
+}
+
+static void dmi_hp_238_speed(const char *fname, unsigned int code)
+{
+	static const char *str = "Reserved";
+	static const char *speed[] = {
+		"Reserved", /* 0x00 */
+		"USB 1.1 Full Speed",
+		"USB 2.0 High Speed",
+		"USB 3.0 Super Speed" /* 0x03 */
+	};
+
+	if (code < ARRAY_SIZE(speed))
+		str = speed[code];
+
+	pr_attr(fname, "%s", str);
+}
+
 static int dmi_decode_hp(const struct dmi_header *h)
 {
 	u8 *data = h->data;
@@ -589,6 +640,44 @@ static int dmi_decode_hp(const struct dmi_header *h)
 				pr_attr("A2 Bay Count", "%d", data[0x13]);
 				pr_attr("Backplane Name", "%s", dmi_string(h, data[0x14]));
 			}
+			break;
+
+		case 238:
+			/*
+			 * Vendor Specific: HPE USB Port Connector Correlation Record
+			 *
+			 * Offset |  Name      | Width | Description
+			 * ---------------------------------------
+			 *  0x00  | Type       | BYTE  | 0xEE, HP Device Correlation Record
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | Hand Assoc | WORD  | Handle to map to Type 8
+			 *  0x06  | Parent Bus | BYTE  | PCI Bus number of USB controller of this port
+			 *  0x07  | Par Dev/Fun| BYTE  | PCI Dev/Fun of USB Controller of this port
+			 *  0x08  | Location   | BYTE  | Enumerated value of location of USB port
+			 *  0x09  | Flags      | WORD  | USB Shared Management Port
+			 *  0x0B  | Port Inst  | BYTE  | Instance number for this type of USB port
+			 *  0x0C  | Parent Hub | BYTE  | Instance number of internal Hub
+			 *  0x0D  | Port Speed | BYTE  | Enumerated value of speed configured by BIOS
+			 *  0x0E  | Device Path| STRING| UEFI Device Path of USB endpoint
+			 */
+			if (gen < G9) return 0;
+			pr_handle_name("%s Proliant USB Port Connector Correlation Record", company);
+			if (h->length < 0x0F) break;
+			if (!(opt.flags & FLAG_QUIET))
+				pr_attr("Associated Handle", "0x%04X", WORD(data + 0x4));
+			pr_attr("PCI Bus of Parent USB", "0x%04X", data[0x6]);
+			pr_attr("PCI Device of Parent USB", "0x%04X", data[0x7] >> 3);
+			pr_attr("PCI Function of Parent USB", "0x%04X", data[0x7] & 0x7);
+			dmi_hp_238_loc("Location", data[0x8]);
+			dmi_hp_238_flags("Management Port", WORD(data + 0x9));
+			pr_attr("Port Instance", "%d", data[0xB]);
+			if (data[0xC] != 0xFE)
+				pr_attr("Parent Hub Port Instance", "%d", data[0xC]);
+			else
+				pr_attr("Parent Hub Port Instance", "N/A");
+			dmi_hp_238_speed("Port Speed Capability", data[0xD]);
+			pr_attr("Device Path", "%s", dmi_string(h, data[0xE]));
 			break;
 
 		case 240:
