@@ -666,9 +666,8 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			if (h->length < 0x0F) break;
 			if (!(opt.flags & FLAG_QUIET))
 				pr_attr("Associated Handle", "0x%04X", WORD(data + 0x4));
-			pr_attr("PCI Bus of Parent USB", "0x%04X", data[0x6]);
-			pr_attr("PCI Device of Parent USB", "0x%04X", data[0x7] >> 3);
-			pr_attr("PCI Function of Parent USB", "0x%04X", data[0x7] & 0x7);
+			pr_attr("PCI Device", "%02x:%02x.%x", data[0x6],
+				data[0x7] >> 3, data[0x7] & 0x7);
 			dmi_hp_238_loc("Location", data[0x8]);
 			dmi_hp_238_flags("Management Port", WORD(data + 0x9));
 			pr_attr("Port Instance", "%d", data[0xB]);
