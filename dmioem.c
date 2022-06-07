@@ -364,6 +364,27 @@ static int dmi_decode_hp(const struct dmi_header *h)
 
 	switch (h->type)
 	{
+		case 194:
+			/*
+			 * Vendor Specific: Super IO Enable/Disable Features
+			 *
+			 * Offset |  Name      | Width | Description
+			 * -------------------------------------
+			 *  0x00  | Type       | BYTE  | 0xC2, Super IO Enable/Disable Indicator
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | Dev Status | BYTE  | Device Status
+			 */
+			pr_handle_name("%s ProLiant Super IO Enable/Disable Indicator", company);
+			if (h->length < 0x05) break;
+			feat = data[0x04];
+			pr_attr("Serial Port A", "%s", feat & (1 << 0) ? "Enabled" : "Disabled");
+			pr_attr("Serial Port B", "%s", feat & (1 << 1) ? "Enabled" : "Disabled");
+			pr_attr("Parallel Port", "%s", feat & (1 << 2) ? "Enabled" : "Disabled");
+			pr_attr("Floppy Disk Port", "%s", feat & (1 << 3) ? "Enabled" : "Disabled");
+			pr_attr("Virtual Serial Port", "%s", feat & (1 << 4) ? "Enabled" : "Disabled");
+			break;
+
 		case 199:
 			/*
 			 * Vendor Specific: CPU Microcode Patch
