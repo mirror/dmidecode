@@ -663,6 +663,34 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			}
 			break;
 
+		case 237:
+			/*
+			 * Vendor Specific: HPE DIMM Vendor Part Number Information
+			 *
+			 * Offset |  Name      | Width | Description
+			 * ---------------------------------------
+			 *  0x00  | Type       | BYTE  | 0xED, DIMM Vendor Part Number information record
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | Hand Assoc | WORD  | Handle to map to Type 17
+			 *  0x06  | Manufacture|STRING | DIMM Manufacturer
+			 *  0x07  | Part Number|STRING | DIMM Manufacturer's Part Number
+			 *  0x08  | Serial Num |STRING | DIMM Vendor Serial Number
+			 *  0x09  | Spare Part |STRING | DIMM Spare Part Number
+			 */
+			if (gen < G9) return 0;
+			pr_handle_name("%s DIMM Vendor Information", company);
+			if (h->length < 0x08) break;
+			if (!(opt.flags & FLAG_QUIET))
+				pr_attr("Associated Handle", "0x%04X", WORD(data + 0x4));
+			pr_attr("DIMM Manufacturer", "%s", dmi_string(h, data[0x06]));
+			pr_attr("DIMM Manufacturer Part Number", "%s", dmi_string(h, data[0x07]));
+			if (h->length < 0x09) break;
+			pr_attr("DIMM Vendor Serial Number", "%s", dmi_string(h, data[0x08]));
+			if (h->length < 0x0A) break;
+			pr_attr("DIMM Spare Part Number", "%s", dmi_string(h, data[0x09]));
+			break;
+
 		case 238:
 			/*
 			 * Vendor Specific: HPE USB Port Connector Correlation Record
