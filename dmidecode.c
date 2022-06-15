@@ -2197,6 +2197,13 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type)
 		case 0xBB: /* PCI Express 4 */
 		case 0xBC: /* PCI Express 4 */
 		case 0xBD: /* PCI Express 4 */
+		case 0xBE: /* PCI Express 5 */
+		case 0xBF: /* PCI Express 5 */
+		case 0xC0: /* PCI Express 5 */
+		case 0xC1: /* PCI Express 5 */
+		case 0xC2: /* PCI Express 5 */
+		case 0xC3: /* PCI Express 5 */
+		case 0xC4: /* PCI Express 6+ */
 			pr_attr("ID", "%u", code1);
 			break;
 		case 0x07: /* PCMCIA */
@@ -2267,6 +2274,65 @@ static void dmi_slot_peers(u8 n, const u8 *data)
 			WORD(data), data[2], data[3] >> 3, data[3] & 0x07,
 			data[4]);
 	}
+}
+
+static void dmi_slot_information(u8 type, u8 code)
+{
+	switch (type)
+	{
+		case 0x1F: /* PCI Express 2 */
+		case 0x20: /* PCI Express 3 */
+		case 0x21: /* PCI Express Mini */
+		case 0x22: /* PCI Express Mini */
+		case 0x23: /* PCI Express Mini */
+		case 0xA5: /* PCI Express */
+		case 0xA6: /* PCI Express */
+		case 0xA7: /* PCI Express */
+		case 0xA8: /* PCI Express */
+		case 0xA9: /* PCI Express */
+		case 0xAA: /* PCI Express */
+		case 0xAB: /* PCI Express 2 */
+		case 0xAC: /* PCI Express 2 */
+		case 0xAD: /* PCI Express 2 */
+		case 0xAE: /* PCI Express 2 */
+		case 0xAF: /* PCI Express 2 */
+		case 0xB0: /* PCI Express 2 */
+		case 0xB1: /* PCI Express 3 */
+		case 0xB2: /* PCI Express 3 */
+		case 0xB3: /* PCI Express 3 */
+		case 0xB4: /* PCI Express 3 */
+		case 0xB5: /* PCI Express 3 */
+		case 0xB6: /* PCI Express 3 */
+		case 0xB8: /* PCI Express 4 */
+		case 0xB9: /* PCI Express 4 */
+		case 0xBA: /* PCI Express 4 */
+		case 0xBB: /* PCI Express 4 */
+		case 0xBC: /* PCI Express 4 */
+		case 0xBD: /* PCI Express 4 */
+		case 0xBE: /* PCI Express 5 */
+		case 0xBF: /* PCI Express 5 */
+		case 0xC0: /* PCI Express 5 */
+		case 0xC1: /* PCI Express 5 */
+		case 0xC2: /* PCI Express 5 */
+		case 0xC3: /* PCI Express 5 */
+		case 0xC4: /* PCI Express 6+ */
+			if (code)
+				pr_attr("PCI Express Generation", "%u", code);
+			break;
+	}
+}
+
+static void dmi_slot_physical_width(u8 code)
+{
+	if (code)
+		pr_attr("Slot Physical Width", "%s",
+			dmi_slot_bus_width(code, 0));
+}
+
+static void dmi_slot_pitch(u16 code)
+{
+	if (code)
+		pr_attr("Pitch", "%u.%02u mm", code / 100, code % 100);
 }
 
 /*
@@ -4438,8 +4504,12 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x13) break;
 			pr_attr("Data Bus Width", "%u", data[0x11]);
 			pr_attr("Peer Devices", "%u", data[0x12]);
-			if (h->length - 0x13 >= data[0x12] * 5)
-				dmi_slot_peers(data[0x12], data + 0x13);
+			if (h->length < 0x13 + data[0x12] * 5) break;
+			dmi_slot_peers(data[0x12], data + 0x13);
+			if (h->length < 0x17 + data[0x12] * 5) break;
+			dmi_slot_information(data[0x05], data[0x13 + data[0x12] * 5]);
+			dmi_slot_physical_width(data[0x14 + data[0x12] * 5]);
+			dmi_slot_pitch(WORD(data + 0x15 + data[0x12] * 5));
 			break;
 
 		case 10: /* 7.11 On Board Devices Information */
