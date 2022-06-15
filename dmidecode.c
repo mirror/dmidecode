@@ -4224,6 +4224,53 @@ static void dmi_tpm_characteristics(u64 code)
 }
 
 /*
+ * 7.46 Firmware Inventory Information (Type 45)
+ */
+
+static void dmi_firmware_characteristics(u16 code)
+{
+	/* 7.46.3 */
+	static const char *characteristics[] = {
+		"Updatable", /* 0 */
+		"Write-Protect" /* 1 */
+	};
+	int i;
+
+	for (i = 0; i <= 1; i++)
+		pr_list_item("%s: %s", characteristics[i],
+			     (code & (1 << i)) ? "Yes" : "No");
+}
+
+static const char *dmi_firmware_state(u8 code)
+{
+	/* 7.46.4 */
+	static const char *state[] = {
+		"Other", /* 0x01 */
+		"Unknown",
+		"Disabled",
+		"Enabled",
+		"Absent",
+		"Stand-by Offline",
+		"Stand-by Spare",
+		"Unavailable Offline" /* 0x08 */
+	};
+
+	if (code >= 0x01 && code <= 0x08)
+		return state[code - 0x01];
+	return out_of_spec;
+}
+
+static void dmi_firmware_components(u8 count, const u8 *p)
+{
+	int i;
+
+	pr_list_start("Associated Components", "%u", count);
+	for (i = 0; i < count; i++)
+		pr_list_item("0x%04X", WORD(p + sizeof(u16) * i));
+	pr_list_end();
+}
+
+/*
  * Main
  */
 
@@ -5274,6 +5321,28 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x1F) break;
 			pr_attr("OEM-specific Information", "0x%08X",
 				DWORD(data + 0x1B));
+			break;
+
+		case 45: /* 7.46 Firmware Inventory Information */
+			pr_handle_name("Firmware Inventory Information");
+			if (h->length < 0x18) break;
+			pr_attr("Firmware Component Name", "%s",
+				dmi_string(h, data[0x04]));
+			pr_attr("Firmware Version", "%s",
+				dmi_string(h, data[0x05]));
+			pr_attr("Firmware ID", "%s", dmi_string(h, data[0x07]));
+			pr_attr("Release Date", "%s", dmi_string(h, data[0x09]));
+			pr_attr("Manufacturer", "%s", dmi_string(h, data[0x0A]));
+			pr_attr("Lowest Supported Firmware Version", "%s",
+				dmi_string(h, data[0x0B]));
+			dmi_memory_size("Image Size", QWORD(data + 0x0C));
+			pr_list_start("Characteristics", NULL);
+			dmi_firmware_characteristics(WORD(data + 0x14));
+			pr_list_end();
+			pr_attr("State", "%s", dmi_firmware_state(data[0x16]));
+			if (h->length < 0x18 + data[0x17] * 2) break;
+			if (!(opt.flags & FLAG_QUIET))
+				dmi_firmware_components(data[0x17], data + 0x18);
 			break;
 
 		case 126: /* 7.44 Inactive */
