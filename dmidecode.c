@@ -2074,29 +2074,47 @@ static const char *dmi_slot_type(u8 code)
 	return out_of_spec;
 }
 
-static const char *dmi_slot_bus_width(u8 code)
+/* If hide_unknown is set, return NULL instead of "Other" or "Unknown" */
+static const char *dmi_slot_bus_width(u8 code, int hide_unknown)
 {
 	/* 7.10.2 */
 	static const char *width[] = {
-		"", /* 0x01, "Other" */
-		"", /* "Unknown" */
-		"8-bit ",
-		"16-bit ",
-		"32-bit ",
-		"64-bit ",
-		"128-bit ",
-		"x1 ",
-		"x2 ",
-		"x4 ",
-		"x8 ",
-		"x12 ",
-		"x16 ",
-		"x32 " /* 0x0E */
+		"Other", /* 0x01 */
+		"Unknown",
+		"8-bit",
+		"16-bit",
+		"32-bit",
+		"64-bit",
+		"128-bit",
+		"x1",
+		"x2",
+		"x4",
+		"x8",
+		"x12",
+		"x16",
+		"x32" /* 0x0E */
 	};
 
 	if (code >= 0x01 && code <= 0x0E)
+	{
+		if (code <= 0x02 && hide_unknown)
+			return NULL;
 		return width[code - 0x01];
+	}
 	return out_of_spec;
+}
+
+static void dmi_slot_type_with_width(u8 type, u8 width)
+{
+	const char *type_str, *width_str;
+
+	type_str = dmi_slot_type(type);
+	width_str = dmi_slot_bus_width(width, 1);
+
+	if (width_str)
+		pr_attr("Type", "%s %s", width_str, type_str);
+	else
+		pr_attr("Type", "%s", type_str);
 }
 
 static const char *dmi_slot_current_usage(u8 code)
@@ -4405,9 +4423,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x0C) break;
 			pr_attr("Designation", "%s",
 				dmi_string(h, data[0x04]));
-			pr_attr("Type", "%s%s",
-				dmi_slot_bus_width(data[0x06]),
-				dmi_slot_type(data[0x05]));
+			dmi_slot_type_with_width(data[0x05], data[0x06]);
 			pr_attr("Current Usage", "%s",
 				dmi_slot_current_usage(data[0x07]));
 			pr_attr("Length", "%s",
