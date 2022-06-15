@@ -203,12 +203,15 @@ static const char *dmi_smbios_structure_type(u8 code)
 		"Additional Information",
 		"Onboard Device",
 		"Management Controller Host Interface",
-		"TPM Device", /* 43 */
+		"TPM Device",
+		"Processor",
+		"Firmware",
+		"String Property" /* 46 */
 	};
 
 	if (code >= 128)
 		return "OEM-specific";
-	if (code <= 43)
+	if (code <= 46)
 		return type[code];
 	return out_of_spec;
 }
