@@ -426,11 +426,13 @@ static void dmi_bios_characteristics_x2(u8 code)
 		"Function key-initiated network boot is supported",
 		"Targeted content distribution is supported",
 		"UEFI is supported",
-		"System is a virtual machine" /* 4 */
+		"System is a virtual machine",
+		"Manufacturing mode is supported",
+		"Manufacturing mode is enabled" /* 6 */
 	};
 	int i;
 
-	for (i = 0; i <= 4; i++)
+	for (i = 0; i <= 6; i++)
 		if (code & (1 << i))
 			pr_list_item("%s", characteristics[i]);
 }
@@ -2335,6 +2337,22 @@ static void dmi_slot_pitch(u16 code)
 		pr_attr("Pitch", "%u.%02u mm", code / 100, code % 100);
 }
 
+static const char *dmi_slot_height(u8 code)
+{
+	/* 7.10.3 */
+	static const char *height[] = {
+		"Not applicable", /* 0x00 */
+		"Other",
+		"Unknown",
+		"Full height",
+		"Low-profile" /* 0x04 */
+	};
+
+	if (code <= 0x04)
+		return height[code];
+	return out_of_spec;
+}
+
 /*
  * 7.11 On Board Devices Information (Type 10)
  */
@@ -2352,10 +2370,16 @@ static const char *dmi_on_board_devices_type(u8 code)
 		"Sound",
 		"PATA Controller",
 		"SATA Controller",
-		"SAS Controller" /* 0x0A */
+		"SAS Controller",
+		"Wireless LAN",
+		"Bluetooth",
+		"WWAN",
+		"eMMC",
+		"NVMe Controller",
+		"UFS Controller" /* 0x10 */
 	};
 
-	if (code >= 0x01 && code <= 0x0A)
+	if (code >= 0x01 && code <= 0x10)
 		return type[code - 0x01];
 	return out_of_spec;
 }
@@ -3135,12 +3159,14 @@ static const char *dmi_pointing_device_interface(u8 code)
 	static const char *interface_0xA0[] = {
 		"Bus Mouse DB-9", /* 0xA0 */
 		"Bus Mouse Micro DIN",
-		"USB" /* 0xA2 */
+		"USB",
+		"I2C",
+		"SPI" /* 0xA4 */
 	};
 
 	if (code >= 0x01 && code <= 0x08)
 		return interface[code - 0x01];
-	if (code >= 0xA0 && code <= 0xA2)
+	if (code >= 0xA0 && code <= 0xA4)
 		return interface_0xA0[code - 0xA0];
 	return out_of_spec;
 }
@@ -4220,9 +4246,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			pr_attr("Release Date", "%s",
 				dmi_string(h, data[0x08]));
 			/*
-			 * On IA-64, the BIOS base address will read 0 because
-			 * there is no BIOS. Skip the base address and the
-			 * runtime size in this case.
+			 * On IA-64 and UEFI-based systems, the BIOS base
+			 * address will read 0 because there is no BIOS. Skip
+			 * the base address and the runtime size in this case.
 			 */
 			if (WORD(data + 0x06) != 0)
 			{
@@ -4510,6 +4536,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_slot_information(data[0x05], data[0x13 + data[0x12] * 5]);
 			dmi_slot_physical_width(data[0x14 + data[0x12] * 5]);
 			dmi_slot_pitch(WORD(data + 0x15 + data[0x12] * 5));
+			if (h->length < 0x18 + data[0x12] * 5) break;
+			pr_attr("Height", "%s",
+				dmi_slot_height(data[0x17 + data[0x12] * 5]));
 			break;
 
 		case 10: /* 7.11 On Board Devices Information */
