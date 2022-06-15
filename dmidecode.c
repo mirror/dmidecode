@@ -5348,11 +5348,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_firmware_components(data[0x17], data + 0x18);
 			break;
 
-		case 126: /* 7.44 Inactive */
+		case 126:
 			pr_handle_name("Inactive");
 			break;
 
-		case 127: /* 7.45 End Of Table */
+		case 127:
 			pr_handle_name("End Of Table");
 			break;
 
