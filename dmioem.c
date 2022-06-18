@@ -243,7 +243,7 @@ static void dmi_hp_203_bayenc(const char *fname, u8 num)
 
 static void dmi_hp_203_devtyp(const char *fname, unsigned int code)
 {
-	static const char *str = "Reserved";
+	const char *str = "Reserved";
 	static const char *type[] = {
 		"Unknown", /* 0x00 */
 		"Reserved",
@@ -273,7 +273,7 @@ static void dmi_hp_203_devtyp(const char *fname, unsigned int code)
 
 static void dmi_hp_203_devloc(const char *fname, unsigned int code)
 {
-	static const char *str = "Reserved";
+	const char *str = "Reserved";
 	static const char *location[] = {
 		"Unknown", /* 0x00 */
 		"Embedded",
@@ -301,7 +301,7 @@ static void dmi_hp_203_devloc(const char *fname, unsigned int code)
 
 static void dmi_hp_238_loc(const char *fname, unsigned int code)
 {
-	static const char *str = "Reserved";
+	const char *str = "Reserved";
 	static const char *location[] = {
 		"Internal", /* 0x00 */
 		"Front of Server",
@@ -321,7 +321,7 @@ static void dmi_hp_238_loc(const char *fname, unsigned int code)
 
 static void dmi_hp_238_flags(const char *fname, unsigned int code)
 {
-	static const char *str = "Reserved";
+	const char *str = "Reserved";
 	static const char *flags[] = {
 		"Not Shared", /* 0x00 */
 		"Shared with physical switch",
@@ -336,7 +336,7 @@ static void dmi_hp_238_flags(const char *fname, unsigned int code)
 
 static void dmi_hp_238_speed(const char *fname, unsigned int code)
 {
-	static const char *str = "Reserved";
+	const char *str = "Reserved";
 	static const char *speed[] = {
 		"Reserved", /* 0x00 */
 		"USB 1.1 Full Speed",
