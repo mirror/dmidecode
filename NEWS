@@ -7,7 +7,7 @@ Version 3.4 (Mon Jun 27 2022)
     characteristics, new slot characteristics, new on-board device types, new
     pointing device interface types, and a new record type (type 45 -
     Firmware Inventory Information).
-  - Decode HPE OEM records 194, 199, 203, 236, 237, 238 ans 240.
+  - Decode HPE OEM records 194, 199, 203, 236, 237, 238 and 240.
   - Bug fixes:
     Fix OEM vendor name matching
     Fix ASCII filtering of strings
