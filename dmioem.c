@@ -198,13 +198,14 @@ static void dmi_hp_240_attr(u64 defined, u64 set)
 	};
 	unsigned int i;
 
-	pr_attr("Attributes Defined/Set", NULL);
+	pr_list_start("Attributes Defined/Set", NULL);
 	for (i = 0; i < ARRAY_SIZE(attributes); i++)
 	{
 		if (!(defined.l & (1UL << i)))
 			continue;
-		pr_subattr(attributes[i], "%s", set.l & (1UL << i) ? "Yes" : "No");
+		pr_list_item("%s: %s", attributes[i], set.l & (1UL << i) ? "Yes" : "No");
 	}
+	pr_list_end();
 }
 
 static void dmi_hp_203_assoc_hndl(const char *fname, u16 num)
