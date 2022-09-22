@@ -424,7 +424,7 @@ static void dmi_hp_238_loc(const char *fname, unsigned int code)
 		"Rear of Server",
 		"Embedded internal SD Card",
 		"iLO USB",
-		"HP NAND Controller (USX 2065 or other)",
+		"USB Hub for NAND Controller",
 		"Reserved",
 		"Debug Port", /* 0x07 */
 	};
