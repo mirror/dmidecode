@@ -466,6 +466,52 @@ static void dmi_hp_238_speed(const char *fname, unsigned int code)
 	pr_attr(fname, "%s", str);
 }
 
+static void dmi_hp_242_hdd_type(u8 code)
+{
+	const char *str = "Reserved";
+	static const char * const type[] = {
+		"Undetermined", /* 0x00 */
+		"NVMe SSD",
+		"SATA",
+		"SAS",
+		"SATA SSD",
+		"NVMe Manged by VROC/VMD", /* 0x05 */
+	};
+	if (code < ARRAY_SIZE(type))
+		str = type[code];
+
+	pr_attr("Hard Drive Type", "%s", str);
+}
+
+static void dmi_hp_242_form_factor(u8 code)
+{
+	const char *str = "Reserved";
+	static const char * const form[] = {
+		"Reserved", /* 0x00 */
+		"Reserved",
+		"3.5\" form factor",
+		"2.5\" form factor",
+		"1.8\" form factor",
+		"Less than 1.8\" form factor",
+		"mSATA",
+		"M.2",
+		"MicroSSD",
+		"CFast", /* 0x09 */
+	};
+	if (code < ARRAY_SIZE(form))
+		str = form[code];
+
+	pr_attr("Form Factor", "%s", str);
+}
+
+static void dmi_hp_242_speed(const char *attr, u16 speed)
+{
+	if (speed)
+		pr_attr(attr, "%hu Gbit/s", speed);
+	else
+		pr_attr(attr, "%s", "Unknown");
+}
+
 static int dmi_decode_hp(const struct dmi_header *h)
 {
 	u8 *data = h->data;
@@ -944,6 +990,82 @@ static int dmi_decode_hp(const struct dmi_header *h)
 				pr_attr("Lowest Supported Version", "Not Available");
 			break;
 
+		case 242:
+			/*
+			 * Vendor Specific: HPE Hard Drive Inventory Record
+			 *
+			 * This record provides a mechanism for software to gather information for
+			 * NVMe and SATA drives that are directly attached to the system. This
+			 * record does not contain drive information for drives attached to a HBA
+			 * (i.e. a SmartArray controller). This record will only contain information
+			 * for a hard drive detected by the BIOS during POST and does not
+			 * comprehend a hot plug event after the system has booted.
+			 *
+			 * Offset |  Name      | Width | Description
+			 * ---------------------------------------
+			 *  0x00  | Type       | BYTE  | 0xF2, HPE Hard Drive Inventory Record
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | Hndl Assoc | WORD  | Handle to map to Type 203
+			 *  0x06  | HDD Type   | BYTE  | Hard drive type
+			 *  0x07  | HDD Uniq ID| QWORD | SATA-> WWID.  NVMe -> IEEE Ext Uniq ID.
+			 *  0x0F  | Capacity   | DWORD | Drive Capacity in Mbytes
+			 *  0x13  | Hours      | 16BYTE| Number of poweron hours
+			 *  0x23  | Reserved   | BYTE  | Reserved
+			 *  0x24  | Power      | BTYE  | Wattage
+			 *  0x25  | Form Factor| BYTE  | HDD Form Factor
+			 *  0x26  | Health     | BYTE  | Hard Drive Health Status
+			 *  0x27  | Serial Num | STRING| NVMe/SATA Serial Number
+			 *  0x28  | Model Num  | STRING| NVMe/SATA Model Number
+			 *  0x29  | FW Rev     | STRING| Firmware revision
+			 *  0x2A  | Location   | STRING| Drive location
+			 *  0x2B  | Crypt Stat | BYTE  | Drive encryption status from BIOS
+			 *  0x2C  | Capacity   | QWORD | Hard Drive capacity in bytes
+			 *  0x34  | Block Size | DWORD | Logical Block Size in bytes
+			 *  0x38  | Rot Speed  | WORD  | Nominal Rotational Speed (RPM)
+			 *  0x3A  | Neg Speed  | WORD  | Current negotiated bus speed
+			 *  0x3C  | Cap Speed  | WORD  | Fastest Capable Bus Speed of drive
+			 */
+			if (gen < G10) return 0;
+			pr_handle_name("%s ProLiant Hard Drive Inventory Record", company);
+			if (h->length < 0x2C) break;
+			if (!(opt.flags & FLAG_QUIET))
+				pr_attr("Associated Handle", "0x%04X", WORD(data + 0x4));
+			dmi_hp_242_hdd_type(data[0x06]);
+			pr_attr("ID", "%lx", QWORD(data + 0x07));
+			if (h->length < 0x3E)
+				pr_attr("Capacity", "%u MB", DWORD(data + 0x0F));
+			else
+				dmi_print_memory_size("Capacity", QWORD(data + 0x2C), 0);
+			/* NB: Poweron low QWORD good for 2,104,351,365,926,255 years */
+			pr_attr("Poweron", "%ld hours", QWORD(data + 0x13));
+			if (data[0x24])
+				pr_attr("Power Wattage", "%hhu W", data[0x24]);
+			else
+				pr_attr("Power Wattage", "%s", "Unknown");
+			dmi_hp_242_form_factor(data[0x25]);
+			feat = data[0x26];
+			pr_attr("Health Status", "%s", (feat == 0x00) ? "OK" :
+							(feat == 0x01) ? "Warning" :
+							(feat == 0x02) ? "Critical" :
+							(feat == 0xFF) ? "Unknown" : "Reserved");
+			pr_attr("Serial Number", dmi_string(h, data[0x27]));
+			pr_attr("Model Number", dmi_string(h, data[0x28]));
+			pr_attr("Firmware Revision", dmi_string(h, data[0x29]));
+			pr_attr("Location", dmi_string(h, data[0x2A]));
+			feat = data[0x2B];
+			pr_attr("Encryption Status", "%s", (feat == 0) ? "Not Encrypted" :
+							(feat == 1) ? "Encrypted" :
+							(feat == 2) ? "Unknown" :
+							(feat == 3) ? "Not Supported" : "Reserved");
+			if (h->length < 0x3E) break;
+			pr_attr("Block Size", "%u bytes", DWORD(data + 0x34));
+			/* Rotational Speed: 0 -> Not Reported, 1 -> N/A (SSD) */
+			if (data[0x38] > 1)
+				pr_attr("Rotational Speed", "%hhu RPM", data[0x38]);
+			dmi_hp_242_speed("Negotiated Speed", WORD(data + 0x3A));
+			dmi_hp_242_speed("Capable Speed", WORD(data + 0x3C));
+			break;
 		default:
 			return 0;
 	}
