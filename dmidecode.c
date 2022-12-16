@@ -1105,24 +1105,6 @@ static enum cpuid_type dmi_get_cpuid_type(const struct dmi_header *h)
 	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
 	      || (type >= 0xE4 && type <= 0xEF)) /* AMD */
 		return cpuid_x86_amd;
-	else if (type == 0x01 || type == 0x02)
-	{
-		const char *version = dmi_string(h, data[0x10]);
-		/*
-		 * Some X86-class CPU have family "Other" or "Unknown". In this case,
-		 * we use the version string to determine if they are known to
-		 * support the CPUID instruction.
-		 */
-		if (strncmp(version, "Pentium III MMX", 15) == 0
-		 || strncmp(version, "Intel(R) Core(TM)2", 18) == 0
-		 || strncmp(version, "Intel(R) Pentium(R)", 19) == 0
-		 || strcmp(version, "Genuine Intel(R) CPU U1400") == 0)
-			return cpuid_x86_intel;
-		else if (strncmp(version, "AMD Athlon(TM)", 14) == 0
-		      || strncmp(version, "AMD Opteron(tm)", 15) == 0
-		      || strncmp(version, "Dual-Core AMD Opteron(tm)", 25) == 0)
-			return cpuid_x86_amd;
-	}
 
 	/* neither X86 nor ARM */
 	return cpuid_none;
