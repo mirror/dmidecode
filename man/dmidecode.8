@@ -70,6 +70,11 @@ Read memory from device \fIFILE\fP (default: \fI/dev/mem\fP)
 Be less verbose. Unknown, inactive and \s-1OEM\s0-specific entries are not
 displayed. Meta-data and handle references are hidden.
 .TP
+.BR "  " "  " "--no-quirks"
+Decode everything exactly as it is in the table, without trying to fix up
+common mistakes or hide irrelevant fields.
+This mode is primarily aimed at firmware developers.
+.TP
 .BR "-s" ", " "--string \fIKEYWORD\fP"
 Only display the value of the \s-1DMI\s0 string identified by \fIKEYWORD\fP.
 It must be a keyword from the following list:

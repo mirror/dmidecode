@@ -2722,7 +2722,7 @@ static void dmi_memory_device_width(const char *attr, u16 code)
 	/*
 	 * If no memory module is present, width may be 0
 	 */
-	if (code == 0xFFFF || code == 0)
+	if (code == 0xFFFF || (code == 0 && !(opt.flags & FLAG_NO_QUIRKS)))
 		pr_attr(attr, "Unknown");
 	else
 		pr_attr(attr, "%u bits", code);
@@ -4720,7 +4720,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_memory_device_type_detail(WORD(data + 0x13));
 			if (h->length < 0x17) break;
 			/* If no module is present, the remaining fields are irrelevant */
-			if (WORD(data + 0x0C) == 0)
+			if (WORD(data + 0x0C) == 0 && !(opt.flags & FLAG_NO_QUIRKS))
 				break;
 			dmi_memory_device_speed("Speed", WORD(data + 0x15),
 						h->length >= 0x5C ?
@@ -5544,7 +5544,7 @@ static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
 		}
 
 		/* Fixup a common mistake */
-		if (h.type == 34)
+		if (h.type == 34 && !(opt.flags & FLAG_NO_QUIRKS))
 			dmi_fixup_type_34(&h, display);
 
 		if (display)
@@ -5735,6 +5735,29 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 	return 1;
 }
 
+static void dmi_fixup_version(u16 *ver)
+{
+	/* Some BIOS report weird SMBIOS version, fix that up */
+	switch (*ver)
+	{
+		case 0x021F:
+		case 0x0221:
+			if (!(opt.flags & FLAG_QUIET))
+				fprintf(stderr,
+					"SMBIOS version fixup (2.%d -> 2.%d).\n",
+					*ver & 0xFF, 3);
+			*ver = 0x0203;
+			break;
+		case 0x0233:
+			if (!(opt.flags & FLAG_QUIET))
+				fprintf(stderr,
+					"SMBIOS version fixup (2.%d -> 2.%d).\n",
+					51, 6);
+			*ver = 0x0206;
+			break;
+	}
+}
+
 static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
 {
 	u16 ver;
@@ -5759,25 +5782,8 @@ static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
 		return 0;
 
 	ver = (buf[0x06] << 8) + buf[0x07];
-	/* Some BIOS report weird SMBIOS version, fix that up */
-	switch (ver)
-	{
-		case 0x021F:
-		case 0x0221:
-			if (!(opt.flags & FLAG_QUIET))
-				fprintf(stderr,
-					"SMBIOS version fixup (2.%d -> 2.%d).\n",
-					ver & 0xFF, 3);
-			ver = 0x0203;
-			break;
-		case 0x0233:
-			if (!(opt.flags & FLAG_QUIET))
-				fprintf(stderr,
-					"SMBIOS version fixup (2.%d -> 2.%d).\n",
-					51, 6);
-			ver = 0x0206;
-			break;
-	}
+	if (!(opt.flags & FLAG_NO_QUIRKS))
+		dmi_fixup_version(&ver);
 	if (!(opt.flags & FLAG_QUIET))
 		pr_info("SMBIOS %u.%u present.",
 			ver >> 8, ver & 0xFF);
