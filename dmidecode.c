@@ -5700,7 +5700,8 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 		return 0;
 	}
 
-	if (!checksum(buf, buf[0x06]))
+	if (buf[0x06] < 0x18
+	 || !checksum(buf, buf[0x06]))
 		return 0;
 
 	ver = (buf[0x07] << 16) + (buf[0x08] << 8) + buf[0x09];
@@ -5747,7 +5748,12 @@ static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
 		return 0;
 	}
 
-	if (!checksum(buf, buf[0x05])
+	/*
+	 * The size of this structure is 0x1F bytes, but we also accept value
+	 * 0x1E due to a mistake in SMBIOS specification version 2.1.
+	 */
+	if (buf[0x05] < 0x1E
+	 || !checksum(buf, buf[0x05])
 	 || memcmp(buf + 0x10, "_DMI_", 5) != 0
 	 || !checksum(buf + 0x10, 0x0F))
 		return 0;
