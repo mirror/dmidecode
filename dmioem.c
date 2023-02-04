@@ -373,86 +373,84 @@ static void dmi_hp_216_fw_type(u16 code)
 
 static void dmi_hp_216_version(u8 format, u8 *data)
 {
-	char buf[80];
+	const char * const name = "Version Data";
 	const char * const reserved = "Reserved";
-	const char *vers = buf;
 	int gen;
 
 	gen = dmi_hpegen(dmi_product);
 
 	switch (format) {
 	case 0:
-		sprintf(buf, "No Version Data");
+		pr_attr(name, "No Version Data");
 		break;
 	case 1:
-		sprintf(buf, "%c.%d.%d", data[0] & (1 << 7) ? 'B' : 'R',
-					data[0] & 0x7, data[1] & 0x7);
+		pr_attr(name, "%c.%d.%d", data[0] & (1 << 7) ? 'B' : 'R',
+					  data[0] & 0x7, data[1] & 0x7);
 		break;
 	case 2:
-		sprintf(buf, "%d.%d", data[0] >> 4, data[0] & 0x0f);
+		pr_attr(name, "%d.%d", data[0] >> 4, data[0] & 0x0f);
 		break;
 	case 4:
-		sprintf(buf, "%d.%d.%d", data[0] >> 4, data[0] & 0x0f, data[1] & 0x7f);
+		pr_attr(name, "%d.%d.%d", data[0] >> 4, data[0] & 0x0f, data[1] & 0x7f);
 		break;
 	case 5:
 		if (gen == G9) {
-			sprintf(buf, "%d.%d.%d", data[0] >> 4, data[0] & 0x0f, data[1] & 0x7f);
+			pr_attr(name, "%d.%d.%d", data[0] >> 4, data[0] & 0x0f, data[1] & 0x7f);
 		} else if (gen == G10 || gen == G10P) {
-			sprintf(buf, "%d.%d.%d.%d", data[1] & 0x0f, data[3] & 0x0f,
-						   data[5] & 0x0f, data[6] & 0x0f);
+			pr_attr(name, "%d.%d.%d.%d", data[1] & 0x0f, data[3] & 0x0f,
+						     data[5] & 0x0f, data[6] & 0x0f);
 		} else {
-			vers = reserved;
+			pr_attr(name, "%s", reserved);
 		}
 		break;
 	case 6:
-		sprintf(buf, "%d.%d", data[1], data[0]);
+		pr_attr(name, "%d.%d", data[1], data[0]);
 		break;
 	case 7:
-		sprintf(buf, "v%d.%.2d (%.2d/%.2d/%d)", data[0], data[1],
-							data[2], data[3], WORD(data + 4));
+		pr_attr(name, "v%d.%.2d (%.2d/%.2d/%d)", data[0], data[1],
+							 data[2], data[3], WORD(data + 4));
 		break;
 	case 8:
-		sprintf(buf, "%d.%d", WORD(data + 4), WORD(data));
+		pr_attr(name, "%d.%d", WORD(data + 4), WORD(data));
 		break;
 	case 9:
-		sprintf(buf, "%d.%d.%d", data[0], data[1], WORD(data + 2));
+		pr_attr(name, "%d.%d.%d", data[0], data[1], WORD(data + 2));
 		break;
 	case 10:
-		sprintf(buf, "%d.%d.%d Build %d", data[0], data[1], data[2], data[3]);
+		pr_attr(name, "%d.%d.%d Build %d", data[0], data[1], data[2], data[3]);
 		break;
 	case 11:
-		sprintf(buf, "%d.%d %d", WORD(data + 2), WORD(data), DWORD(data + 4));
+		pr_attr(name, "%d.%d %d", WORD(data + 2), WORD(data), DWORD(data + 4));
 		break;
 	case 12:
-		sprintf(buf, "%d.%d.%d.%d", WORD(data), WORD(data + 2),
-					    WORD(data + 4), WORD(data + 6));
+		pr_attr(name, "%d.%d.%d.%d", WORD(data), WORD(data + 2),
+					     WORD(data + 4), WORD(data + 6));
 		break;
 	case 13:
-		sprintf(buf, "%d", data[0]);
+		pr_attr(name, "%d", data[0]);
 		break;
 	case 14:
-		sprintf(buf, "%d.%d.%d.%d", data[0], data[1], data[2], data[3]);
+		pr_attr(name, "%d.%d.%d.%d", data[0], data[1], data[2], data[3]);
 		break;
 	case 15:
-		sprintf(buf, "%d.%d.%d.%d (%.2d/%.2d/%d)",
+		pr_attr(name, "%d.%d.%d.%d (%.2d/%.2d/%d)",
 				WORD(data), WORD(data + 2), WORD(data + 4), WORD(data + 6),
 				data[8], data[9], WORD(data + 10));
 		break;
 	case 16:
-		sprintf(buf, "%c%c%c%c.%d%d",
+		pr_attr(name, "%c%c%c%c.%d%d",
 				data[0], data[1], data[2], data[3], data[4], data[5]);
 		break;
 	case 17:
-		sprintf(buf, "%08X", DWORD(data));
+		pr_attr(name, "%08X", DWORD(data));
 		break;
 	case 18:
-		sprintf(buf, "%d.%2d", data[0], data[1]);
+		pr_attr(name, "%d.%2d", data[0], data[1]);
 		break;
 	case 3: /* fall through */
 	default:
-		vers = reserved;
+		pr_attr(name, "%s", reserved);
 	}
-	pr_attr("Version Data", "%s", vers);
 }
 
 static int dmi_hp_224_status(u8 code)
