@@ -259,46 +259,6 @@ out:
 	return p;
 }
 
-int write_dump(size_t base, size_t len, const void *data, const char *dumpfile, int add)
-{
-	FILE *f;
-
-	f = fopen(dumpfile, add ? "r+b" : "wb");
-	if (!f)
-	{
-		fprintf(stderr, "%s: ", dumpfile);
-		perror("fopen");
-		return -1;
-	}
-
-	if (fseek(f, base, SEEK_SET) != 0)
-	{
-		fprintf(stderr, "%s: ", dumpfile);
-		perror("fseek");
-		goto err_close;
-	}
-
-	if (fwrite(data, len, 1, f) != 1)
-	{
-		fprintf(stderr, "%s: ", dumpfile);
-		perror("fwrite");
-		goto err_close;
-	}
-
-	if (fclose(f))
-	{
-		fprintf(stderr, "%s: ", dumpfile);
-		perror("fclose");
-		return -1;
-	}
-
-	return 0;
-
-err_close:
-	fclose(f);
-	return -1;
-}
-
 /* Returns end - start + 1, assuming start < end */
 u64 u64_range(u64 start, u64 end)
 {

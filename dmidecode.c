@@ -5409,11 +5409,56 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 	}
 }
 
-static void dmi_table_dump(const u8 *buf, u32 len)
+static int dmi_table_dump(const u8 *ep, u32 ep_len, const u8 *table,
+			  u32 table_len)
 {
+	FILE *f;
+
+	f = fopen(opt.dumpfile, "wb");
+	if (!f)
+	{
+		fprintf(stderr, "%s: ", opt.dumpfile);
+		perror("fopen");
+		return -1;
+	}
+
 	if (!(opt.flags & FLAG_QUIET))
-		pr_comment("Writing %d bytes to %s.", len, opt.dumpfile);
-	write_dump(32, len, buf, opt.dumpfile, 0);
+		pr_comment("Writing %d bytes to %s.", ep_len, opt.dumpfile);
+	if (fwrite(ep, ep_len, 1, f) != 1)
+	{
+		fprintf(stderr, "%s: ", opt.dumpfile);
+		perror("fwrite");
+		goto err_close;
+	}
+
+	if (fseek(f, 32, SEEK_SET) != 0)
+	{
+		fprintf(stderr, "%s: ", opt.dumpfile);
+		perror("fseek");
+		goto err_close;
+	}
+
+	if (!(opt.flags & FLAG_QUIET))
+		pr_comment("Writing %d bytes to %s.", table_len, opt.dumpfile);
+	if (fwrite(table, table_len, 1, f) != 1)
+	{
+		fprintf(stderr, "%s: ", opt.dumpfile);
+		perror("fwrite");
+		goto err_close;
+	}
+
+	if (fclose(f))
+	{
+		fprintf(stderr, "%s: ", opt.dumpfile);
+		perror("fclose");
+		return -1;
+	}
+
+	return 0;
+
+err_close:
+	fclose(f);
+	return -1;
 }
 
 static void dmi_table_decode(u8 *buf, u32 len, u16 num, u16 ver, u32 flags)
@@ -5708,11 +5753,7 @@ static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
 		memcpy(crafted, buf, 32);
 		overwrite_smbios3_address(crafted);
 
-		dmi_table_dump(table, len);
-		if (!(opt.flags & FLAG_QUIET))
-			pr_comment("Writing %d bytes to %s.", crafted[0x06],
-				   opt.dumpfile);
-		write_dump(0, crafted[0x06], crafted, opt.dumpfile, 1);
+		dmi_table_dump(crafted, crafted[0x06], table, len);
 	}
 	else
 	{
@@ -5795,11 +5836,7 @@ static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
 		memcpy(crafted, buf, 32);
 		overwrite_dmi_address(crafted + 0x10);
 
-		dmi_table_dump(table, len);
-		if (!(opt.flags & FLAG_QUIET))
-			pr_comment("Writing %d bytes to %s.", crafted[0x05],
-				   opt.dumpfile);
-		write_dump(0, crafted[0x05], crafted, opt.dumpfile, 1);
+		dmi_table_dump(crafted, crafted[0x05], table, len);
 	}
 	else
 	{
@@ -5840,11 +5877,7 @@ static int legacy_decode(u8 *buf, const char *devmem, u32 flags)
 		memcpy(crafted, buf, 16);
 		overwrite_dmi_address(crafted);
 
-		dmi_table_dump(table, len);
-		if (!(opt.flags & FLAG_QUIET))
-			pr_comment("Writing %d bytes to %s.", 0x0F,
-				   opt.dumpfile);
-		write_dump(0, 0x0F, crafted, opt.dumpfile, 1);
+		dmi_table_dump(crafted, 0x0F, table, len);
 	}
 	else
 	{
