@@ -60,6 +60,7 @@
  *    https://www.dmtf.org/sites/default/files/DSP0270_1.0.1.pdf
  */
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -5412,13 +5413,22 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 static int dmi_table_dump(const u8 *ep, u32 ep_len, const u8 *table,
 			  u32 table_len)
 {
+	int fd;
 	FILE *f;
 
-	f = fopen(opt.dumpfile, "wb");
+	fd = open(opt.dumpfile, O_WRONLY|O_CREAT|O_EXCL, 0666);
+	if (fd == -1)
+	{
+		fprintf(stderr, "%s: ", opt.dumpfile);
+		perror("open");
+		return -1;
+	}
+
+	f = fdopen(fd, "wb");
 	if (!f)
 	{
 		fprintf(stderr, "%s: ", opt.dumpfile);
-		perror("fopen");
+		perror("fdopen");
 		return -1;
 	}
 
