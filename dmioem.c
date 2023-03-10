@@ -1230,7 +1230,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			if (!(opt.flags & FLAG_QUIET))
 				pr_attr("Associated Handle", "0x%04X", WORD(data + 0x4));
 			dmi_hp_242_hdd_type(data[0x06]);
-			pr_attr("ID", "%lx", QWORD(data + 0x07));
+			pr_attr("ID", "%llx", QWORD(data + 0x07));
 			if (h->length < 0x3E)
 				pr_attr("Capacity", "%u MB", DWORD(data + 0x0F));
 			else
