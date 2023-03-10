@@ -5386,12 +5386,12 @@ static void dmi_table_string(const struct dmi_header *h, const u8 *data, u16 ver
 	switch (key)
 	{
 		case 0x015: /* -s bios-revision */
-			if (data[key - 1] != 0xFF && data[key] != 0xFF)
-				printf("%u.%u\n", data[key - 1], data[key]);
+			if (data[offset - 1] != 0xFF && data[offset] != 0xFF)
+				printf("%u.%u\n", data[offset - 1], data[offset]);
 			break;
 		case 0x017: /* -s firmware-revision */
-			if (data[key - 1] != 0xFF && data[key] != 0xFF)
-				printf("%u.%u\n", data[key - 1], data[key]);
+			if (data[offset - 1] != 0xFF && data[offset] != 0xFF)
+				printf("%u.%u\n", data[offset - 1], data[offset]);
 			break;
 		case 0x108:
 			dmi_system_uuid(NULL, NULL, data + offset, ver);
