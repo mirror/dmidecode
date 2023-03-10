@@ -173,18 +173,26 @@ static void safe_memcpy(void *dest, const void *src, size_t n)
  */
 void *mem_chunk(off_t base, size_t len, const char *devmem)
 {
-	void *p;
+	struct stat statbuf;
+	void *p = NULL;
 	int fd;
 #ifdef USE_MMAP
-	struct stat statbuf;
 	off_t mmoffset;
 	void *mmp;
 #endif
 
-	if ((fd = open(devmem, O_RDONLY)) == -1)
+	/*
+	 * Safety check: if running as root, devmem is expected to be a
+	 * character device file.
+	 */
+	if ((fd = open(devmem, O_RDONLY)) == -1
+	 || fstat(fd, &statbuf) == -1
+	 || (geteuid() == 0 && !S_ISCHR(statbuf.st_mode)))
 	{
-		perror(devmem);
-		return NULL;
+		fprintf(stderr, "Can't read memory from %s\n", devmem);
+		if (fd == -1)
+			return NULL;
+		goto out;
 	}
 
 	if ((p = malloc(len)) == NULL)
@@ -194,13 +202,6 @@ void *mem_chunk(off_t base, size_t len, const char *devmem)
 	}
 
 #ifdef USE_MMAP
-	if (fstat(fd, &statbuf) == -1)
-	{
-		fprintf(stderr, "%s: ", devmem);
-		perror("stat");
-		goto err_free;
-	}
-
 	/*
 	 * mmap() will fail with SIGBUS if trying to map beyond the end of
 	 * the file.
