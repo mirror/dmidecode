@@ -4508,11 +4508,11 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				dmi_cache_mode((WORD(data + 0x05) >> 8) & 0x0003));
 			pr_attr("Location", "%s",
 				dmi_cache_location((WORD(data + 0x05) >> 5) & 0x0003));
-			if (h->length >= 0x1B)
+			if (h->length >= 0x1B && 0xFFFF==WORD(data + 0x09))
 				dmi_cache_size_2("Installed Size", DWORD(data + 0x17));
 			else
 				dmi_cache_size("Installed Size", WORD(data + 0x09));
-			if (h->length >= 0x17)
+			if (h->length >= 0x17 && 0xFFFF==WORD(data + 0x07))
 				dmi_cache_size_2("Maximum Size", DWORD(data + 0x13));
 			else
 				dmi_cache_size("Maximum Size", WORD(data + 0x07));
