@@ -620,6 +620,85 @@ static void dmi_hp_238_speed(const char *fname, unsigned int code)
 	pr_attr(fname, "%s", str);
 }
 
+static void dmi_hp_239_usb_device(u8 class, u8 subclass, u8 protocol)
+{
+	/* https://www.usb.org/defined-class-codes */
+	/* https://www.usb.org/sites/default/files/Mass_Storage_Specification_Overview_v1.4_2-19-2010.pdf */
+	const char *str = "Reserved";
+	if (class == 0x08)
+	{
+		static const char * const sub_class_name[] = {
+			"SCSI command set not reported", /* 0x00 */
+			"RBC",
+			"ATAPI",
+			"Obsolete",
+			"UFI",
+			"Obsolete",
+			"SCSI",
+			"LSD FS",
+			"IEEE 1667" /* 0x08 */
+		};
+		pr_attr("USB Class", "%s", "Mass Storage");
+		if (subclass == 0xFF)
+		{
+			str = "Vendor Specific";
+		}
+		else if (subclass < ARRAY_SIZE(sub_class_name))
+		{
+			str = sub_class_name[subclass];
+		}
+		pr_attr("USB SubClass", "%s", str);
+
+		switch (protocol) {
+		case 0x00:
+			str = "CBI w/ completion interrupt";
+			break;
+		case 0x01:
+			str = "CBI w/o completion interrupt";
+			break;
+		case 0x02:
+			str = "Obsolete";
+			break;
+		case 0x50:
+			str = "Bulk-Only";
+			break;
+		case 0x62:
+			str = "UAS";
+			break;
+		case 0xFF:
+			str = "Vendor Specific";
+			break;
+		default:
+			str = "Reserved";
+		}
+		pr_attr("USB Protocol", "%s", str);
+	}
+	else if (class == 0x09 && subclass == 0)
+	{
+		pr_attr("USB Class", "%s", "HUB");
+		switch (protocol) {
+		case 0:
+			str = "Full Speed";
+			break;
+		case 1:
+			str = "Hi-Speed w/ single TT";
+			break;
+		case 2:
+			str = "Hi-Speed w/ multiple TT";
+			break;
+		default:
+			str = "Reserved";
+		}
+		pr_attr("USB Protocol", str);
+	}
+	else
+	{
+		pr_attr("USB Class", "0x%02x", class);
+		pr_attr("USB SubClass", "0x%02x", subclass);
+		pr_attr("USB Protocol", "0x%02x", protocol);
+	}
+}
+
 static void dmi_hp_242_hdd_type(u8 code)
 {
 	const char *str = "Reserved";
@@ -1147,6 +1226,54 @@ static int dmi_decode_hp(const struct dmi_header *h)
 				pr_attr("Parent Hub Port Instance", "N/A");
 			dmi_hp_238_speed("Port Speed Capability", data[0xD]);
 			pr_attr("Device Path", "%s", dmi_string(h, data[0xE]));
+			break;
+
+		case 239:
+			/*
+			 * Vendor Specific: HPE USB Device Correlation Record
+			 *
+			 * This record provides a mechanism for software to correlate USB device
+			 * information provided in SMBIOS record Type 8 and Type 238. It
+			 * additionally provides device specific data that is typically not
+			 * available in SMBIOS to allow HP tools to understand how these device
+			 * entries correlate to both UEFI and Legacy USB Boot entries. This record
+			 * will only contain information for a device detected by the BIOS during
+			 * POST and does not comprehend a hot plug event after the system has
+			 * booted. This record will only be supported on UEFI Based systems.
+			 *
+			 * Offset |  Name      | Width | Description
+			 * -------+------------+-------+------------
+			 *  0x00  | Type       | BYTE  | 0xEF, HP Device Correlation Record
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | Hand Assoc | WORD  | Handle to map to Type 238
+			 *  0x06  | Vendor ID  | WORD  | Vendor ID of detected USB Device
+			 *  0x08  | Flags      | WORD  | Bit[0] - Indicates presence of SD card
+			 *  0x0A  | Class      | BYTE  | USB Device Class per USB HID Dev Spec
+			 *  0x0B  | Sub Class  | BYTE  | USB Device SubClass per USB HID Dev Spec
+			 *  0x0C  | Protocol   | BYTE  | Device Protocol per USB HID Dev Spec
+			 *  0x0D  | Product ID | WORD  | USB Product ID
+			 *  0x0F  | Capacity   | DWORD | USB Device Capacity (if apropos) in Mbytes
+			 *  0x13  | Device Path| STRING| UEFI Device Path
+			 *  0x14  | Device Name| STRING| UEFI Device Structured Name
+			 *  0x15  | UEFI Name  | STRING| Device Name
+			 *  0x16  | Location   | STRING| USB Device Location
+			 */
+			if (gen < G9) return 0;
+			pr_handle_name("%s USB Device Correlation Record", company);
+			if (h->length < 0x17) break;
+			if (!(opt.flags & FLAG_QUIET))
+				pr_attr("Associated Handle", "0x%04X", WORD(data + 0x04));
+			pr_attr("USB Vendor ID", "0x%04x", WORD(data + 0x06));
+			pr_attr("Embedded SD Card", "%s", data[0x08] & 0x01 ? "Present" : "Empty");
+			dmi_hp_239_usb_device(data[0x0A], data[0x0B], data[0x0C]);
+			pr_attr("USB Product ID", "0x%04x", WORD(data + 0x0D));
+			if (DWORD(data + 0x0F))
+				pr_attr("USB Capacity", "%u MB", DWORD(data + 0x0F));
+			pr_attr("UEFI Device Path", "%s", dmi_string(h, data[0x13]));
+			pr_attr("UEFI Device Name", "%s", dmi_string(h, data[0x14]));
+			pr_attr("Device Name", "%s", dmi_string(h, data[0x15]));
+			pr_attr("Device Location", "%s", dmi_string(h, data[0x16]));
 			break;
 
 		case 240:
