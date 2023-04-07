@@ -966,6 +966,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *
 			 * Source: hpwdt kernel driver
 			 */
+			if (gen >= G9) return 0;
 			pr_handle_name("%s 64-bit CRU Information", company);
 			if (h->length < 0x18) break;
 			if (is_printable(data + 0x04, 4))
