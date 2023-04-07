@@ -943,6 +943,7 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *
 			 * Type 221: is deprecated in the latest docs
 			 */
+			if (gen >= G8 && h->type == 221) return 0;
 			pr_handle_name("%s %s", company, h->type == 221 ?
 				       "BIOS iSCSI NIC PCI and MAC Information" :
 				       "BIOS PXE NIC PCI and MAC Information");
