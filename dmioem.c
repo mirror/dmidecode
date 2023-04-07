@@ -368,8 +368,9 @@ static void dmi_hp_216_fw_type(u16 code)
 		"Secondary System Programmable Logic Device",
 		"CPU MEZZ Programmable Logic Device", /* 0x37 */
 		"Intel Artic Sound -M Accelerator Models Firmware",
-		"Ampere System Control Processor (SCP – PMPro+SMPro)",
+		"Ampere System Control Processor (SCP - PMPro+SMPro)",
 		"Intel CFR information", /* 0x3A */
+		"OCP cards",
 	};
 
 	if (code < ARRAY_SIZE(type))
