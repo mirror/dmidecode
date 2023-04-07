@@ -292,7 +292,13 @@ static void dmi_hp_203_devloc(const char *fname, unsigned int code)
 		"USB",
 		"Dynamic Smart Array Controller",
 		"URL",
-		"NVMe Drive Bay" /* 0x0F */
+		"NVMe Drive Bay", /* 0x0F */
+		"NVDIMM Processor",
+		"NVDIMM Board",
+		"NVMe Riser",
+		"NVDIMM Name Space",
+		"VROC SATA",
+		"VROC NVMe", /* 0x15 */
 	};
 
 	if (code < ARRAY_SIZE(location))
@@ -869,6 +875,10 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			}
 			dmi_hp_203_assoc_hndl("Parent Handle", WORD(data + 0x12));
 			pr_attr("Flags", "0x%04X", WORD(data + 0x14));
+			if (WORD(data + 0x14) & 0x01)
+				pr_subattr("Peer Bifurcated Device", "Yes");
+			if (WORD(data + 0x14) & 0x02)
+				pr_subattr("Upstream Device", "Yes");
 			dmi_hp_203_devtyp("Device Type", data[0x16]);
 			dmi_hp_203_devloc("Device Location", data[0x17]);
 			pr_attr("Device Instance", "%d", data[0x18]);
