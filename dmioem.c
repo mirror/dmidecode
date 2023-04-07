@@ -587,6 +587,8 @@ static void dmi_hp_238_loc(const char *fname, unsigned int code)
 		"USB Hub for NAND Controller",
 		"Reserved",
 		"Debug Port", /* 0x07 */
+		"Reserved",
+		"OCP USB", /* 0x09 */
 	};
 
 	if (code < ARRAY_SIZE(location))
