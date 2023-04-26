@@ -5718,14 +5718,14 @@ static void overwrite_smbios3_address(u8 *buf)
 	buf[0x17] = 0;
 }
 
-static int smbios3_decode(u8 *buf, const char *devmem, u32 flags)
+static int smbios3_decode(u8 *buf, size_t buf_len, const char *devmem, u32 flags)
 {
 	u32 ver, len;
 	u64 offset;
 	u8 *table;
 
 	/* Don't let checksum run beyond the buffer */
-	if (buf[0x06] > 0x20)
+	if (buf[0x06] > buf_len)
 	{
 		fprintf(stderr,
 			"Entry point length too large (%u bytes, expected %u).\n",
@@ -5799,14 +5799,14 @@ static void dmi_fixup_version(u16 *ver)
 	}
 }
 
-static int smbios_decode(u8 *buf, const char *devmem, u32 flags)
+static int smbios_decode(u8 *buf, size_t buf_len, const char *devmem, u32 flags)
 {
 	u16 ver, num;
 	u32 len;
 	u8 *table;
 
 	/* Don't let checksum run beyond the buffer */
-	if (buf[0x05] > 0x20)
+	if (buf[0x05] > buf_len)
 	{
 		fprintf(stderr,
 			"Entry point length too large (%u bytes, expected %u).\n",
@@ -6046,12 +6046,12 @@ int main(int argc, char * const argv[])
 
 		if (memcmp(buf, "_SM3_", 5) == 0)
 		{
-			if (smbios3_decode(buf, opt.dumpfile, 0))
+			if (smbios3_decode(buf, size, opt.dumpfile, 0))
 				found++;
 		}
 		else if (memcmp(buf, "_SM_", 4) == 0)
 		{
-			if (smbios_decode(buf, opt.dumpfile, 0))
+			if (smbios_decode(buf, size, opt.dumpfile, 0))
 				found++;
 		}
 		else if (memcmp(buf, "_DMI_", 5) == 0)
@@ -6074,12 +6074,12 @@ int main(int argc, char * const argv[])
 			pr_info("Getting SMBIOS data from sysfs.");
 		if (size >= 24 && memcmp(buf, "_SM3_", 5) == 0)
 		{
-			if (smbios3_decode(buf, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
+			if (smbios3_decode(buf, size, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
 				found++;
 		}
 		else if (size >= 31 && memcmp(buf, "_SM_", 4) == 0)
 		{
-			if (smbios_decode(buf, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
+			if (smbios_decode(buf, size, SYS_TABLE_FILE, FLAG_NO_FILE_OFFSET))
 				found++;
 		}
 		else if (size >= 15 && memcmp(buf, "_DMI_", 5) == 0)
@@ -6116,12 +6116,12 @@ int main(int argc, char * const argv[])
 
 	if (memcmp(buf, "_SM3_", 5) == 0)
 	{
-		if (smbios3_decode(buf, opt.devmem, 0))
+		if (smbios3_decode(buf, 0x20, opt.devmem, 0))
 			found++;
 	}
 	else if (memcmp(buf, "_SM_", 4) == 0)
 	{
-		if (smbios_decode(buf, opt.devmem, 0))
+		if (smbios_decode(buf, 0x20, opt.devmem, 0))
 			found++;
 	}
 	goto done;
@@ -6142,7 +6142,7 @@ memory_scan:
 	{
 		if (memcmp(buf + fp, "_SM3_", 5) == 0)
 		{
-			if (smbios3_decode(buf + fp, opt.devmem, 0))
+			if (smbios3_decode(buf + fp, 0x20, opt.devmem, 0))
 			{
 				found++;
 				goto done;
@@ -6155,7 +6155,7 @@ memory_scan:
 	{
 		if (memcmp(buf + fp, "_SM_", 4) == 0 && fp <= 0xFFE0)
 		{
-			if (smbios_decode(buf + fp, opt.devmem, 0))
+			if (smbios_decode(buf + fp, 0x20, opt.devmem, 0))
 			{
 				found++;
 				goto done;
