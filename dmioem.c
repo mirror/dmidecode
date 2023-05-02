@@ -205,27 +205,6 @@ static void dmi_hp_197_qdf(const u8 *qdf)
 	pr_attr("QDF/S-SPEC", "%s", str);
 }
 
-static void dmi_hp_240_attr(u64 defined, u64 set)
-{
-	static const char *attributes[] = {
-		"Updatable",
-		"Reset Required",
-		"Authentication Required",
-		"In Use",
-		"UEFI Image",
-	};
-	unsigned int i;
-
-	pr_list_start("Attributes Defined/Set", NULL);
-	for (i = 0; i < ARRAY_SIZE(attributes); i++)
-	{
-		if (!(defined.l & (1UL << i)))
-			continue;
-		pr_list_item("%s: %s", attributes[i], set.l & (1UL << i) ? "Yes" : "No");
-	}
-	pr_list_end();
-}
-
 static void dmi_hp_203_assoc_hndl(const char *fname, u16 num)
 {
 	if (opt.flags & FLAG_QUIET)
@@ -723,6 +702,27 @@ static void dmi_hp_239_usb_device(u8 class, u8 subclass, u8 protocol)
 		pr_attr("USB SubClass", "0x%02x", subclass);
 		pr_attr("USB Protocol", "0x%02x", protocol);
 	}
+}
+
+static void dmi_hp_240_attr(u64 defined, u64 set)
+{
+	static const char *attributes[] = {
+		"Updatable",
+		"Reset Required",
+		"Authentication Required",
+		"In Use",
+		"UEFI Image",
+	};
+	unsigned int i;
+
+	pr_list_start("Attributes Defined/Set", NULL);
+	for (i = 0; i < ARRAY_SIZE(attributes); i++)
+	{
+		if (!(defined.l & (1UL << i)))
+			continue;
+		pr_list_item("%s: %s", attributes[i], set.l & (1UL << i) ? "Yes" : "No");
+	}
+	pr_list_end();
 }
 
 static void dmi_hp_242_hdd_type(u8 code)
