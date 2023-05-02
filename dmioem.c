@@ -188,6 +188,23 @@ static int dmi_hpegen(const char *s)
 	return (dmi_vendor == VENDOR_HPE) ? G10P : G6;
 }
 
+static void dmi_hp_197_qdf(const u8 *qdf)
+{
+	char str[7];
+	int i, j, len = 6;
+
+	if (!is_printable(qdf, len))
+		return;
+
+	for (i = 0, j = 0;  i < len;  i++)
+	{
+		if (qdf[i] != ' ')
+			str[j++] = qdf[i];
+	}
+	str[j] = '\0';
+	pr_attr("QDF/S-SPEC", "%s", str);
+}
+
 static void dmi_hp_240_attr(u64 defined, u64 set)
 {
 	static const char *attributes[] = {
@@ -787,6 +804,69 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			pr_attr("Parallel Port", "%s", feat & (1 << 2) ? "Enabled" : "Disabled");
 			pr_attr("Floppy Disk Port", "%s", feat & (1 << 3) ? "Enabled" : "Disabled");
 			pr_attr("Virtual Serial Port", "%s", feat & (1 << 4) ? "Enabled" : "Disabled");
+			break;
+
+		case 197:
+			/*
+			 * Vendor Specific: HPE Processor Specific Information
+			 *
+			 * Processor Information structure (Type 197) for each possibly installed
+			 * physical processor to go along with each standard Processor Info
+			 * Record (Type 4).  The Type 197 record will be ignored for Processor
+			 * slots that are empty (specified in the Type 4 records).
+			 *
+			 * Processor Wattage value will be filled in with information gotten from
+			 * the CPUID instruction or possibly estimated based on CPU Family/Type.
+			 *
+			 * Designator bytes will be 0FFh if the location of the processor does not
+			 * use it.  If a system has processor slots, but no sockets, then the value
+			 * in the Socket Designator will be 0FFh. A system would have one or the
+			 * other, or both.
+			 *
+			 * Offset |  Name      | Width | Description
+			 * -------+------------+-------+-------------
+			 *  0x00  | Type       | BYTE  | 0xC5, Processor Information
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | Assoc Dev  | WORD  | Handle of Associated Type 4 Record
+			 *  0x06  | APIC ID    | BYTE  | Processor local APIC ID
+			 *  0x07  | OEM Status | BYTE  | Bits: 0: BSP, 1: x2APIC, 2: Therm Margining
+			 *  0x08  | Phys Slot  | BYTE  | Matches silk screen
+			 *  0x09  | Phys Socket| BYTE  | Matches silk screen
+			 *  0x0A  | Max Wattage| WORD  | Rated max wattage of the processor
+			 *  0x0C  | x2APIC ID  | DWORD | Processor x2APIC (if OEM Status -> x2APIC)
+			 *  0x10  | Proc UUID  | QWORD | Processor Unique Identifier
+			 *  0x18  | Conn Speed | WORD  | Interconnect speed in MT/s
+			 *  0x1A  | QDF/S-SPEC |6 BYTES| Processor QDF/S-SPEC Numbers (Intel only)
+			 *  0x20  | Reserved   | DWORD | Gen11 Reserved
+			 */
+			pr_handle_name("%s Processor Specific Information", company);
+			if (h->length < 0x0A) break;
+			if (!(opt.flags & FLAG_QUIET))
+				pr_attr("Associated Handle", "0x%04X", WORD(data + 0x04));
+			pr_attr("APIC ID", "%u", data[0x06]);
+			feat = data[0x07];
+			pr_attr("BSP", "%s", feat & 0x01 ? "Yes" : "No");
+			pr_attr("x2APIC", "%s", feat & 0x02 ? "Yes" : "No");
+			pr_attr("Advanced Thermal Margining", "%s", feat & 0x04 ? "Yes" : "No");
+			if (data[0x08] != 0xFF)
+				pr_attr("Physical Slot", "%d", data[0x08]);
+			if (data[0x09] != 0xFF)
+				pr_attr("Physical Socket", "%d", data[0x09]);
+			if (h->length < 0x0C) break;
+			if (WORD(data + 0x0A))
+				pr_attr("Maximum Power", "%d W", WORD(data + 0x0A));
+			if (h->length < 0x10) break;
+			if (feat & 0x02)
+				pr_attr("x2APIC ID", "0x%08x", DWORD(data + 0x0C));
+			if (h->length < 0x18) break;
+			if (DWORD(data + 0x10) || DWORD(data + 0x14))
+				pr_attr("UUID", "0x%08x%08x", DWORD(data + 0x14), DWORD(data + 0x10));
+			if (h->length < 0x1A) break;
+			if (WORD(data + 0x18))
+				pr_attr("Interconnect Speed", "%d MT/s", WORD(data + 0x18));
+			if (h->length < 0x20) break;
+			dmi_hp_197_qdf(data + 0x1A);
 			break;
 
 		case 199:
