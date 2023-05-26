@@ -58,6 +58,8 @@
  *    https://trustedcomputinggroup.org/pc-client-platform-tpm-profile-ptp-specification/
  *  - "RedFish Host Interface Specification" (DMTF DSP0270)
  *    https://www.dmtf.org/sites/default/files/DSP0270_1.0.1.pdf
+ *  - LoongArch Reference Manual, volume 1
+ *    https://loongson.github.io/LoongArch-Documentation/LoongArch-Vol1-EN.html#_cpucfg
  */
 
 #include <fcntl.h>
@@ -989,6 +991,24 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x200, "RV32" },
 		{ 0x201, "RV64" },
 		{ 0x202, "RV128" },
+
+		{ 0x258, "LoongArch" },
+		{ 0x259, "Loongson 1" },
+		{ 0x25A, "Loongson 2" },
+		{ 0x25B, "Loongson 3" },
+		{ 0x25C, "Loongson 2K" },
+		{ 0x25D, "Loongson 3A" },
+		{ 0x25E, "Loongson 3B" },
+		{ 0x25F, "Loongson 3C" },
+		{ 0x260, "Loongson 3D" },
+		{ 0x261, "Loongson 3E" },
+		{ 0x262, "Dual-Core Loongson 2K 2xxx" },
+		{ 0x26C, "Quad-Core Loongson 3A 5xxx" },
+		{ 0x26D, "Multi-Core Loongson 3A 5xxx" },
+		{ 0x26E, "Quad-Core Loongson 3B 5xxx" },
+		{ 0x26F, "Multi-Core Loongson 3B 5xxx" },
+		{ 0x270, "Multi-Core Loongson 3C 5xxx" },
+		{ 0x271, "Multi-Core Loongson 3D 5xxx" },
 	};
 	/*
 	 * Note to developers: when adding entries to this list, check if
@@ -1107,6 +1127,9 @@ static enum cpuid_type dmi_get_cpuid_type(const struct dmi_header *h)
 	      || (type >= 0xB6 && type <= 0xB7) /* AMD */
 	      || (type >= 0xE4 && type <= 0xEF)) /* AMD */
 		return cpuid_x86_amd;
+	else if ((type >= 0x258 && type <= 0x262) /* Loongarch */
+	      || (type >= 0x26C && type <= 0x271)) /* Loongarch */
+		return cpuid_loongarch;
 
 	/* neither X86 nor ARM */
 	return cpuid_none;
@@ -1203,6 +1226,11 @@ void dmi_print_cpuid(void (*print_cb)(const char *name, const char *format, ...)
 				 ((eax >> 8) & 0xF) + (((eax >> 8) & 0xF) == 0xF ? (eax >> 20) & 0xFF : 0),
 				 ((eax >> 4) & 0xF) | (((eax >> 8) & 0xF) == 0xF ? (eax >> 12) & 0xF0 : 0),
 				 eax & 0xF);
+			break;
+
+		case cpuid_loongarch: /* LoongArch Reference Manual, volume 1 */
+			eax = DWORD(p);
+			print_cb(label, "Processor Identity 0x%08x\n", eax);
 			break;
 		default:
 			return;
