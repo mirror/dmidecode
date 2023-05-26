@@ -771,6 +771,31 @@ static void dmi_hp_242_speed(const char *attr, u16 speed)
 		pr_attr(attr, "%s", "Unknown");
 }
 
+static void dmi_hp_245_pcie_riser(const struct dmi_header *h)
+{
+	const char *str = "Reserved";
+	u8 *data = h->data;
+
+	pr_attr("Board Type", "PCIe Riser");
+	if (h->length < 0x09) return;
+	switch (data[0x05])
+	{
+		case 1: str = "Primary"; break;
+		case 2: str = "Secondary"; break;
+		case 3: str = "Tertiary"; break;
+		case 4: str = "Quaternary"; break;
+		case 10: str = "Front"; break;
+	}
+	pr_attr("Riser Position", "%s", str);
+	pr_attr("Riser ID", "%d", data[0x06]);
+	if (data[0x07])
+	{
+		str = (data[0x07] >> 7) ? "B." : "";
+		pr_attr("CPLD Version", "%s0x%02X", str, (data[0x07] & 0x7F));
+	}
+	pr_attr("Riser Name", dmi_string(h, data[0x08]));
+}
+
 static int dmi_decode_hp(const struct dmi_header *h)
 {
 	u8 *data = h->data;
@@ -1490,6 +1515,40 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			dmi_hp_242_speed("Negotiated Speed", WORD(data + 0x3A));
 			dmi_hp_242_speed("Capable Speed", WORD(data + 0x3C));
 			break;
+
+		case 245:
+			/*
+			 * Vendor Specific: HPE Extension Board Inventory Record
+			 *
+			 * This record provides a mechanism for software to retrieve installed
+			 * Extension Boards in system, such as Riser Cards, etc. Each extension
+			 * board discovered at system boot time has a corresponding record
+			 * produced in SMBIOS Type 245. This record is currently applicable
+			 * for ML, DL and Alletra series servers in Gen11 and will be backward
+			 * compatible with next generations
+			 *
+			 * This is a variant record. Definition of fields 0x05 ... vary based
+			 * upon field 0x04 Board Type.
+			 *
+			 * Offset |  Name      | Width | Description
+			 * ---------------------------------------
+			 *  0x00  | Type       | BYTE  | 0xF5, Extension Board Inventory Record
+			 *  0x01  | Length     | BYTE  | Length of structure
+			 *  0x02  | Handle     | WORD  | Unique handle
+			 *  0x04  | Board Type | WORD  | 0: PCIe Riser, Other Reserved
+			 *
+			 *  If Board Type == 0
+			 *  0x05  | Riser Pos  | WORD  |
+			 *  0x06  | Riser ID   | BYTE  |
+			 *  0x07  | CPLD Vers  | BTYE  | 0-> No CPLD. Bits [7][6:0] Release:Vers
+			 *  0x08  | Riser Name | STRING|
+			 */
+			pr_handle_name("%s ProLiant Extension Board Inventory Record", company);
+			if (h->length < 0x05) break;
+			if (data[0x04] == 0)
+				dmi_hp_245_pcie_riser(h);
+			break;
+
 		default:
 			return 0;
 	}
