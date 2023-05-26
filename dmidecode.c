@@ -2836,10 +2836,11 @@ static const char *dmi_memory_device_type(u8 code)
 		"HBM",
 		"HBM2",
 		"DDR5",
-		"LPDDR5" /* 0x23 */
+		"LPDDR5",
+		"HBM3" /* 0x24 */
 	};
 
-	if (code >= 0x01 && code <= 0x23)
+	if (code >= 0x01 && code <= 0x24)
 		return type[code - 0x01];
 	return out_of_spec;
 }
