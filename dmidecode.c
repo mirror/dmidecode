@@ -974,6 +974,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 
 		{ 0x100, "ARMv7" },
 		{ 0x101, "ARMv8" },
+		{ 0x102, "ARMv9" },
 		{ 0x104, "SH-3" },
 		{ 0x105, "SH-4" },
 		{ 0x118, "ARM" },
@@ -1073,7 +1074,7 @@ static enum cpuid_type dmi_get_cpuid_type(const struct dmi_header *h)
 		else
 			return cpuid_80486;
 	}
-	else if ((type >= 0x100 && type <= 0x101) /* ARM */
+	else if ((type >= 0x100 && type <= 0x102) /* ARM */
 	      || (type >= 0x118 && type <= 0x119)) /* ARM */
 	{
 		/*
@@ -1415,10 +1416,19 @@ static const char *dmi_processor_upgrade(u8 code)
 		"Socket BGA1528",
 		"Socket LGA4189",
 		"Socket LGA1200",
-		"Socket LGA4677" /* 0x3F */
+		"Socket LGA4677",
+		"Socket LGA1700",
+		"Socket BGA1744",
+		"Socket BGA1781",
+		"Socket BGA1211",
+		"Socket BGA2422",
+		"Socket LGA1211",
+		"Socket LGA2422",
+		"Socket LGA5773",
+		"Socket BGA5773" /* 0x48 */
 	};
 
-	if (code >= 0x01 && code <= 0x3F)
+	if (code >= 0x01 && code <= 0x48)
 		return upgrade[code - 0x01];
 	return out_of_spec;
 }
@@ -4451,6 +4461,9 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 				pr_attr("Thread Count", "%u",
 					h->length >= 0x30 && data[0x25] == 0xFF ?
 					WORD(data + 0x2E) : data[0x25]);
+			if (h->length >= 0x32 && WORD(data + 0x30) != 0)
+				pr_attr("Thread Enabled", "%u",
+					WORD(data + 0x30));
 			dmi_processor_characteristics("Characteristics",
 						      WORD(data + 0x26));
 			break;
