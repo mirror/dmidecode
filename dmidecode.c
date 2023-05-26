@@ -90,7 +90,7 @@ static const char *bad_index = "<BAD INDEX>";
 
 enum cpuid_type cpuid_type = cpuid_none;
 
-#define SUPPORTED_SMBIOS_VER 0x030500
+#define SUPPORTED_SMBIOS_VER 0x030600
 
 #define FLAG_NO_FILE_OFFSET     (1 << 0)
 #define FLAG_STOP_AT_EOT        (1 << 1)
