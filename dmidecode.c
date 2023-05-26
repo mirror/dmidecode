@@ -2640,7 +2640,7 @@ static const char *dmi_memory_array_location(u8 code)
 		"PC-98/C24 Add-on Card",
 		"PC-98/E Add-on Card",
 		"PC-98/Local Bus Add-on Card",
-		"CXL Flexbus 1.0" /* 0xA4 */
+		"CXL Add-on Card" /* 0xA4 */
 	};
 
 	if (code >= 0x01 && code <= 0x0A)
