@@ -71,7 +71,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) || defined(__DragonFly__)
 #include <errno.h>
 #include <kenv.h>
 #endif
@@ -5952,7 +5952,7 @@ static int address_from_efi(off_t *address)
 	FILE *efi_systab;
 	const char *filename;
 	char linebuf[64];
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__DragonFly__)
 	char addrstr[KENV_MVALLEN + 1];
 #endif
 	const char *eptype;
@@ -5990,11 +5990,14 @@ static int address_from_efi(off_t *address)
 
 	if (ret == EFI_NO_SMBIOS)
 		fprintf(stderr, "%s: SMBIOS entry point missing\n", filename);
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__DragonFly__)
 	/*
 	 * On FreeBSD, SMBIOS anchor base address in UEFI mode is exposed
 	 * via kernel environment:
 	 * https://svnweb.freebsd.org/base?view=revision&revision=307326
+	 *
+	 * DragonFly BSD adopted the same method as FreeBSD, see commit
+	 * 5e488df32cb01056a5b714a522e51c69ab7b4612
 	 */
 	ret = kenv(KENV_GET, "hint.smbios.0.mem", addrstr, sizeof(addrstr));
 	if (ret == -1)
