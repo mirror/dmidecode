@@ -388,8 +388,10 @@ static void dmi_hp_216_version(u8 format, u8 *data)
 		pr_attr(name, "No Version Data");
 		break;
 	case 1:
-		pr_attr(name, "%c.%d.%d", data[0] & (1 << 7) ? 'B' : 'R',
-					  data[0] & 0x7, data[1] & 0x7);
+		if (data[0] >> 7)
+			pr_attr(name, "0x%02X B.0x%02X", data[1] & 0x7F, data[0] & 0x7F);
+		else
+			pr_attr(name, "0x%02X", data[1] & 0x7F);
 		break;
 	case 2:
 		pr_attr(name, "%d.%d", data[0] >> 4, data[0] & 0x0f);
