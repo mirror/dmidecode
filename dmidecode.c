@@ -57,7 +57,7 @@
  *    Family "2.0", Level 00, Revision 00.43, January 26, 2015
  *    https://trustedcomputinggroup.org/pc-client-platform-tpm-profile-ptp-specification/
  *  - "RedFish Host Interface Specification" (DMTF DSP0270)
- *    https://www.dmtf.org/sites/default/files/DSP0270_1.0.1.pdf
+ *    https://www.dmtf.org/sites/default/files/standards/documents/DSP0270_1.3.0.pdf
  *  - LoongArch Reference Manual, volume 1
  *    https://loongson.github.io/LoongArch-Documentation/LoongArch-Vol1-EN.html#_cpucfg
  */
@@ -3852,7 +3852,7 @@ static const char *dmi_protocol_record_type(u8 type)
 }
 
 /*
- * DSP0270: 8.6: Protocol IP Assignment types
+ * DSP0270: 8.4.2: Protocol IP Assignment types
  */
 static const char *dmi_protocol_assignment_type(u8 type)
 {
@@ -3870,7 +3870,7 @@ static const char *dmi_protocol_assignment_type(u8 type)
 }
 
 /*
- * DSP0270: 8.6: Protocol IP Address type
+ * DSP0270: 8.4.3: Protocol IP Address type
  */
 static const char *dmi_address_type(u8 type)
 {
@@ -3886,7 +3886,7 @@ static const char *dmi_address_type(u8 type)
 }
 
 /*
- *  DSP0270: 8.6 Protocol Address decode
+ *  DSP0270: 8.4.3 Protocol Address decode
  */
 static const char *dmi_address_decode(u8 *data, char *storage, u8 addrtype)
 {
@@ -3898,7 +3898,7 @@ static const char *dmi_address_decode(u8 *data, char *storage, u8 addrtype)
 }
 
 /*
- * DSP0270: 8.5: Parse the protocol record format
+ * DSP0270: 8.4: Parse the protocol record format
  */
 static void dmi_parse_protocol_record(u8 *rec)
 {
@@ -3913,11 +3913,11 @@ static void dmi_parse_protocol_record(u8 *rec)
 	const char *hname;
 	char attr[38];
 
-	/* DSP0270: 8.5: Protocol Identifier */
+	/* DSP0270: 8.4: Protocol Identifier */
 	rid = rec[0x0];
-	/* DSP0270: 8.5: Protocol Record Length */
+	/* DSP0270: 8.4: Protocol Record Length */
 	rlen = rec[0x1];
-	/* DSP0270: 8.5: Protocol Record Data */
+	/* DSP0270: 8.4: Protocol Record Data */
 	rdata = &rec[0x2];
 
 	pr_attr("Protocol ID", "%02x (%s)", rid,
@@ -3926,7 +3926,7 @@ static void dmi_parse_protocol_record(u8 *rec)
 	/*
 	 * Don't decode anything other than Redfish for now
 	 * Note 0x4 is Redfish over IP in 7.43.2
-	 * and DSP0270: 8.5
+	 * and DSP0270: 8.4
 	 */
 	if (rid != 0x4)
 		return;
@@ -3940,7 +3940,7 @@ static void dmi_parse_protocol_record(u8 *rec)
 		return;
 
 	/*
-	 * DSP0270: 8.6: Redfish Over IP Service UUID
+	 * DSP0270: 8.4.1: Redfish Over IP Service UUID
 	 * Note: ver is hardcoded to 0x311 here just for
 	 * convenience.  It could get passed from the SMBIOS
 	 * header, but that's a lot of passing of pointers just
@@ -3953,7 +3953,7 @@ static void dmi_parse_protocol_record(u8 *rec)
 	dmi_system_uuid(pr_subattr, "Service UUID", &rdata[0], 0x311);
 
 	/*
-	 * DSP0270: 8.6: Redfish Over IP Host IP Assignment Type
+	 * DSP0270: 8.4.1: Redfish Over IP Host IP Assignment Type
 	 * Note, using decimal indices here, as the DSP0270
 	 * uses decimal, so as to make it more comparable
 	 */
@@ -3961,34 +3961,34 @@ static void dmi_parse_protocol_record(u8 *rec)
 	pr_subattr("Host IP Assignment Type", "%s",
 		dmi_protocol_assignment_type(assign_val));
 
-	/* DSP0270: 8.6: Redfish Over IP Host Address format */
+	/* DSP0270: 8.4.1: Redfish Over IP Host Address format */
 	addrtype = rdata[17];
 	addrstr = dmi_address_type(addrtype);
 	pr_subattr("Host IP Address Format", "%s",
 		addrstr);
 
-	/* DSP0270: 8.6 IP Assignment types */
+	/* DSP0270: 8.4.1 IP Assignment types */
 	/* We only use the Host IP Address and Mask if the assignment type is static */
 	if (assign_val == 0x1 || assign_val == 0x3)
 	{
-		/* DSP0270: 8.6: the Host IPv[4|6] Address */
+		/* DSP0270: 8.4.1: the Host IPv[4|6] Address */
 		sprintf(attr, "%s Address", addrstr);
 		pr_subattr(attr, "%s",
 			dmi_address_decode(&rdata[18], buf, addrtype));
 
-		/* DSP0270: 8.6: Prints the Host IPv[4|6] Mask */
+		/* DSP0270: 8.4.1: Prints the Host IPv[4|6] Mask */
 		sprintf(attr, "%s Mask", addrstr);
 		pr_subattr(attr, "%s",
 			dmi_address_decode(&rdata[34], buf, addrtype));
 	}
 
-	/* DSP0270: 8.6: Get the Redfish Service IP Discovery Type */
+	/* DSP0270: 8.4.1: Get the Redfish Service IP Discovery Type */
 	assign_val = rdata[50];
 	/* Redfish Service IP Discovery type mirrors Host IP Assignment type */
 	pr_subattr("Redfish Service IP Discovery Type", "%s",
 		dmi_protocol_assignment_type(assign_val));
 
-	/* DSP0270: 8.6: Get the Redfish Service IP Address Format */
+	/* DSP0270: 8.4.1: Get the Redfish Service IP Address Format */
 	addrtype = rdata[51];
 	addrstr = dmi_address_type(addrtype);
 	pr_subattr("Redfish Service IP Address Format", "%s",
@@ -3999,30 +3999,30 @@ static void dmi_parse_protocol_record(u8 *rec)
 		u16 port;
 		u32 vlan;
 
-		/* DSP0270: 8.6: Prints the Redfish IPv[4|6] Service Address */
+		/* DSP0270: 8.4.1: Prints the Redfish IPv[4|6] Service Address */
 		sprintf(attr, "%s Redfish Service Address", addrstr);
 		pr_subattr(attr, "%s",
 			dmi_address_decode(&rdata[52], buf,
 			addrtype));
 
-		/* DSP0270: 8.6: Prints the Redfish IPv[4|6] Service Mask */
+		/* DSP0270: 8.4.1: Prints the Redfish IPv[4|6] Service Mask */
 		sprintf(attr, "%s Redfish Service Mask", addrstr);
 		pr_subattr(attr, "%s",
 			dmi_address_decode(&rdata[68], buf,
 			addrtype));
 
-		/* DSP0270: 8.6: Redfish vlan and port info */
+		/* DSP0270: 8.4.1: Redfish vlan and port info */
 		port = WORD(&rdata[84]);
 		vlan = DWORD(&rdata[86]);
 		pr_subattr("Redfish Service Port", "%hu", port);
 		pr_subattr("Redfish Service Vlan", "%u", vlan);
 	}
 
-	/* DSP0270: 8.6: Redfish host length and name */
+	/* DSP0270: 8.4.1: Redfish host length and name */
 	hlen = rdata[90];
 
 	/*
-	 * DSP0270: 8.6: The length of the host string + 91 (the minimum
+	 * DSP0270: 8.4.1: The length of the host string + 91 (the minimum
 	 * size of a protocol record) cannot exceed the record length
 	 * (rec[0x1])
 	 */
@@ -4043,13 +4043,37 @@ static const char *dmi_parse_device_type(u8 type)
 	const char *devname[] = {
 		"USB",		/* 0x2 */
 		"PCI/PCIe",	/* 0x3 */
+		"USB v2",	/* 0x4 */
+		"PCI/PCIe v2",	/* 0x5 */
 	};
 
-	if (type >= 0x2 && type <= 0x3)
+	if (type >= 0x2 && type <= 0x5)
 		return devname[type - 0x2];
 	if (type >= 0x80)
 		return "OEM";
 	return out_of_spec;
+}
+
+/*
+ * DSP0270: 8.3.7: Device Characteristics
+ */
+static void dmi_device_characteristics(u16 code)
+{
+	const char *characteristics[] = {
+		"Credential bootstrapping via IPMI is supported", /* 0 */
+		/* Reserved */
+	};
+
+	if ((code & 0x1) == 0)
+		pr_list_item("None");
+	else
+	{
+		int i;
+
+		for (i = 0; i < 1; i++)
+			if (code & (1 << i))
+				pr_list_item("%s", characteristics[i]);
+	}
 }
 
 static void dmi_parse_controller_structure(const struct dmi_header *h)
@@ -4094,7 +4118,7 @@ static void dmi_parse_controller_structure(const struct dmi_header *h)
 
 	if (len != 0)
 	{
-		/* DSP0270: 8.3 Table 2: Device Type */
+		/* DSP0270: 8.3.1 Table 3: Device Type values */
 		type = data[0x6];
 
 		pr_attr("Device Type", "%s",
@@ -4131,6 +4155,83 @@ static void dmi_parse_controller_structure(const struct dmi_header *h)
 			pr_attr("SubDeviceID", "0x%04x",
 				WORD(&pcidata[0x6]));
 		}
+		else if (type == 0x4 && len >= 0x0d)
+		{
+			/* USB Device Type v2 - need at least 12 bytes */
+			u8 *usbdata = &data[7];
+			/* USB Device Descriptor v2: idVendor */
+			pr_attr("idVendor", "0x%04x",
+				WORD(&usbdata[0x1]));
+			/* USB Device Descriptor v2: idProduct */
+			pr_attr("idProduct", "0x%04x",
+				WORD(&usbdata[0x3]));
+
+			/*
+			 * USB Serial number is here, but its useless, don't
+			 * bother decoding it
+			 */
+
+			/* USB Device Descriptor v2: MAC Address */
+			pr_attr("MAC Address", "%02x:%02x:%02x:%02x:%02x:%02x",
+				usbdata[0x6], usbdata[0x7], usbdata[0x8],
+				usbdata[0x9], usbdata[0xa], usbdata[0xb]);
+
+			/* DSP0270 v1.3.0 support */
+			if (len >= 0x11)
+			{
+				/* USB Device Descriptor v2: Device Characteristics */
+				pr_list_start("Device Characteristics", NULL);
+				dmi_device_characteristics(WORD(&usbdata[0xc]));
+				pr_list_end();
+
+				/* USB Device Descriptor v2: Credential Bootstrapping Handle */
+				if (WORD(&usbdata[0x0c]) & 0x1)
+				{
+					pr_attr("Credential Bootstrapping Handle", "0x%04x",
+							WORD(&usbdata[0xe]));
+				}
+			}
+		}
+		else if (type == 0x5 && len >= 0x14)
+		{
+			/* PCI Device Type v2 - Need at least 19 bytes */
+			u8 *pcidata = &data[0x7];
+			/* PCI Device Descriptor v2: VendorID */
+			pr_attr("VendorID", "0x%04x",
+				WORD(&pcidata[0x1]));
+			/* PCI Device Descriptor v2: DeviceID */
+			pr_attr("DeviceID", "0x%04x",
+				WORD(&pcidata[0x3]));
+			/* PCI Device Descriptor v2: PCI SubvendorID */
+			pr_attr("SubVendorID", "0x%04x",
+				WORD(&pcidata[0x5]));
+			/* PCI Device Descriptor v2: PCI SubdeviceID */
+			pr_attr("SubDeviceID", "0x%04x",
+				WORD(&pcidata[0x7]));
+			/* PCI Device Descriptor v2: MAC Address */
+			pr_attr("MAC Address", "%02x:%02x:%02x:%02x:%02x:%02x",
+				pcidata[0x9], pcidata[0xa], pcidata[0xb],
+				pcidata[0xc], pcidata[0xd], pcidata[0xe]);
+			/* PCI Device Descriptor v2:
+			 *		Segment Group Number, Bus Number, Device/Function Number
+			 */
+			dmi_slot_segment_bus_func(WORD(&pcidata[0xf]), pcidata[0x11], pcidata[0x12]);
+
+			/* DSP0270 v1.3.0 support */
+			if (len >= 0x18)
+			{
+				/* PCI Device Descriptor v2: Device Characteristics */
+				pr_list_start("Device Characteristics", NULL);
+				dmi_device_characteristics(WORD(&pcidata[0x13]) );
+				pr_list_end();
+				/* PCI Device Descriptor v2: Credential Bootstrapping Handle */
+				if (WORD(&pcidata[0x13]) & 0x1)
+				{
+					pr_attr("Credential Bootstrapping Handle", "0x%04x",
+							WORD(&pcidata[0x15]));
+				}
+			}
+		}
 		else if (type >= 0x80 && len >= 5)
 		{
 			/* OEM Device Type - Need at least 4 bytes */
@@ -4144,7 +4245,7 @@ static void dmi_parse_controller_structure(const struct dmi_header *h)
 	}
 
 	/*
-	 * DSP0270: 8.2 and 8.5: Protocol record count and protocol records
+	 * DSP0270: 8.2 and 8.4: Protocol record count and protocol records
 	 * Move to the Protocol Count.
 	 */
 	data = &data[total_read];
@@ -4187,7 +4288,7 @@ static void dmi_parse_controller_structure(const struct dmi_header *h)
 			dmi_parse_protocol_record(rec);
 
 			/*
-			 * DSP0270: 8.6
+			 * DSP0270: 8.4.1
 			 * Each record is rec[1] bytes long, starting at the
 			 * data byte immediately following the length field.
 			 * That means we need to add the byte for the rec id,
