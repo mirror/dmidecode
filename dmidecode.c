@@ -4131,7 +4131,7 @@ static void dmi_parse_controller_structure(const struct dmi_header *h)
 			pr_attr("SubDeviceID", "0x%04x",
 				WORD(&pcidata[0x6]));
 		}
-		else if (type == 0x4 && len >= 5)
+		else if (type >= 0x80 && len >= 5)
 		{
 			/* OEM Device Type - Need at least 4 bytes */
 			u8 *oemdata = &data[0x7];
