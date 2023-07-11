@@ -759,8 +759,17 @@ static void dmi_hp_242_form_factor(u8 code)
 		"MicroSSD",
 		"CFast", /* 0x09 */
 	};
+	static const char * const form2[] = {
+		"EDSFF Unknown", /* 0x20 */
+		"EDSFF 1U Short",
+		"EDSFF 1U Long",
+		"EDSFF E3 Short",
+		"EDSFF E3 Long", /* 0x24 */
+	};
 	if (code < ARRAY_SIZE(form))
 		str = form[code];
+	else if (code >= 0x20 && code < 0x20 + ARRAY_SIZE(form2))
+		str = form2[code - 0x20];
 
 	pr_attr("Form Factor", "%s", str);
 }
