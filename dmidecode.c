@@ -2660,7 +2660,8 @@ static const char *dmi_memory_array_use(u8 code)
 		"Video Memory",
 		"Flash Memory",
 		"Non-volatile RAM",
-		"Cache Memory" /* 0x07 */
+		"Cache Memory",
+		"System memory" /* 0x08 */
 	};
 
 	if (code >= 0x01 && code <= 0x07)
