@@ -127,6 +127,10 @@ typically from files under
 .IR /sys/devices/virtual/dmi/id .
 Most of these files are even readable by regular users.
 .TP
+.BR "  " "  " "--list-strings"
+List available string keywords, which can then be passed to the \fB--string\fP
+option.
+.TP
 .BR "-t" ", " "--type \fITYPE\fP"
 Only display the entries of type \fITYPE\fP. It can be either a
 \s-1DMI\s0 type number, or a comma-separated list of type numbers, or a
@@ -149,6 +153,10 @@ If \fITYPE\fP is not provided or not valid, a list of all valid keywords
 is printed and
 .B dmidecode
 exits with an error.
+.TP
+.BR "  " "  " "--list-types"
+List available type keywords, which can then be passed to the \fB--type\fP
+option.
 .TP
 .BR "-H" ", " "--handle \fIHANDLE\fP"
 Only display the entry whose handle matches \fIHANDLE\fP.
