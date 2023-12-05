@@ -2130,19 +2130,6 @@ static const char *dmi_slot_bus_width(u8 code, int hide_unknown)
 	return out_of_spec;
 }
 
-static void dmi_slot_type_with_width(u8 type, u8 width)
-{
-	const char *type_str, *width_str;
-
-	type_str = dmi_slot_type(type);
-	width_str = dmi_slot_bus_width(width, 1);
-
-	if (width_str)
-		pr_attr("Type", "%s %s", width_str, type_str);
-	else
-		pr_attr("Type", "%s", type_str);
-}
-
 static const char *dmi_slot_current_usage(u8 code)
 {
 	/* 7.10.3 */
@@ -4691,7 +4678,8 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x0C) break;
 			pr_attr("Designation", "%s",
 				dmi_string(h, data[0x04]));
-			dmi_slot_type_with_width(data[0x05], data[0x06]);
+			pr_attr("Type", "%s", dmi_slot_type(data[0x05]));
+			pr_attr("Data Bus Width", "%s", dmi_slot_bus_width(data[0x06], 0));
 			pr_attr("Current Usage", "%s",
 				dmi_slot_current_usage(data[0x07]));
 			pr_attr("Length", "%s",
@@ -4704,7 +4692,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			if (h->length < 0x11) break;
 			dmi_slot_segment_bus_func(WORD(data + 0x0D), data[0x0F], data[0x10]);
 			if (h->length < 0x13) break;
-			pr_attr("Data Bus Width", "%u", data[0x11]);
+			pr_attr("Data Bus Width (Base)", "%u", data[0x11]);
 			pr_attr("Peer Devices", "%u", data[0x12]);
 			if (h->length < 0x13 + data[0x12] * 5) break;
 			dmi_slot_peers(data[0x12], data + 0x13);
