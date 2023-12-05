@@ -2106,18 +2106,18 @@ static const char *dmi_slot_bus_width(u8 code)
 	static const char *width[] = {
 		"Other", /* 0x01 */
 		"Unknown",
-		"8-bit",
-		"16-bit",
-		"32-bit",
-		"64-bit",
-		"128-bit",
-		"x1",
-		"x2",
-		"x4",
-		"x8",
-		"x12",
-		"x16",
-		"x32" /* 0x0E */
+		"8 bit",
+		"16 bit",
+		"32 bit",
+		"64 bit",
+		"128 bit",
+		"1x or x1",
+		"2x or x2",
+		"4x or x4",
+		"8x or x8",
+		"12x or x12",
+		"16x or x16",
+		"32x or x32" /* 0x0E */
 	};
 
 	if (code >= 0x01 && code <= 0x0E)
