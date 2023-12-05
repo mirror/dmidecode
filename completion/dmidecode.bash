@@ -17,19 +17,11 @@ _comp_cmd_dmidecode() {
 		return 0
 		;;
 	-s | --string)
-		COMPREPLY=($(compgen -W '$(
-			"$1" --string 2>&1 | while IFS=\$'\\n' read -r line ; do
-				[[ $line == "  "* ]] && printf "%s\n" "$line"
-			done
-		)' -- "$cur"))
+		COMPREPLY=($(compgen -W '$("$1" --list-strings)' -- "$cur"))
 		return 0
 		;;
 	-t | --type)
-		COMPREPLY=($(compgen -W '$(
-			"$1" --type 2>&1 | while IFS=\$'\\n' read -r line ; do
-				[[ $line == "  "* ]] && printf "%s\n" "$line"
-			done
-		)' -- "$cur"))
+		COMPREPLY=($(compgen -W '$("$1" --list-types)' -- "$cur"))
 		return 0
 		;;
 	--dump-bin | --from-dump)
@@ -49,7 +41,9 @@ _comp_cmd_dmidecode() {
 			--help
 			--quiet
 			--string
+			--list-strings
 			--type
+			--list-types
 			--handle
 			--dump
 			--dump-bin
