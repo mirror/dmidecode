@@ -2100,8 +2100,7 @@ static const char *dmi_slot_type(u8 code)
 	return out_of_spec;
 }
 
-/* If hide_unknown is set, return NULL instead of "Other" or "Unknown" */
-static const char *dmi_slot_bus_width(u8 code, int hide_unknown)
+static const char *dmi_slot_bus_width(u8 code)
 {
 	/* 7.10.2 */
 	static const char *width[] = {
@@ -2122,11 +2121,7 @@ static const char *dmi_slot_bus_width(u8 code, int hide_unknown)
 	};
 
 	if (code >= 0x01 && code <= 0x0E)
-	{
-		if (code <= 0x02 && hide_unknown)
-			return NULL;
 		return width[code - 0x01];
-	}
 	return out_of_spec;
 }
 
@@ -2339,7 +2334,7 @@ static void dmi_slot_physical_width(u8 code)
 {
 	if (code)
 		pr_attr("Slot Physical Width", "%s",
-			dmi_slot_bus_width(code, 0));
+			dmi_slot_bus_width(code));
 }
 
 static void dmi_slot_pitch(u16 code)
@@ -4679,7 +4674,7 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			pr_attr("Designation", "%s",
 				dmi_string(h, data[0x04]));
 			pr_attr("Type", "%s", dmi_slot_type(data[0x05]));
-			pr_attr("Data Bus Width", "%s", dmi_slot_bus_width(data[0x06], 0));
+			pr_attr("Data Bus Width", "%s", dmi_slot_bus_width(data[0x06]));
 			pr_attr("Current Usage", "%s",
 				dmi_slot_current_usage(data[0x07]));
 			pr_attr("Length", "%s",
