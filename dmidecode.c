@@ -1985,14 +1985,16 @@ static const char *dmi_port_type(u8 code)
 		"Modem Port",
 		"Network Port",
 		"SATA",
-		"SAS" /* 0x21 */
+		"SAS",
+		"MFDP (Multi-Function Display Port)",
+		"Thunderbolt" /* 0x23 */
 	};
 	static const char *type_0xA0[] = {
 		"8251 Compatible", /* 0xA0 */
 		"8251 FIFO Compatible" /* 0xA1 */
 	};
 
-	if (code <= 0x21)
+	if (code <= 0x23)
 		return type[code];
 	if (code >= 0xA0 && code <= 0xA1)
 		return type_0xA0[code - 0xA0];
