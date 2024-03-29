@@ -2255,7 +2255,7 @@ static void dmi_slot_characteristics(const char *attr, u8 code1, u8 code2)
 
 	if (code1 & (1 << 0))
 		pr_attr(attr, "Unknown");
-	else if ((code1 & 0xFE) == 0 && (code2 & 0x07) == 0)
+	else if ((code1 & 0xFE) == 0 && code2 == 0)
 		pr_attr(attr, "None");
 	else
 	{
