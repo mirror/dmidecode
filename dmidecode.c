@@ -2252,7 +2252,8 @@ static void dmi_slot_characteristics(const char *attr, u8 code1, u8 code2)
 		"PCIe slot bifurcation is supported",
 		"Async/surprise removal is supported",
 		"Flexbus slot, CXL 1.0 capable",
-		"Flexbus slot, CXL 2.0 capable" /* 6 */
+		"Flexbus slot, CXL 2.0 capable",
+		"Flexbus slot, CXL 3.0 capable" /* 7 */
 	};
 
 	if (code1 & (1 << 0))
@@ -2267,7 +2268,7 @@ static void dmi_slot_characteristics(const char *attr, u8 code1, u8 code2)
 		for (i = 1; i <= 7; i++)
 			if (code1 & (1 << i))
 				pr_list_item("%s", characteristics1[i - 1]);
-		for (i = 0; i <= 6; i++)
+		for (i = 0; i <= 7; i++)
 			if (code2 & (1 << i))
 				pr_list_item("%s", characteristics2[i]);
 		pr_list_end();
