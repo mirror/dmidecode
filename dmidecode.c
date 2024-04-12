@@ -783,6 +783,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x13, "M2" },
 		{ 0x14, "Celeron M" },
 		{ 0x15, "Pentium 4 HT" },
+		{ 0x16, "Intel" },
 
 		{ 0x18, "Duron" },
 		{ 0x19, "K5" },
@@ -977,6 +978,7 @@ static const char *dmi_processor_family(const struct dmi_header *h, u16 ver)
 		{ 0x100, "ARMv7" },
 		{ 0x101, "ARMv8" },
 		{ 0x102, "ARMv9" },
+		{ 0x103, "ARM" },
 		{ 0x104, "SH-3" },
 		{ 0x105, "SH-4" },
 		{ 0x118, "ARM" },
