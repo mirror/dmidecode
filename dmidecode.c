@@ -2971,6 +2971,8 @@ static void dmi_memory_manufacturer_id(const char *attr, u16 code)
 {
 	/* 7.18.8 */
 	/* 7.18.10 */
+	/* 7.18.15 */
+	/* 7.17.17 */
 	/* LSB is 7-bit Odd Parity number of continuation codes */
 	if (code == 0)
 		pr_attr(attr, "Unknown");
@@ -2999,6 +3001,45 @@ static void dmi_memory_size(const char *attr, u64 code)
 		pr_attr(attr, "None");
 	else
 		dmi_print_memory_size(attr, code, 0);
+}
+
+static void dmi_memory_revision(const char *attr_type, u16 code, u8 mem_type)
+{
+	/* 7.18.16 */
+	/* 7.18.18 */
+	char attr[22];
+
+	if (code == 0xFF00)
+	{
+		snprintf(attr, sizeof(attr), "%s Revision Number", attr_type);
+		pr_attr(attr, "Unknown");
+	}
+	else if (mem_type == 0x22 || mem_type == 0x23)	/* DDR5 */
+	{
+		u8 dev_type = (code >> 8) & 0x0F;
+		u8 dev_rev = code & 0xFF;
+
+		if (code & 0x8000)			/* Installed */
+		{
+			snprintf(attr, sizeof(attr), "%s Device Type",
+				 attr_type);
+			pr_attr(attr, "%hu", dev_type);
+			snprintf(attr, sizeof(attr), "%s Device Revision",
+				 attr_type);
+			pr_attr(attr, "%hu.%hu", dev_rev >> 4, dev_rev & 0x0F);
+		}
+		else
+		{
+			snprintf(attr, sizeof(attr), "%s Device Type",
+				 attr_type);
+			pr_attr(attr, "Not Installed");
+		}
+	}
+	else						/* Generic fallback */
+	{
+		snprintf(attr, sizeof(attr), "%s Revision Number", attr_type);
+		pr_attr(attr, "0x%04x", code);
+	}
 }
 
 /*
@@ -4894,6 +4935,15 @@ static void dmi_decode(const struct dmi_header *h, u16 ver)
 			dmi_memory_size("Cache Size", QWORD(data + 0x44));
 			if (h->length < 0x54) break;
 			dmi_memory_size("Logical Size", QWORD(data + 0x4C));
+			if (h->length < 0x64) break;
+			dmi_memory_manufacturer_id("PMIC0 Manufacturer ID",
+						   WORD(data + 0x5C));
+			dmi_memory_revision("PMIC0", WORD(data + 0x5E),
+					    data[0x12]);
+			dmi_memory_manufacturer_id("RCD Manufacturer ID",
+						   WORD(data + 0x60));
+			dmi_memory_revision("RCD", WORD(data + 0x62),
+					    data[0x12]);
 			break;
 
 		case 18: /* 7.19 32-bit Memory Error Information */
