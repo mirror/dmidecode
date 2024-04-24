@@ -367,6 +367,7 @@ static void dmi_hp_216_fw_type(u16 code)
 		"Ampere System Control Processor (SCP - PMPro+SMPro)",
 		"Intel CFR information", /* 0x3A */
 		"OCP cards",
+		"DC-SCM CPLD",
 	};
 
 	if (code < ARRAY_SIZE(type))
