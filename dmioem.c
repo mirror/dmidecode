@@ -2,7 +2,8 @@
  * Decoding of OEM-specific entries
  * This file is part of the dmidecode project.
  *
- *   Copyright (C) 2007-2023 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2007-2024 Jean Delvare <jdelvare@suse.de>
+ *   Copyright (C) 2017-2024 Jerry Hoemann <jerry.hoemann@hpe.com>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
