@@ -1346,14 +1346,20 @@ static int dmi_decode_hp(const struct dmi_header *h)
 			 *  0x0C  | Parent Hub | BYTE  | Instance number of internal Hub
 			 *  0x0D  | Port Speed | BYTE  | Enumerated value of speed configured by BIOS
 			 *  0x0E  | Device Path| STRING| UEFI Device Path of USB endpoint
+			 *  0x0F  | PCI Seg    | WORD  | PCI Segment number of the USB controller
 			 */
 			if (gen < G9) return 0;
 			pr_handle_name("%s Proliant USB Port Connector Correlation Record", company);
 			if (h->length < 0x0F) break;
 			if (!(opt.flags & FLAG_QUIET))
 				pr_attr("Associated Handle", "0x%04X", WORD(data + 0x4));
-			pr_attr("PCI Device", "%02x:%02x.%x", data[0x6],
-				data[0x7] >> 3, data[0x7] & 0x7);
+			if (h->length < 0x11)
+				pr_attr("PCI Device", "%02x:%02x.%x", data[0x6],
+					data[0x7] >> 3, data[0x7] & 0x7);
+			else
+				pr_attr("PCI Device", "%04x:%02x:%02x.%x",
+					WORD(data + 0xF), data[0x6],
+					data[0x7] >> 3, data[0x7] & 0x7);
 			dmi_hp_238_loc("Location", data[0x8]);
 			dmi_hp_238_flags("Management Port", WORD(data + 0x9));
 			pr_attr("Port Instance", "%d", data[0xB]);
