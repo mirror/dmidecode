@@ -613,6 +613,7 @@ static void dmi_hp_224_chipid(u16 code)
 		"Nationz TPM",
 		"STMicroGen10 Plus TPM",
 		"STMicroGen11 TPM", /* 0x05 */
+		"STMicroGen12 TPM",
 	};
 	if ((code & 0xff) < ARRAY_SIZE(chipid))
 		str = chipid[code & 0xff];
