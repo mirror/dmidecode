@@ -328,7 +328,8 @@ static void dmi_hp_203_devtyp(const char *fname, unsigned int code)
 		"Dynamic Smart Array Controller",
 		"File",
 		"NVME Hard Drive",
-		"NVDIMM" /* 0x11 */
+		"NVDIMM", /* 0x11 */
+		"Embedded GPU"
 	};
 
 	if (code < ARRAY_SIZE(type))
