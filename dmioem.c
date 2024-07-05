@@ -136,6 +136,14 @@ static int dmi_decode_acer(const struct dmi_header *h)
  * Dell-specific data structures are decoded here.
  */
 
+static void dmi_dell_bios_flags(u64 flags)
+{
+	/*
+	 * TODO: The meaning of the other bits is unknown.
+	 */
+	pr_attr("ACPI WMI Supported", "%s", (flags.l & (1 << 1)) ? "Yes" : "No");
+}
+
 static void dmi_dell_token_interface(const struct dmi_header *h)
 {
 	int tokens = (h->length - 0x0B) / 0x06;
@@ -165,8 +173,16 @@ static void dmi_dell_token_interface(const struct dmi_header *h)
 
 static int dmi_decode_dell(const struct dmi_header *h)
 {
+	u8 *data = h->data;
+
 	switch (h->type)
 	{
+		case 177:
+			pr_handle_name("Dell BIOS Flags");
+			if (h->length < 0x0C) break;
+			dmi_dell_bios_flags(QWORD(data + 0x04));
+			break;
+
 		case 218:
 			pr_handle_name("Dell Token Interface");
 			if (h->length < 0x0B) break;
