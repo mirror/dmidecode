@@ -144,6 +144,48 @@ static void dmi_dell_bios_flags(u64 flags)
 	pr_attr("ACPI WMI Supported", "%s", (flags.l & (1 << 1)) ? "Yes" : "No");
 }
 
+static void dmi_dell_indexed_io_access(const struct dmi_header *h)
+{
+	static const char *checksum_types[] = {
+		"Word Checksum",
+		"Byte Checksum",
+		"CRC Checksum",
+		"Negative Word Checksum",	/* 0x03 */
+	};
+	int tokens = (h->length - 0x0C) / 0x05;
+	const char *str = out_of_spec;
+	u8 *data = h->data;
+	u8 *token;
+	u8 type;
+
+	pr_attr("Index Port", "0x%04hx", WORD(data + 0x04));
+	pr_attr("Data Port", "0x%04hx", WORD(data + 0x06));
+
+	type = data[0x08];
+	if (type < ARRAY_SIZE(checksum_types))
+		str = checksum_types[type];
+
+	pr_attr("Type", "%s", str);
+	pr_attr("Checked Range Start Index", "0x%02hhx", data[0x09]);
+	pr_attr("Checked Range End Index", "0x%02hhx", data[0x0a]);
+	pr_attr("Check Value Index", "0x%02hhx", data[0x0b]);
+
+	/*
+	 * Final token seems to be a terminator, so we ignore it.
+	 */
+	if (tokens <= 1)
+		return;
+
+	pr_list_start("Tokens", NULL);
+	for (int i = 0; i < tokens - 1; i++)
+	{
+		token = data + 0x0C + 0x05 * i;
+                pr_list_item("0x%04hx (location 0x%02hhx, AND mask 0x%02hhx, OR mask 0x%02hhx)",
+                             WORD(token + 0x00), token[0x02], token[0x03], token[0x04]);
+	}
+	pr_list_end();
+}
+
 static void dmi_dell_token_interface(const struct dmi_header *h)
 {
 	int tokens = (h->length - 0x0B) / 0x06;
@@ -181,6 +223,12 @@ static int dmi_decode_dell(const struct dmi_header *h)
 			pr_handle_name("Dell BIOS Flags");
 			if (h->length < 0x0C) break;
 			dmi_dell_bios_flags(QWORD(data + 0x04));
+			break;
+
+		case 212:
+			pr_handle_name("Dell Indexed I/O Access");
+			if (h->length < 0x0C) break;
+			dmi_dell_indexed_io_access(h);
 			break;
 
 		case 218:
