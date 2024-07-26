@@ -85,7 +85,6 @@
 #include "dmioem.h"
 #include "dmioutput.h"
 
-#define out_of_spec "<OUT OF SPEC>"
 static const char *bad_index = "<BAD INDEX>";
 
 enum cpuid_type cpuid_type = cpuid_none;
