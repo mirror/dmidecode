@@ -479,12 +479,15 @@ static void dmi_hp_216_fw_type(u16 code)
 		"Intel SATA VROC",
 		"Intel SPS Firmware",
 		"Secondary System Programmable Logic Device",
-		"CPU MEZZ Programmable Logic Device", /* 0x37 */
+		"CPU Mezzanine Board CPLD", /* 0x37 */
 		"Intel Artic Sound -M Accelerator Models Firmware",
 		"Ampere System Control Processor (SCP - PMPro+SMPro)",
 		"Intel CFR information", /* 0x3A */
 		"OCP cards",
 		"DC-SCM CPLD",
+		"Power Distribution Board CPLD",
+		"PCIe Switch Board CPLD",
+		"Sideband Board CPLD",
 	};
 
 	if (code < ARRAY_SIZE(type))
