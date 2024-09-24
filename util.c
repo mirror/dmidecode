@@ -186,10 +186,11 @@ void *mem_chunk(off_t base, size_t len, const char *devmem)
 	/*
 	 * Safety check: if running as root, devmem is expected to be a
 	 * character device file.
+     * TODO: Remove this check
 	 */
 	if ((fd = open(devmem, O_RDONLY)) == -1
-	 || fstat(fd, &statbuf) == -1
-	 || (geteuid() == 0 && !S_ISCHR(statbuf.st_mode)))
+	 || fstat(fd, &statbuf) == -1)
+	 // || (geteuid() == 0 && !S_ISCHR(statbuf.st_mode)))
 	{
 		fprintf(stderr, "Can't read memory from %s\n", devmem);
 		if (fd == -1)
