@@ -2192,6 +2192,10 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type)
 		case 0x21: /* PCI Express Mini */
 		case 0x22: /* PCI Express Mini */
 		case 0x23: /* PCI Express Mini */
+		case 0x24: /* PCI Express Gen 4 SFF-8639 (U.2) */
+		case 0x25: /* PCI Express Gen 5 SFF-8639 (U.2) */
+		case 0x26: /* OCP NIC 3.0 Small Form Factor (SFF) */
+		case 0x27: /* OCP NIC 3.0 Large Form Factor (LFF) */
 		case 0xA5: /* PCI Express */
 		case 0xA6: /* PCI Express */
 		case 0xA7: /* PCI Express */
@@ -2223,6 +2227,8 @@ static void dmi_slot_id(u8 code1, u8 code2, u8 type)
 		case 0xC2: /* PCI Express 5 */
 		case 0xC3: /* PCI Express 5 */
 		case 0xC4: /* PCI Express 6+ */
+		case 0xC5: /* Enterprise and Datacenter 1U E1 Form Factor Slot (EDSFF E1.S, E1.L) */
+		case 0xC6: /* Enterprise and Datacenter 3" E3 Form Factor Slot (EDSFF E3.S, E3.L) */
 			pr_attr("ID", "%u", code1);
 			break;
 		case 0x07: /* PCMCIA */
